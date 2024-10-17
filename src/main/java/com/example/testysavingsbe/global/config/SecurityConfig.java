@@ -33,10 +33,13 @@ public class SecurityConfig {
                                 .userService(customUserService)
                         )
                         .successHandler((request, response, authentication) -> {
-
+                            response.sendRedirect("/");         // baseurl
                         })
                 )
-                .logout(Customizer.withDefaults());
+                .logout(logout -> logout
+                        .logoutUrl("/logout")
+                        .logoutSuccessUrl("/")      // {baseurl 설정}
+                );
         return http.build();
     }
 }

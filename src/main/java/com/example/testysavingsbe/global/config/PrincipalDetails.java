@@ -31,4 +31,16 @@ public class PrincipalDetails implements OAuth2User {
     public String getName() {
         return this.user.getUsername();
     }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("User: [");
+        sb.append(this.getName());
+        sb.append("]");
+        sb.append("Attributes: ");
+        sb.append(this.getAttributes());
+        sb.append("]");
+        return sb.toString();
+    }
 }
