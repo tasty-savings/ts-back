@@ -39,6 +39,7 @@ public class SecurityConfig {
                 .logout(logout -> logout
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("/")      // {baseurl 설정}
+                        .permitAll()
                 );
         return http.build();
     }
