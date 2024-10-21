@@ -41,6 +41,18 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * Not Found Exception
+     */
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleNoResourceFoundException(NoResourceFoundException e) {
+        Map<String, Object> errors = new HashMap<>();
+        errors.put("code", HttpStatus.NOT_FOUND);
+        errors.put("message", e.getMessage());
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errors);
+    }
+
+    /**
      * 기타 모든 예외 처리
      */
     @ExceptionHandler(Exception.class)
