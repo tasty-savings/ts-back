@@ -56,15 +56,7 @@ public class RecipeController {
      */
     @GetMapping
     public ResponseEntity<List<RecipeResponse>> getRecipeListByQuery(@RequestParam(name = "type") String queryType, @AuthenticationPrincipal PrincipalDetails principalDetails) {
-         List<RecipeResponse> responses = handleRecipeQuery(RecipeQueryType.fromString(queryType), principalDetails.getUser());
+         List<RecipeResponse> responses  = recipeQueryUseCase.getRecipeByQuery(queryType, principalDetails.getUser());
         return ResponseEntity.ok(responses);
-    }
-
-    private List<RecipeResponse> handleRecipeQuery(RecipeQueryType recipeQueryType, User user) {
-        return switch (recipeQueryType) {
-            case BOOKMARK -> recipeQueryUseCase.getBookMarkedRecipes(user);
-            case EATEN -> recipeQueryUseCase.getEatenRecipes(user);
-            default -> throw new IllegalStateException("Unexpected value: " + recipeQueryType);
-        };
     }
 }

@@ -85,7 +85,7 @@ public class RecipeDocs extends RestDocsSupport {
     @Test
     void getRecipesByQuery() throws Exception {
 
-        when(recipeQueryUseCase.getBookMarkedRecipes(any()))
+        when(recipeQueryUseCase.getRecipeByQuery(any(), any()))
                 .thenReturn(List.of(
                         RecipeResponse.builder()
                                 .id(1L)

@@ -2,6 +2,7 @@ package com.example.testysavingsbe.domain.recipe.service;
 
 import com.example.testysavingsbe.domain.recipe.dto.response.RecipeResponse;
 import com.example.testysavingsbe.domain.recipe.entity.Recipe;
+import com.example.testysavingsbe.domain.recipe.entity.RecipeQueryType;
 import com.example.testysavingsbe.domain.recipe.repository.RecipeRepository;
 import com.example.testysavingsbe.domain.recipe.service.usecase.RecipeCommandUseCase;
 import com.example.testysavingsbe.domain.recipe.service.usecase.RecipeQueryUseCase;
@@ -54,16 +55,22 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
 
     @Override
     @Transactional(readOnly = true)
-    public List<RecipeResponse> getEatenRecipes(User user) {
+    public List<RecipeResponse> getRecipeByQuery(String type, User user) {
+        return switch (RecipeQueryType.fromString(type)) {
+            case BOOKMARK -> getBookMarkedRecipes(user);
+            case EATEN -> getEatenRecipes(user);
+            default -> throw new IllegalStateException("Unexpected value: " + type);
+        };
+    }
+
+    private List<RecipeResponse> getEatenRecipes(User user) {
         List<Recipe> eatenRecipes = recipeRepository.findAllEatenRecipeByUser(user);
         return eatenRecipes.stream()
                 .map(this::mapToRecipeResponse)
                 .toList();
     }
 
-    @Override
-    @Transactional(readOnly = true)
-    public List<RecipeResponse> getBookMarkedRecipes(User user) {
+    private List<RecipeResponse> getBookMarkedRecipes(User user) {
         List<Recipe> bookMarkedRecipes = recipeRepository.findAllBookMarkedRecipeByUser(user);
         return bookMarkedRecipes.stream()
                 .map(this::mapToRecipeResponse)
