@@ -5,18 +5,21 @@ import com.example.testysavingsbe.domain.recipe.entity.Recipe;
 import com.example.testysavingsbe.domain.recipe.repository.RecipeRepository;
 import com.example.testysavingsbe.domain.recipe.service.usecase.RecipeCommandUseCase;
 import com.example.testysavingsbe.domain.recipe.service.usecase.RecipeQueryUseCase;
+import com.example.testysavingsbe.domain.user.entity.User;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
     private final RecipeRepository recipeRepository;
 
     @Override
+    @Transactional
     public RecipeResponse generateRecipe(RecipeGenerateServiceRequest request) {
         String recipeValue = generateRecipeByAI(request.recipeName());
         Recipe recipe = Recipe.builder()
@@ -25,41 +28,57 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
                 .build();
         recipeRepository.save(recipe);
 
-        return new RecipeResponse(
-                recipe.getContent(),
-                recipe.getIsEaten(),
-                recipe.getIsBookMarked(),
-                recipe.getUser().getUsername());
+        return mapToRecipeResponse(recipe);
     }
 
     @Override
+    @Transactional
     public RecipeResponse checkEatRecipe(RecipeUpdateServiceRequest request) {
         Recipe recipe = recipeRepository.findById(request.recipeId())
                 .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 레시피입니다."));
         recipe.updateEaten();
 
-        return new RecipeResponse(
-                recipe.getContent(),
-                recipe.getIsEaten(),
-                recipe.getIsBookMarked(),
-                recipe.getUser().getUsername()
-        );
+        return mapToRecipeResponse(recipe);
     }
 
     @Override
+    @Transactional
     public RecipeResponse bookmarkRecipe(RecipeUpdateServiceRequest request) {
         Recipe recipe = recipeRepository.findById(request.recipeId())
                 .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 레시피입니다."));
         recipe.updateBookMarked();
 
-        return new RecipeResponse(
-                recipe.getContent(),
-                recipe.getIsEaten(),
-                recipe.getIsBookMarked(),
-                recipe.getUser().getUsername()
-        );
+        return mapToRecipeResponse(recipe);
     }
 
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<RecipeResponse> getEatenRecipes(User user) {
+        List<Recipe> eatenRecipes = recipeRepository.findAllEatenRecipeByUser(user);
+        return eatenRecipes.stream()
+                .map(this::mapToRecipeResponse)
+                .toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<RecipeResponse> getBookMarkedRecipes(User user) {
+        List<Recipe> bookMarkedRecipes = recipeRepository.findAllBookMarkedRecipeByUser(user);
+        return bookMarkedRecipes.stream()
+                .map(this::mapToRecipeResponse)
+                .toList();
+    }
+
+    private RecipeResponse mapToRecipeResponse(Recipe recipe) {
+        return RecipeResponse.builder()
+                .id(recipe.getId())
+                .content(recipe.getContent())
+                .isEaten(recipe.getIsEaten())
+                .isBookMarked(recipe.getIsBookMarked())
+                .userName(recipe.getUser().getUsername())
+                .build();
+    }
 
     // TODO AI 모델 완성시 연결
     private String generateRecipeByAI(String recipeName) {
