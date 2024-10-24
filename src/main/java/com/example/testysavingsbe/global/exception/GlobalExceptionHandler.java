@@ -16,7 +16,7 @@ import java.util.Map;
 public class GlobalExceptionHandler {
 
     /**
-     * IllegalArgumentException 및 BadRequestException 처리
+     * 잘못된 인자로 접근할경우 예외처리
      */
     @ExceptionHandler({IllegalArgumentException.class, BadRequestException.class, EntityNotFoundException.class})
     public ResponseEntity<Map<String, Object>> handleIllegalArgumentException(IllegalArgumentException e) {
@@ -41,7 +41,7 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * Not Found Exception
+     * Not Found 예외 처리
      */
     @ExceptionHandler(NoResourceFoundException.class)
     public ResponseEntity<Map<String, Object>> handleNoResourceFoundException(NoResourceFoundException e) {
