@@ -11,14 +11,10 @@ ifndef::snippets[]
 :snippets: ../../build/generated-snippets
 endif::[]
 
-= Common
-
-== 공통 API 응답 포맷
-
-== 응답 상태 코드 및 메세지
-
-
 = API
 
 == Kakao Login & Log out
 include::api/auth/Oauth.adoc[]
+
+== Recipe API
+include::api/recipe/recipe-api.adoc[]
