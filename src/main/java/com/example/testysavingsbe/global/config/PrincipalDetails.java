@@ -1,6 +1,7 @@
 package com.example.testysavingsbe.global.config;
 
 import com.example.testysavingsbe.domain.user.entity.User;
+import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
@@ -9,12 +10,17 @@ import java.util.List;
 import java.util.Map;
 
 public class PrincipalDetails implements OAuth2User {
+    @Getter
     private final User user;
     private final Map<String, Object> attributes;
 
     public PrincipalDetails(User user , Map<String, Object> attributes) {
         this.user = user;
         this.attributes = attributes;
+    }
+
+    public Long getUserId(){
+        return this.user.getId();
     }
 
     @Override
