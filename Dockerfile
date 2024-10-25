@@ -1,5 +1,5 @@
 # Step 1: Build the application with Gradle
-FROM gradle:8.9.0-jdk17 AS build
+FROM gradle:8.10.2-jdk17 AS build
 
 # Work directory inside the container
 WORKDIR /app
