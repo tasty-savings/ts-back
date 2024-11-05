@@ -13,8 +13,11 @@ public class Recipe {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column
     private String content;
+    @Column
     private Boolean isEaten;
+    @Column
     private Boolean isBookMarked;
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;
