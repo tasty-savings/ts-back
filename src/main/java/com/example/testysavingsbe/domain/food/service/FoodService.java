@@ -1,6 +1,7 @@
 package com.example.testysavingsbe.domain.food.service;
 
 import com.example.testysavingsbe.domain.food.dto.FoodResponse;
+import com.example.testysavingsbe.domain.food.dto.SearchFoodResponse;
 import com.example.testysavingsbe.domain.food.entity.Food;
 import com.example.testysavingsbe.domain.food.entity.FoodInfo;
 import com.example.testysavingsbe.domain.food.entity.SavingType;
@@ -20,6 +21,16 @@ import java.util.List;
 public class FoodService implements FoodQueryUseCase, FoodCommandUseCase {
     private final FoodRepository foodRepository;
     private final FoodInfoRepository foodTypeRepository;
+
+    @Override
+    public List<SearchFoodResponse> searchFood(String foodName) {
+        List<FoodInfo> byNameContaining = foodTypeRepository.findByNameContaining(foodName);
+        return byNameContaining.stream()
+                .map(info ->
+                        new SearchFoodResponse(info.getName(), info.getFoodType().toString())
+                ).toList();
+    }
+
 
     @Override
     @Transactional

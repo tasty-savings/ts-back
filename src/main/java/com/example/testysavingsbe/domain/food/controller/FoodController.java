@@ -3,6 +3,8 @@ package com.example.testysavingsbe.domain.food.controller;
 import com.example.testysavingsbe.domain.food.dto.FoodRegisterRequest;
 import com.example.testysavingsbe.domain.food.dto.FoodResponse;
 import com.example.testysavingsbe.domain.food.dto.FoodUpdateRequest;
+import com.example.testysavingsbe.domain.food.dto.SearchFoodResponse;
+import com.example.testysavingsbe.domain.food.service.FoodService;
 import com.example.testysavingsbe.domain.food.service.usecase.FoodCommandUseCase;
 import com.example.testysavingsbe.domain.food.service.usecase.FoodQueryUseCase;
 import com.example.testysavingsbe.global.config.PrincipalDetails;
@@ -19,6 +21,11 @@ import java.util.List;
 public class FoodController {
     private final FoodCommandUseCase foodCommandUseCase;
     private final FoodQueryUseCase foodQueryUseCase;
+
+    @GetMapping("/search")
+    public ResponseEntity<List<SearchFoodResponse>> search(@RequestParam(name = "food") String foodName) {
+        return ResponseEntity.ok(foodQueryUseCase.searchFood(foodName));
+    }
 
     @GetMapping("/my_foods")
     public ResponseEntity<List<FoodResponse>> getAllFood(@AuthenticationPrincipal PrincipalDetails principal) {
