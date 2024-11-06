@@ -16,7 +16,9 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
+    @Column(name = "username")
     private String username;
+    @Column(name = "social_id")
     private Long socialId;
 
     @Builder

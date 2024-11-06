@@ -1,91 +1,47 @@
 == Recipe
 
 == 메뉴이름으로 레시피 생성
-
 === HTTP request
-
 include::{snippets}/Recipe/create/menu/http-request.adoc[]
-
 === Request Fields
-
 include::{snippets}/Recipe/create/menu/request-fields.adoc[]
-
 === Request body
-
 include::{snippets}/Recipe/create/menu/request-body.adoc[]
-
 === Response Fields
-
 include::{snippets}/Recipe/create/menu/response-fields.adoc[]
-
 === Response body
-
 include::{snippets}/Recipe/create/menu/response-body.adoc[]
 
 == 북마크 or 먹은 레시피 가져오기
-
 === HTTP request
-
 include::{snippets}/Recipe/get/http-request.adoc[]
-
 === Request Query Parameter
-
 include::{snippets}/Recipe/get/query-parameters.adoc[]
-
-=== Request body
-
-include::{snippets}/Recipe/get/request-body.adoc[]
-
 === Response Fields
-
 include::{snippets}/Recipe/get/response-fields.adoc[]
-
 === Response body
-
 include::{snippets}/Recipe/get/response-body.adoc[]
 
 == 레시피 북마크
-
 === HTTP request
-
 include::{snippets}/Recipe/update/bookmark/http-request.adoc[]
-
 === Request Path Parameter
-
 include::{snippets}/Recipe/update/bookmark/path-parameters.adoc[]
-
 === Request body
-
 include::{snippets}/Recipe/update/bookmark/request-body.adoc[]
-
 === Response Fields
-
 include::{snippets}/Recipe/update/bookmark/response-fields.adoc[]
-
 === Response body
-
 include::{snippets}/Recipe/update/bookmark/response-body.adoc[]
 
 == 레시피 먹기 체크
-
 === HTTP request
-
 include::{snippets}/Recipe/update/eat/http-request.adoc[]
-
 === Request Path Parameter
-
 include::{snippets}/Recipe/update/eat/path-parameters.adoc[]
-
-=== Request body
-
-include::{snippets}/Recipe/update/eat/request-body.adoc[]
-
 === Response Fields
-
 include::{snippets}/Recipe/update/eat/response-fields.adoc[]
-
 === Response body
-
 include::{snippets}/Recipe/update/eat/response-body.adoc[]
 
 

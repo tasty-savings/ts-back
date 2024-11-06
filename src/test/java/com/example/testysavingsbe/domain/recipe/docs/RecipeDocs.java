@@ -84,7 +84,6 @@ public class RecipeDocs extends RestDocsSupport {
     @DisplayName("북마크 OR 먹은 레시피 가져오기")
     @Test
     void getRecipesByQuery() throws Exception {
-
         when(recipeQueryUseCase.getRecipeByQuery(any(), any()))
                 .thenReturn(List.of(
                         RecipeResponse.builder()
