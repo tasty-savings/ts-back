@@ -1,7 +1,7 @@
 package com.example.testysavingsbe.domain.food.service;
 
+import com.example.testysavingsbe.domain.food.dto.FoodInfoDto;
 import com.example.testysavingsbe.domain.food.dto.FoodResponse;
-import com.example.testysavingsbe.domain.food.dto.SearchFoodResponse;
 import com.example.testysavingsbe.domain.food.entity.Food;
 import com.example.testysavingsbe.domain.food.entity.FoodInfo;
 import com.example.testysavingsbe.domain.food.entity.SavingType;
@@ -11,6 +11,7 @@ import com.example.testysavingsbe.domain.food.service.usecase.FoodCommandUseCase
 import com.example.testysavingsbe.domain.food.service.usecase.FoodQueryUseCase;
 import com.example.testysavingsbe.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,22 +21,21 @@ import java.util.List;
 @RequiredArgsConstructor
 public class FoodService implements FoodQueryUseCase, FoodCommandUseCase {
     private final FoodRepository foodRepository;
-    private final FoodInfoRepository foodTypeRepository;
+    private final FoodInfoRepository foodInfoRepository;
 
-    @Override
-    public List<SearchFoodResponse> searchFood(String foodName) {
-        List<FoodInfo> byNameContaining = foodTypeRepository.findByNameContaining(foodName);
+    @Cacheable(cacheNames = "foodSearchCache", key = "#foodName")
+    public List<FoodInfoDto> searchFood(String foodName) {
+        List<FoodInfo> byNameContaining = foodInfoRepository.findByNameContaining(foodName);
         return byNameContaining.stream()
                 .map(info ->
-                        new SearchFoodResponse(info.getName(), info.getFoodType().toString())
+                        new FoodInfoDto(info.getName(), null)
                 ).toList();
     }
-
 
     @Override
     @Transactional
     public FoodResponse registerFood(User user, RegisterFoodRequest request) {
-        FoodInfo foodInfo = foodTypeRepository.findByName(request.foodName()).orElse(null);
+        FoodInfo foodInfo = foodInfoRepository.findByName(request.foodName()).orElse(null);
 
         Food food = Food.builder()
                 .foodName(request.foodName())

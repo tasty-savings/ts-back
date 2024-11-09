@@ -1,7 +1,7 @@
 package com.example.testysavingsbe.domain.food.service.usecase;
 
+import com.example.testysavingsbe.domain.food.dto.FoodInfoDto;
 import com.example.testysavingsbe.domain.food.dto.FoodResponse;
-import com.example.testysavingsbe.domain.food.dto.SearchFoodResponse;
 import com.example.testysavingsbe.domain.user.entity.User;
 
 import java.util.List;
@@ -9,5 +9,5 @@ import java.util.List;
 public interface FoodQueryUseCase {
     List<FoodResponse> getAllFoods(User user);
 
-    List<SearchFoodResponse> searchFood(String foodName);
+    List<FoodInfoDto> searchFood(String foodName);
 }
