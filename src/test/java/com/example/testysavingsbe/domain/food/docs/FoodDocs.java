@@ -72,9 +72,9 @@ public class FoodDocs extends RestDocsSupport {
                         preprocessResponse(prettyPrint()),
                         pathParameters(),
                         responseFields(
-                                fieldWithPath("[].id").type(JsonFieldType.NUMBER).description("아이디"),
+                                fieldWithPath("[].id").type(JsonFieldType.NUMBER).description("레시피 아이디"),
                                 fieldWithPath("[].foodName").type(JsonFieldType.STRING).description("음식이름"),
-                                fieldWithPath("[].savingType").type(JsonFieldType.STRING).description("저장되는 형식"),
+                                fieldWithPath("[].savingType").type(JsonFieldType.STRING).description("저장되는 형식 [FROZEN(냉동), REFRIGERATED(냉장), ROOM_TEMPERATURE(상온)]"),
                                 fieldWithPath("[].expirationDate").type(JsonFieldType.STRING).description("유통기한")
                         )
                 ));
@@ -107,7 +107,7 @@ public class FoodDocs extends RestDocsSupport {
                         preprocessResponse(prettyPrint()),
                         requestFields(
                                 fieldWithPath("foodName").type(JsonFieldType.STRING).description("음식이름"),
-                                fieldWithPath("savingType").type(JsonFieldType.STRING).description("저장되는 형식"),
+                                fieldWithPath("savingType").type(JsonFieldType.STRING).description("저장되는 형식 [FROZEN(냉동), REFRIGERATED(냉장), ROOM_TEMPERATURE(상온)]"),
                                 fieldWithPath("expirationDate").type(JsonFieldType.STRING).description("유통기한")
                         ),
                         responseFields(
@@ -158,7 +158,7 @@ public class FoodDocs extends RestDocsSupport {
                                 parameterWithName("foodId").description("음식 id")
                         ),
                         requestFields(
-                                fieldWithPath("savingType").type(JsonFieldType.STRING).description("저장되는 형식"),
+                                fieldWithPath("savingType").type(JsonFieldType.STRING).description("저장되는 형식 [FROZEN(냉동), REFRIGERATED(냉장), ROOM_TEMPERATURE(상온)]"),
                                 fieldWithPath("expirationDate").type(JsonFieldType.STRING).description("유통기한")
                         ),
                         responseFields(
