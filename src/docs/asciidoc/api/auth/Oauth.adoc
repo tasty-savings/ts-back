@@ -1,11 +1,11 @@
-== Login
+=== Login
 카카오 로그인 요청
 
-=== Request
+==== Request
 include::{snippets}/oauth2-login/httpie-request.adoc[]
 
-== Logout
-로그아웃 요청
+=== Logout
+==== Http Request
 [source,bash]
 ----
 $ http GET 'http://localhost:8080/logout'

@@ -18,6 +18,7 @@ public class FoodInfo {
     private String name;
 
     @Column(name = "food_type")
+    @Enumerated(EnumType.STRING)
     private FoodType foodType;
 
 

@@ -1,24 +1,31 @@
 package com.example.testysavingsbe.domain.food.controller;
 
-import com.example.testysavingsbe.domain.food.dto.FoodRegisterRequest;
-import com.example.testysavingsbe.domain.food.dto.FoodResponse;
-import com.example.testysavingsbe.domain.food.dto.FoodUpdateRequest;
+import com.example.testysavingsbe.domain.food.dto.*;
+import com.example.testysavingsbe.domain.food.service.FoodService;
 import com.example.testysavingsbe.domain.food.service.usecase.FoodCommandUseCase;
 import com.example.testysavingsbe.domain.food.service.usecase.FoodQueryUseCase;
 import com.example.testysavingsbe.global.config.PrincipalDetails;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/food")
 public class FoodController {
     private final FoodCommandUseCase foodCommandUseCase;
     private final FoodQueryUseCase foodQueryUseCase;
+
+
+    @GetMapping("/search")
+    public ResponseEntity<List<FoodInfoDto>> search(@RequestParam(name = "food") String foodName) {
+        return ResponseEntity.ok(foodQueryUseCase.searchFood(foodName));
+    }
 
     @GetMapping("/my_foods")
     public ResponseEntity<List<FoodResponse>> getAllFood(@AuthenticationPrincipal PrincipalDetails principal) {
