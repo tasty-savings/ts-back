@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 
 
@@ -23,6 +24,7 @@ public class SecurityConfig {
                         .requestMatchers("/healthcheck/userinfo").authenticated()
                         .requestMatchers("/recipe/**").authenticated()
                         .requestMatchers("/recipes/**").authenticated()
+                        .requestMatchers("/userinfo/prefer").authenticated()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .anyRequest().permitAll()
                 )
@@ -41,7 +43,13 @@ public class SecurityConfig {
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("/")      // {baseurl 설정}
                         .permitAll()
+                )
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                        .invalidSessionUrl("/login/oauth2/code")
+                        .maximumSessions(1)
                 );
+
         return http.build();
     }
 }
