@@ -2,13 +2,13 @@ package com.example.testysavingsbe.domain.recipe.controller;
 
 import com.example.testysavingsbe.domain.recipe.dto.request.RecipeSearchByMenuNameRequest;
 import com.example.testysavingsbe.domain.recipe.dto.response.RecipeResponse;
-import com.example.testysavingsbe.domain.recipe.entity.RecipeQueryType;
+import com.example.testysavingsbe.domain.recipe.entity.RecommendedRecipe;
 import com.example.testysavingsbe.domain.recipe.service.usecase.RecipeCommandUseCase;
 import com.example.testysavingsbe.domain.recipe.service.usecase.RecipeQueryUseCase;
-import com.example.testysavingsbe.domain.user.entity.User;
 import com.example.testysavingsbe.global.config.PrincipalDetails;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +21,38 @@ import java.util.List;
 public class RecipeController {
     private final RecipeCommandUseCase recipeCommandUseCase;
     private final RecipeQueryUseCase recipeQueryUseCase;
+
+    // 내가 저장한 레시피 전부 가져오기
+    @GetMapping("/all")
+    public ResponseEntity<Page<RecipeResponse>> getSavedRecipe(@AuthenticationPrincipal PrincipalDetails principalDetails){
+        Page<RecipeResponse> recipes = recipeQueryUseCase.getRecipes(principalDetails.getUser(), 0, 10);
+         return ResponseEntity.ok(recipes);
+    }
+
+    /* todo 추천된 레시피 가져오기
+    * RAG를 통해 추천된 레시피 전송
+    * */
+    @GetMapping("/recommend")
+    public ResponseEntity<?> getRecommendedRecipe(@AuthenticationPrincipal PrincipalDetails principalDetails){
+        Page<RecommendedRecipe> response = recipeQueryUseCase.getRecommendedRecipe(principalDetails.getUser(), 0, 10);
+
+        return ResponseEntity.ok(response.getContent());
+    }
+
+    /*
+    * 냉장고 파먹기
+    *
+    * */
+    public ResponseEntity<?> getRecommendedRecipes(@AuthenticationPrincipal PrincipalDetails principalDetails){
+//        recipeQueryUseCase.getRecommendedRecipe(principalDetails.getUser());
+
+        return ResponseEntity.ok(null);
+    }
+
+    /* todo 레시피 편집
+    * 레시피 단락 별로 인공지능을 이용해서 편집한다.
+    * */
+
 
     /**
      * 메뉴 이름으로 레시피 생성

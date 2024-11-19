@@ -11,6 +11,11 @@ public interface RecipeCommandUseCase {
 
     RecipeResponse bookmarkRecipe(RecipeUpdateServiceRequest request);
 
+    // todo
+    // 1. 냉장고 파먹기 기능
+    void createRecipeFromIngredients(User user);
+    // 2. 레시피 간소화
+
     record RecipeGenerateServiceRequest(
             User user,
             String recipeName
@@ -22,4 +27,5 @@ public interface RecipeCommandUseCase {
             Long recipeId
     ){
     }
+
 }
