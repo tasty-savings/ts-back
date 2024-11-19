@@ -25,4 +25,19 @@ public class UserService implements UserInfoSettingUseCase {
 
         return new UserPreferTypeResponse(request.preferredTypes());
     }
+
+
+    @Override
+    @Transactional
+    public List<String> registerAllergy(User user, List<String> allergy) {
+        allergy.forEach(name ->{
+            Allergy allergy1 = new Allergy(name);
+            allergyRepository.save(allergy1);
+            user.registerAllergy(allergy1);
+            }
+        );
+
+        return allergy;
+    }
+
 }

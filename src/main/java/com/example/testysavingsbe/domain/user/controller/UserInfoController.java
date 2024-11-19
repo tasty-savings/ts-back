@@ -26,6 +26,17 @@ public class UserInfoController {
                                                    @Valid @RequestBody SetUserTypesRequest request){
         UserPreferTypeResponse userPreferTypeResponse = userInfoSettingUseCase.registerPreferType(new UserInfoSettingUseCase.
                 SettingPreferTypeRequest(principal.getUser(), request.types()));
-        return ResponseEntity.ok(userPreferTypeResponse);
+        return ResponseEntity.status(HttpStatus.CREATED).body(userPreferTypeResponse);
+    }
+
+
+    // todo
+    // 1. 알러지 받기
+    @PostMapping("/allergy")
+    public ResponseEntity<RegisteredAllergyResponse> registerAllergy(@AuthenticationPrincipal PrincipalDetails principal,
+                                             @RequestBody RegisterAllergyRequest request
+    ){
+        List<String> allergy = userInfoSettingUseCase.registerAllergy(principal.getUser(), request.allergy());
+        return ResponseEntity.status(HttpStatus.CREATED).body(new RegisteredAllergyResponse(allergy));
     }
 }
