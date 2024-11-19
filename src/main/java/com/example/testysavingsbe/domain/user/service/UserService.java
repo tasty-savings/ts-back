@@ -40,4 +40,18 @@ public class UserService implements UserInfoSettingUseCase {
         return allergy;
     }
 
+
+    @Override
+    @Transactional
+    public String updateSpicyLevel(User user, SpicyLevel level) {
+        user.updateSpicyLevel(level);
+        return level.getDisplayName();
+    }
+
+    @Override
+    @Transactional
+    public String updateCookingLevel(User user, CookingLevel level) {
+        user.updateCookingLevel(level);
+        return level.getDisplayName();
+    }
 }

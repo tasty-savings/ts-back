@@ -1,18 +1,27 @@
 package com.example.testysavingsbe.domain.user.controller;
 
+import com.example.testysavingsbe.domain.user.dto.request.RegisterAllergyRequest;
 import com.example.testysavingsbe.domain.user.dto.request.SetUserTypesRequest;
+import com.example.testysavingsbe.domain.user.dto.response.RegisteredAllergyResponse;
+import com.example.testysavingsbe.domain.user.dto.response.UserCookingLevelResponse;
 import com.example.testysavingsbe.domain.user.dto.response.UserPreferTypeResponse;
+import com.example.testysavingsbe.domain.user.dto.response.UserSpicyLevelResponse;
+import com.example.testysavingsbe.domain.user.entity.CookingLevel;
+import com.example.testysavingsbe.domain.user.entity.SpicyLevel;
 import com.example.testysavingsbe.domain.user.service.UserInfoSettingUseCase;
 import com.example.testysavingsbe.global.config.PrincipalDetails;
 import jakarta.validation.Valid;
+import lombok.ConfigurationKeys;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.BadRequestException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
 
 @Validated
 @RequestMapping("/userinfo")
@@ -39,4 +48,25 @@ public class UserInfoController {
         List<String> allergy = userInfoSettingUseCase.registerAllergy(principal.getUser(), request.allergy());
         return ResponseEntity.status(HttpStatus.CREATED).body(new RegisteredAllergyResponse(allergy));
     }
+
+
+    @PutMapping("/settings/spicy-level")
+    public ResponseEntity<UserSpicyLevelResponse> updateUserSpicyLevel(@AuthenticationPrincipal PrincipalDetails principal,
+                                                  @RequestParam("value") int spicyLevel
+    ) throws BadRequestException {
+        if (spicyLevel < 0 || spicyLevel > 5) throw new BadRequestException("Spicy level must be between 0 and 5");
+        String response = userInfoSettingUseCase.updateSpicyLevel(principal.getUser(), SpicyLevel.of(spicyLevel));
+
+        return ResponseEntity.ok(new UserSpicyLevelResponse(response));
+    }
+
+    @PutMapping("/settings/cooking-level")
+    public ResponseEntity<UserCookingLevelResponse> updateUserCookingLevel(@AuthenticationPrincipal PrincipalDetails principal,
+                                                                           @RequestParam("value") String cookingLevel
+    ){
+        String response = userInfoSettingUseCase.updateCookingLevel(principal.getUser(), CookingLevel.fromDisplayName(cookingLevel));
+        return ResponseEntity.ok(new UserCookingLevelResponse(response));
+    }
+
+
 }

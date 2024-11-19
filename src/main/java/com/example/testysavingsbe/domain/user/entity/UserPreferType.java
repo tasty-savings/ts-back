@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 
+
 @Entity
 @NoArgsConstructor
 public class UserPreferType {
@@ -12,14 +13,15 @@ public class UserPreferType {
     private Long id;
 
     @Column(name = "type_name")
-    private String typeName;
+    @Enumerated(EnumType.STRING)
+    private PreferType type;
 
     @ManyToOne
     private User user;
 
     @Builder
-    public UserPreferType(String typeName, User user) {
-        this.typeName = typeName;
+    public UserPreferType(PreferType type, User user) {
+        this.type = type;
         this.user = user;
     }
 }
