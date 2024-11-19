@@ -26,8 +26,7 @@ public class SecurityConfig {
                         .requestMatchers("/healthcheck/userinfo").authenticated()
                         .requestMatchers("/recipe/**").authenticated()
                         .requestMatchers("/recipes/**").authenticated()
-                        .requestMatchers("/userinfo/prefer").authenticated()
-                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        .requestMatchers("/userinfo/**").authenticated()
                         .anyRequest().permitAll()
                 )
                 .oauth2Login(oauth2 -> oauth2

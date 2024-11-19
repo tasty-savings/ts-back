@@ -6,6 +6,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.HashSet;
+import java.util.Set;
+
 
 @Entity
 @Getter
@@ -20,6 +23,17 @@ public class User {
     private String username;
     @Column(name = "social_id")
     private Long socialId;
+
+    // 추가 할 거
+    @Enumerated(EnumType.STRING)
+    private CookingLevel cookingLevel;
+
+    @Enumerated(EnumType.STRING)
+    private SpicyLevel spicyLevel;
+
+    // todo 이후 알러지 정보는 DB에 등록해서 관리할 예정
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private Set<Allergy> allergy;
 
     @Builder
     public User(String username, Long socialId) {
