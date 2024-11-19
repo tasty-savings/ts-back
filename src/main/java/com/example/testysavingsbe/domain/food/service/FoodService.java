@@ -2,6 +2,7 @@ package com.example.testysavingsbe.domain.food.service;
 
 import com.example.testysavingsbe.domain.food.dto.FoodInfoDto;
 import com.example.testysavingsbe.domain.food.dto.FoodResponse;
+import com.example.testysavingsbe.domain.food.dto.FoodUpdateRequest;
 import com.example.testysavingsbe.domain.food.entity.Food;
 import com.example.testysavingsbe.domain.food.entity.FoodInfo;
 import com.example.testysavingsbe.domain.food.entity.SavingType;

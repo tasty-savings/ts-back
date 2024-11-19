@@ -29,7 +29,7 @@ import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.oauth2Login;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-public class RecipeDocs extends RestDocsSupport {
+public class CustomRecipeDocs extends RestDocsSupport {
     private final RecipeQueryUseCase recipeQueryUseCase = mock(RecipeQueryUseCase.class);
     private final RecipeCommandUseCase recipeCommandUseCase = mock(RecipeCommandUseCase.class);
 

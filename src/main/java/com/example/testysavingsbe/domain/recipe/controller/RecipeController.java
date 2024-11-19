@@ -2,7 +2,7 @@ package com.example.testysavingsbe.domain.recipe.controller;
 
 import com.example.testysavingsbe.domain.recipe.dto.request.RecipeSearchByMenuNameRequest;
 import com.example.testysavingsbe.domain.recipe.dto.response.RecipeResponse;
-import com.example.testysavingsbe.domain.recipe.entity.RecommendedRecipe;
+import com.example.testysavingsbe.domain.recipe.entity.Recipe;
 import com.example.testysavingsbe.domain.recipe.service.usecase.RecipeCommandUseCase;
 import com.example.testysavingsbe.domain.recipe.service.usecase.RecipeQueryUseCase;
 import com.example.testysavingsbe.global.config.PrincipalDetails;
@@ -34,14 +34,13 @@ public class RecipeController {
     * */
     @GetMapping("/recommend")
     public ResponseEntity<?> getRecommendedRecipe(@AuthenticationPrincipal PrincipalDetails principalDetails){
-        Page<RecommendedRecipe> response = recipeQueryUseCase.getRecommendedRecipe(principalDetails.getUser(), 0, 10);
+        Page<Recipe> response = recipeQueryUseCase.getRecommendedRecipe(principalDetails.getUser(), 0, 10);
 
         return ResponseEntity.ok(response.getContent());
     }
 
-    /*
+    /**
     * 냉장고 파먹기
-    *
     * */
     public ResponseEntity<?> getRecommendedRecipes(@AuthenticationPrincipal PrincipalDetails principalDetails){
 //        recipeQueryUseCase.getRecommendedRecipe(principalDetails.getUser());
@@ -55,7 +54,21 @@ public class RecipeController {
 
 
     /**
+    * 단일 레시피 가져오기
+     * @param principalDetails
+    * */
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getRecipe(@AuthenticationPrincipal PrincipalDetails principalDetails,
+                                       @PathVariable("id") String id
+    ){
+        recipeQueryUseCase.getRecipeById(principalDetails.getUser(), id);
+        return ResponseEntity.ok(null);
+    }
+
+    /**
      * 메뉴 이름으로 레시피 생성
+     * @param principalDetails
+     * @param request
      */
     @PostMapping
     public ResponseEntity<RecipeResponse> getRecipeByMenuName(@AuthenticationPrincipal PrincipalDetails principalDetails, @RequestBody @Valid RecipeSearchByMenuNameRequest request) {

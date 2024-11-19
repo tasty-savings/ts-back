@@ -1,10 +1,9 @@
 package com.example.testysavingsbe.domain.recipe.service;
 
-import com.example.testysavingsbe.domain.recipe.dto.LeftoverCookingRequest;
 import com.example.testysavingsbe.domain.recipe.dto.response.RecipeResponse;
-import com.example.testysavingsbe.domain.recipe.entity.Recipe;
+import com.example.testysavingsbe.domain.recipe.entity.CustomRecipe;
 import com.example.testysavingsbe.domain.recipe.entity.RecipeQueryType;
-import com.example.testysavingsbe.domain.recipe.entity.RecommendedRecipe;
+import com.example.testysavingsbe.domain.recipe.entity.Recipe;
 import com.example.testysavingsbe.domain.recipe.repository.RecipeRepository;
 import com.example.testysavingsbe.domain.recipe.repository.RecommendRecipeRepository;
 import com.example.testysavingsbe.domain.recipe.service.usecase.RecipeCommandUseCase;
@@ -19,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -30,33 +30,33 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
     @Transactional
     public RecipeResponse generateRecipe(RecipeGenerateServiceRequest request) {
         String recipeValue = generateRecipeByAI(request.recipeName());
-        Recipe recipe = Recipe.builder()
+        CustomRecipe customRecipe = CustomRecipe.builder()
                 .user(request.user())
                 .content(recipeValue)
                 .build();
-        recipeRepository.save(recipe);
+        recipeRepository.save(customRecipe);
 
-        return mapToRecipeResponse(recipe);
+        return mapToRecipeResponse(customRecipe);
     }
 
     @Override
     @Transactional
     public RecipeResponse checkEatRecipe(RecipeUpdateServiceRequest request) {
-        Recipe recipe = recipeRepository.findById(request.recipeId())
+        CustomRecipe customRecipe = recipeRepository.findById(request.recipeId())
                 .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 레시피입니다."));
-        recipe.updateEaten();
+        customRecipe.updateEaten();
 
-        return mapToRecipeResponse(recipe);
+        return mapToRecipeResponse(customRecipe);
     }
 
     @Override
     @Transactional
     public RecipeResponse bookmarkRecipe(RecipeUpdateServiceRequest request) {
-        Recipe recipe = recipeRepository.findById(request.recipeId())
+        CustomRecipe customRecipe = recipeRepository.findById(request.recipeId())
                 .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 레시피입니다."));
-        recipe.updateBookMarked();
+        customRecipe.updateBookMarked();
 
-        return mapToRecipeResponse(recipe);
+        return mapToRecipeResponse(customRecipe);
     }
 
 
@@ -105,38 +105,44 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
     @Override
     public Page<RecipeResponse> getRecipes(User user, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<Recipe> allByUser = recipeRepository.findAllByUser(user, pageable);
+        Page<CustomRecipe> allByUser = recipeRepository.findAllByUser(user, pageable);
         return allByUser.map(this::mapToRecipeResponse);
     }
 
     @Override
-    public Page<RecommendedRecipe> getRecommendedRecipe(User user, int page, int size) {
+    public Page<Recipe> getRecommendedRecipe(User user, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<RecommendedRecipe> all = recipeRecommendRepository.findAll(pageable);
-        return all;
+        Page<Recipe> response = recipeRecommendRepository.findAll(pageable);
+        return response;
+    }
+
+    @Override
+    public Recipe getRecipeById(User user, String id) {
+        Recipe recipe = recipeRecommendRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("존재하지 않는 레시피입니다."));
+        return recipe;
     }
 
     private List<RecipeResponse> getEatenRecipes(User user) {
-        List<Recipe> eatenRecipes = recipeRepository.findAllEatenRecipeByUser(user);
-        return eatenRecipes.stream()
+        List<CustomRecipe> eatenCustomRecipes = recipeRepository.findAllEatenRecipeByUser(user);
+        return eatenCustomRecipes.stream()
                 .map(this::mapToRecipeResponse)
                 .toList();
     }
 
     private List<RecipeResponse> getBookMarkedRecipes(User user) {
-        List<Recipe> bookMarkedRecipes = recipeRepository.findAllBookMarkedRecipeByUser(user);
-        return bookMarkedRecipes.stream()
+        List<CustomRecipe> bookMarkedCustomRecipes = recipeRepository.findAllBookMarkedRecipeByUser(user);
+        return bookMarkedCustomRecipes.stream()
                 .map(this::mapToRecipeResponse)
                 .toList();
     }
 
-    private RecipeResponse mapToRecipeResponse(Recipe recipe) {
+    private RecipeResponse mapToRecipeResponse(CustomRecipe customRecipe) {
         return RecipeResponse.builder()
-                .id(recipe.getId())
-                .content(recipe.getContent())
-                .isEaten(recipe.getIsEaten())
-                .isBookMarked(recipe.getIsBookMarked())
-                .userName(recipe.getUser().getUsername())
+                .id(customRecipe.getId())
+                .content(customRecipe.getContent())
+                .isEaten(customRecipe.getIsEaten())
+                .isBookMarked(customRecipe.getIsBookMarked())
+                .userName(customRecipe.getUser().getUsername())
                 .build();
     }
 
@@ -144,6 +150,5 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
     private String generateRecipeByAI(String recipeName) {
         return "Recipe Name: " + recipeName + "\n" + "This recipe generated by AI model";
     }
-
 
 }

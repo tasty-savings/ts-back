@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 
 
-class RecipeTest {
+class CustomRecipeTest {
     @Nested
     @DisplayName("updateEaten()은 ")
     class UpdateIsEaten {
@@ -18,35 +18,35 @@ class RecipeTest {
         void updateIsEatenToTrue() {
             // given
             User mockUser = mock(User.class);
-            Recipe recipe = Recipe.builder()
+            CustomRecipe customRecipe = CustomRecipe.builder()
                     .content("Test Content")
                     .user(mockUser)
                     .build();
 
             // when
-            recipe.updateEaten();
+            customRecipe.updateEaten();
 
             // then
-            assertEquals("Test Content", recipe.getContent());
-            assertTrue(recipe.getIsEaten());
+            assertEquals("Test Content", customRecipe.getContent());
+            assertTrue(customRecipe.getIsEaten());
         }
 
         @DisplayName("2번 사용시 원래대로 상태가 돌아온다.")
         @Test
         void updateIsEatenTwice() {
             User mockUser = mock(User.class);
-            Recipe recipe = Recipe.builder()
+            CustomRecipe customRecipe = CustomRecipe.builder()
                     .content("Test Content")
                     .user(mockUser)
                     .build();
 
             // when
-            recipe.updateBookMarked();
-            recipe.updateBookMarked();
+            customRecipe.updateBookMarked();
+            customRecipe.updateBookMarked();
 
             // then
-            assertEquals("Test Content", recipe.getContent());
-            assertFalse(recipe.getIsBookMarked());
+            assertEquals("Test Content", customRecipe.getContent());
+            assertFalse(customRecipe.getIsBookMarked());
         }
 
     }
@@ -58,17 +58,17 @@ class RecipeTest {
         @Test
         void updateIsBookmarkedToTrue() {
             User mockUser = mock(User.class);
-            Recipe recipe = Recipe.builder()
+            CustomRecipe customRecipe = CustomRecipe.builder()
                     .content("Test Content")
                     .user(mockUser)
                     .build();
 
             // when
-            recipe.updateBookMarked();
+            customRecipe.updateBookMarked();
 
             // then
-            assertEquals("Test Content", recipe.getContent());
-            assertTrue(recipe.getIsBookMarked());
+            assertEquals("Test Content", customRecipe.getContent());
+            assertTrue(customRecipe.getIsBookMarked());
         }
     }
 }

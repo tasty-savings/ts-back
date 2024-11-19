@@ -1,6 +1,6 @@
 package com.example.testysavingsbe.domain.recipe.repository;
 
-import com.example.testysavingsbe.domain.recipe.entity.Recipe;
+import com.example.testysavingsbe.domain.recipe.entity.CustomRecipe;
 import com.example.testysavingsbe.domain.user.entity.User;
 import com.example.testysavingsbe.domain.user.repository.UserRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -16,7 +16,7 @@ import static org.mockito.Mockito.mock;
 
 
 @DataJpaTest
-class RecipeRepositoryTest {
+class CustomRecipeRepositoryTest {
     @Autowired
     private RecipeRepository recipeRepository;
     @Autowired
@@ -24,7 +24,7 @@ class RecipeRepositoryTest {
 
     @Nested
     @DisplayName("findAllEatenRecipe() ")
-    class FindAllEatenRecipeTest {
+    class FindAllEatenCustomRecipeTest {
 
         @DisplayName("먹었다고 체크한 레시피만 가져온다")
         @Test
@@ -35,43 +35,43 @@ class RecipeRepositoryTest {
             userRepository.save(mockUser);
             userRepository.save(anotherUser);
 
-            Recipe eatenRecipe = Recipe.builder()
+            CustomRecipe eatenCustomRecipe = CustomRecipe.builder()
                     .user(mockUser)
                     .content("recipe content")
                     .build();
-            Recipe eatenRecipe2 = Recipe.builder()
+            CustomRecipe eatenCustomRecipe2 = CustomRecipe.builder()
                     .user(mockUser)
                     .content("recipe content2")
                     .build();
 
-            Recipe defaultRecipe = Recipe.builder()
+            CustomRecipe defaultCustomRecipe = CustomRecipe.builder()
                     .user(mockUser)
                     .content("Default recipe content")
                     .build();
 
-            Recipe anotherUserRecipe = Recipe.builder()
+            CustomRecipe anotherUserCustomRecipe = CustomRecipe.builder()
                     .user(anotherUser)
                     .content("another User recipe content")
                     .build();
 
-            eatenRecipe.updateEaten();
-            eatenRecipe2.updateEaten();
-            anotherUserRecipe.updateEaten();
+            eatenCustomRecipe.updateEaten();
+            eatenCustomRecipe2.updateEaten();
+            anotherUserCustomRecipe.updateEaten();
 
-            recipeRepository.save(eatenRecipe);
-            recipeRepository.save(eatenRecipe2);
-            recipeRepository.save(defaultRecipe);
-            recipeRepository.save(anotherUserRecipe);
+            recipeRepository.save(eatenCustomRecipe);
+            recipeRepository.save(eatenCustomRecipe2);
+            recipeRepository.save(defaultCustomRecipe);
+            recipeRepository.save(anotherUserCustomRecipe);
 
 
             // when
-            List<Recipe> recipeList = recipeRepository.findAllEatenRecipeByUser(mockUser);
+            List<CustomRecipe> customRecipeList = recipeRepository.findAllEatenRecipeByUser(mockUser);
 
             // then
-            assertThat(recipeList).isNotEmpty();
-            assertThat(recipeList.size()).isEqualTo(2);
-            assertThat(recipeList).allMatch(recipe -> recipe.getIsEaten().equals(true));
-            assertThat(recipeList).allMatch(recipe -> recipe.getUser().equals(mockUser));
+            assertThat(customRecipeList).isNotEmpty();
+            assertThat(customRecipeList.size()).isEqualTo(2);
+            assertThat(customRecipeList).allMatch(customRecipe -> customRecipe.getIsEaten().equals(true));
+            assertThat(customRecipeList).allMatch(customRecipe -> customRecipe.getUser().equals(mockUser));
         }
 
         @DisplayName("없는 경우 사이즈가 0인 리스트를 반환한다")
@@ -80,28 +80,28 @@ class RecipeRepositoryTest {
             // given
             User mockUser = mock(User.class);
             userRepository.save(mockUser);
-            Recipe notEaten = Recipe.builder()
+            CustomRecipe notEaten = CustomRecipe.builder()
                     .user(mockUser)
                     .content("recipe content")
                     .build();
-            Recipe defaultRecipe = Recipe.builder()
+            CustomRecipe defaultCustomRecipe = CustomRecipe.builder()
                     .user(mockUser)
                     .content("Default recipe content")
                     .build();
             recipeRepository.save(notEaten);
-            recipeRepository.save(defaultRecipe);
+            recipeRepository.save(defaultCustomRecipe);
 
             // when
-            List<Recipe> recipeList = recipeRepository.findAllEatenRecipeByUser(mockUser);
+            List<CustomRecipe> customRecipeList = recipeRepository.findAllEatenRecipeByUser(mockUser);
 
             // then
-            assertThat(recipeList).isEmpty();
+            assertThat(customRecipeList).isEmpty();
         }
     }
 
     @DisplayName("findAllBookMarkedRecipeByUser() ")
     @Nested
-    class FindAllBookMarkedRecipeTest {
+    class FindAllBookMarkedCustomRecipeTest {
 
         @DisplayName("북마크된 레시피만 가져온다")
         @Test
@@ -112,42 +112,42 @@ class RecipeRepositoryTest {
             userRepository.save(mockUser);
             userRepository.save(anotherUser);
 
-            Recipe eatenRecipe = Recipe.builder()
+            CustomRecipe eatenCustomRecipe = CustomRecipe.builder()
                     .user(mockUser)
                     .content("recipe content")
                     .build();
-            Recipe eatenRecipe2 = Recipe.builder()
+            CustomRecipe eatenCustomRecipe2 = CustomRecipe.builder()
                     .user(mockUser)
                     .content("recipe content2")
                     .build();
 
-            Recipe defaultRecipe = Recipe.builder()
+            CustomRecipe defaultCustomRecipe = CustomRecipe.builder()
                     .user(mockUser)
                     .content("Default recipe content")
                     .build();
 
-            Recipe anotherMockUser = Recipe.builder()
+            CustomRecipe anotherMockUser = CustomRecipe.builder()
                     .user(anotherUser)
                     .content("another Bookmarked Mock User Recipe")
                     .build();
 
-            eatenRecipe.updateBookMarked();
-            eatenRecipe2.updateBookMarked();
+            eatenCustomRecipe.updateBookMarked();
+            eatenCustomRecipe2.updateBookMarked();
             anotherMockUser.updateBookMarked();
-            recipeRepository.save(eatenRecipe);
-            recipeRepository.save(eatenRecipe2);
-            recipeRepository.save(defaultRecipe);
+            recipeRepository.save(eatenCustomRecipe);
+            recipeRepository.save(eatenCustomRecipe2);
+            recipeRepository.save(defaultCustomRecipe);
             recipeRepository.save(anotherMockUser);
 
 
             // when
-            List<Recipe> recipeList = recipeRepository.findAllBookMarkedRecipeByUser(mockUser);
+            List<CustomRecipe> customRecipeList = recipeRepository.findAllBookMarkedRecipeByUser(mockUser);
 
             // then
-            assertThat(recipeList).isNotEmpty();
-            assertThat(recipeList.size()).isEqualTo(2);
-            assertThat(recipeList).allMatch(recipe -> recipe.getIsBookMarked().equals(true));
-            assertThat(recipeList).allMatch(recipe -> recipe.getUser().equals(mockUser));
+            assertThat(customRecipeList).isNotEmpty();
+            assertThat(customRecipeList.size()).isEqualTo(2);
+            assertThat(customRecipeList).allMatch(customRecipe -> customRecipe.getIsBookMarked().equals(true));
+            assertThat(customRecipeList).allMatch(customRecipe -> customRecipe.getUser().equals(mockUser));
         }
 
         @DisplayName("먹었다고 체크한 레시피가 없을경우 빈 리스트를 반환한다")
@@ -156,22 +156,22 @@ class RecipeRepositoryTest {
             // given
             User mockUser = mock(User.class);
             userRepository.save(mockUser);
-            Recipe notEaten = Recipe.builder()
+            CustomRecipe notEaten = CustomRecipe.builder()
                     .user(mockUser)
                     .content("recipe content")
                     .build();
-            Recipe defaultRecipe = Recipe.builder()
+            CustomRecipe defaultCustomRecipe = CustomRecipe.builder()
                     .user(mockUser)
                     .content("Default recipe content")
                     .build();
             recipeRepository.save(notEaten);
-            recipeRepository.save(defaultRecipe);
+            recipeRepository.save(defaultCustomRecipe);
 
             // when
-            List<Recipe> recipeList = recipeRepository.findAllBookMarkedRecipeByUser(mockUser);
+            List<CustomRecipe> customRecipeList = recipeRepository.findAllBookMarkedRecipeByUser(mockUser);
 
             // then
-            assertThat(recipeList).isEmpty();
+            assertThat(customRecipeList).isEmpty();
 
         }
 
