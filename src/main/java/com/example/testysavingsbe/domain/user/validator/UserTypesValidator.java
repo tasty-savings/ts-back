@@ -1,4 +1,4 @@
-package com.example.testysavingsbe.domain.user.dto.validator;
+package com.example.testysavingsbe.domain.user.validator;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;

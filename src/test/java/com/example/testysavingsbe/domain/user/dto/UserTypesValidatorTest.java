@@ -1,6 +1,6 @@
 package com.example.testysavingsbe.domain.user.dto;
 
-import com.example.testysavingsbe.domain.user.dto.validator.UserTypesValidator;
+import com.example.testysavingsbe.domain.user.validator.UserTypesValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
