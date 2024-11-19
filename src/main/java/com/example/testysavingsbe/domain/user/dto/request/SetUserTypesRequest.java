@@ -1,6 +1,6 @@
 package com.example.testysavingsbe.domain.user.dto.request;
 
-import com.example.testysavingsbe.domain.user.dto.validator.ValidUserType;
+import com.example.testysavingsbe.domain.user.validator.ValidUserType;
 
 import java.util.List;
 
