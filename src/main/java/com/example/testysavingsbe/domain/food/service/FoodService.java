@@ -25,7 +25,7 @@ public class FoodService implements FoodQueryUseCase, FoodCommandUseCase {
     private final FoodInfoRepository foodInfoRepository;
 
     @Override
-    @Cacheable(cacheNames = "foodSearchCache", key = "#foodName")
+//    @Cacheable(cacheNames = "foodSearchCache", key = "#foodName")
     public List<FoodInfoDto> searchFood(String foodName) {
         List<FoodInfo> byNameContaining = foodInfoRepository.findByNameContaining(foodName);
         return byNameContaining.stream()
