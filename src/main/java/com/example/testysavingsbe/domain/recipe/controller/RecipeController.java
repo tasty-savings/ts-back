@@ -61,8 +61,8 @@ public class RecipeController {
     public ResponseEntity<?> getRecipe(@AuthenticationPrincipal PrincipalDetails principalDetails,
                                        @PathVariable("id") String id
     ){
-        recipeQueryUseCase.getRecipeById(principalDetails.getUser(), id);
-        return ResponseEntity.ok(null);
+        Recipe recipeById = recipeQueryUseCase.getRecipeById(principalDetails.getUser(), id);
+        return ResponseEntity.ok(recipeById);
     }
 
     /**
