@@ -72,6 +72,7 @@ public class RecipeController {
      */
     @PostMapping
     public ResponseEntity<RecipeResponse> getRecipeByMenuName(@AuthenticationPrincipal PrincipalDetails principalDetails, @RequestBody @Valid RecipeSearchByMenuNameRequest request) {
+
         RecipeResponse recipeResponse = recipeCommandUseCase.generateRecipe(new RecipeCommandUseCase.RecipeGenerateServiceRequest(principalDetails.getUser(), request.menuName()));
 
         return ResponseEntity.ok().body(recipeResponse);
