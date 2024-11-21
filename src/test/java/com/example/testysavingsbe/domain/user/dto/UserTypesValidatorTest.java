@@ -4,42 +4,41 @@ import com.example.testysavingsbe.domain.user.validator.UserTypesValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.List;
+import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 
 
 class UserTypesValidatorTest {
     UserTypesValidator validator = new UserTypesValidator();
 
-    @Test
-    @DisplayName("커스텀한 유저 선호 타입 validator 성공한다.")
-    void customUserTypesValidatorWillSuccess(){
+    @ParameterizedTest
+    @MethodSource("provideTypesAndExpectedResults")
+    @DisplayName("커스텀한 유저 선호 타입 validator 테스트")
+    void customUserTypesValidatorTest(List<String> types, boolean expectedResult) {
         // given
-        List<String> types = List.of("건강식", "삶기", "죽");
         ConstraintValidatorContext context = mock(ConstraintValidatorContext.class);
+
         // when
-        boolean output =  validator.isValid(types, context);
+        boolean output = validator.isValid(types, context);
 
         // then
-        assertTrue(output);
+        assertEquals(expectedResult, output);
     }
 
-    @Test
-    @DisplayName("커스텀한 유저 선호 타입 validator 실패한다.")
-    void customUserTypesValidatorFail(){
-        // given
-        List<String> types = List.of("건강식", "돈", "");
-        ConstraintValidatorContext context = mock(ConstraintValidatorContext.class);
-        // when
-        boolean output =  validator.isValid(types, context);
-
-        // then
-        assertFalse(output);
+    static Stream<Arguments> provideTypesAndExpectedResults() {
+        return Stream.of(
+                Arguments.of(List.of("건강식", "삶기", "죽"), true),
+                Arguments.of(List.of("InvalidType1", "InvalidType2"), false),
+                Arguments.of(List.of("건강식", "UnknownType"), false)
+                // 추가 데이터
+        );
     }
-
 
 }
