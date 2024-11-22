@@ -1,14 +1,18 @@
 package com.example.testysavingsbe.domain.recipe.controller;
 
-import com.example.testysavingsbe.domain.recipe.dto.request.RecipeSearchByMenuNameRequest;
-import com.example.testysavingsbe.domain.recipe.dto.response.RecipeResponse;
+import com.example.testysavingsbe.domain.recipe.dto.request.EatRecipeRequest;
+import com.example.testysavingsbe.domain.recipe.dto.request.SaveCustomRecipeRequest;
+import com.example.testysavingsbe.domain.recipe.dto.response.IsBookmarkedResponse;
+import com.example.testysavingsbe.domain.recipe.entity.BookmarkedRecipe;
+import com.example.testysavingsbe.domain.recipe.entity.CustomRecipe;
 import com.example.testysavingsbe.domain.recipe.entity.Recipe;
+import com.example.testysavingsbe.domain.recipe.entity.UserEaten;
 import com.example.testysavingsbe.domain.recipe.service.usecase.RecipeCommandUseCase;
 import com.example.testysavingsbe.domain.recipe.service.usecase.RecipeQueryUseCase;
 import com.example.testysavingsbe.global.config.PrincipalDetails;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -22,45 +26,34 @@ public class RecipeController {
     private final RecipeCommandUseCase recipeCommandUseCase;
     private final RecipeQueryUseCase recipeQueryUseCase;
 
-    // 내가 저장한 레시피 전부 가져오기
-    @GetMapping("/all")
-    public ResponseEntity<Page<RecipeResponse>> getSavedRecipe(@AuthenticationPrincipal PrincipalDetails principalDetails){
-        Page<RecipeResponse> recipes = recipeQueryUseCase.getRecipes(principalDetails.getUser(), 0, 10);
-         return ResponseEntity.ok(recipes);
-    }
-
-    /* todo 추천된 레시피 가져오기
-    * RAG를 통해 추천된 레시피 전송
-    * */
+    /**
+     * todo 추천 레시피 가져오기
+     * user prefer 가 없을시 백엔드에서 아무거나 주기
+     * RAG를 통해 추천된 레시피 전송
+     */
     @GetMapping("/recommend")
-    public ResponseEntity<?> getRecommendedRecipe(@AuthenticationPrincipal PrincipalDetails principalDetails){
+    public ResponseEntity<?> getRecommendedRecipe(@AuthenticationPrincipal PrincipalDetails principalDetails) {
         Page<Recipe> response = recipeQueryUseCase.getRecommendedRecipe(principalDetails.getUser(), 0, 10);
 
         return ResponseEntity.ok(response.getContent());
     }
 
     /**
-    * 냉장고 파먹기
-    * */
-    public ResponseEntity<?> getRecommendedRecipes(@AuthenticationPrincipal PrincipalDetails principalDetails){
+     * todo 냉장고 파먹기
+     */
+    public ResponseEntity<?> getRecommendedRecipes(@AuthenticationPrincipal PrincipalDetails principalDetails) {
 //        recipeQueryUseCase.getRecommendedRecipe(principalDetails.getUser());
 
         return ResponseEntity.ok(null);
     }
 
-    /* todo 레시피 편집
-    * 레시피 단락 별로 인공지능을 이용해서 편집한다.
-    * */
-
-
     /**
-    * 단일 레시피 가져오기
+     * 단일 레시피 가져오기(원본)
+     *
      * @param principalDetails
-    * */
+     */
     @GetMapping("/{id}")
-    public ResponseEntity<?> getRecipe(@AuthenticationPrincipal PrincipalDetails principalDetails,
-                                       @PathVariable("id") String id
-    ){
+    public ResponseEntity<?> getRecipe(@AuthenticationPrincipal PrincipalDetails principalDetails, @PathVariable("id") String id) {
         Recipe recipeById = recipeQueryUseCase.getRecipeById(principalDetails.getUser(), id);
         return ResponseEntity.ok(recipeById);
     }
@@ -83,7 +76,6 @@ public class RecipeController {
     @PostMapping("/custom/save")
     public ResponseEntity<CustomRecipe> saveCustomRecipe(@AuthenticationPrincipal PrincipalDetails principalDetails, @RequestBody SaveCustomRecipeRequest request) {
         CustomRecipe mongoRecipe = recipeCommandUseCase.saveCustomRecipe(principalDetails.getUser(), request);
-        log.info(mongoRecipe.toString());
         return ResponseEntity.status(HttpStatus.CREATED).body(mongoRecipe);
     }
 
@@ -121,4 +113,19 @@ public class RecipeController {
         UserEaten userEaten = recipeCommandUseCase.checkEatRecipe(principalDetails.getUser(), request);
         return ResponseEntity.ok(userEaten);
     }
+
+    // todo 5. 레시피 공유하기(인증된 사용자 아니여도 접근가능, 편집 불가능)
+    public ResponseEntity<?> shareCustomRecipe() {
+        return ResponseEntity.ok(null);
+    }
+
+
+    // 최종적으로 편집 창에서 편집 완료를 누르게 되면 내 레시피로 레시피를 완료되게
+    // 2. AI 맞춤형
+    // 1. 수동으로 레시피 편집
+    /* todo 레시피 편집
+     * 레시피 단락 별로 인공지능을 이용해서 편집한다.
+     * */
+    // 내가 저장한 레시피 전부 가져오기
+
 }
