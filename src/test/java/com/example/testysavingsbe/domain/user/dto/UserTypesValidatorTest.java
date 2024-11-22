@@ -3,7 +3,6 @@ package com.example.testysavingsbe.domain.user.dto;
 import com.example.testysavingsbe.domain.user.validator.UserTypesValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -27,7 +26,6 @@ class UserTypesValidatorTest {
 
         // when
         boolean output = validator.isValid(types, context);
-
         // then
         assertEquals(expectedResult, output);
     }

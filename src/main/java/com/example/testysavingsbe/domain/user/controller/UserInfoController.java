@@ -11,7 +11,6 @@ import com.example.testysavingsbe.domain.user.entity.SpicyLevel;
 import com.example.testysavingsbe.domain.user.service.UserInfoSettingUseCase;
 import com.example.testysavingsbe.global.config.PrincipalDetails;
 import jakarta.validation.Valid;
-import lombok.ConfigurationKeys;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpStatus;
