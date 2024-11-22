@@ -23,12 +23,12 @@ public class FoodService implements FoodQueryUseCase, FoodCommandUseCase {
     private final FoodRepository foodRepository;
     private final FoodInfoRepository foodInfoRepository;
 
+    @Override
     @Cacheable(cacheNames = "foodSearchCache", key = "#foodName")
     public List<FoodInfoDto> searchFood(String foodName) {
         List<FoodInfo> byNameContaining = foodInfoRepository.findByNameContaining(foodName);
         return byNameContaining.stream()
-                .map(info ->
-                        new FoodInfoDto(info.getName(), null)
+                .map(info -> new FoodInfoDto(info.getName(), info.getFoodType().toString())
                 ).toList();
     }
 
@@ -51,6 +51,7 @@ public class FoodService implements FoodQueryUseCase, FoodCommandUseCase {
                 .id(food.getId())
                 .foodName(food.getFoodName())
                 .savingType(food.getSavingType().toString())
+                .foodType(food.getFoodInfo().getFoodType().toString())
                 .expirationDate(food.getExpirationDate())
                 .build();
     }
@@ -73,6 +74,7 @@ public class FoodService implements FoodQueryUseCase, FoodCommandUseCase {
                 .id(food.getId())
                 .foodName(food.getFoodName())
                 .savingType(food.getSavingType().toString())
+                .foodType(food.getFoodInfo().getFoodType().toString())
                 .expirationDate(food.getExpirationDate())
                 .build();
     }
@@ -91,6 +93,7 @@ public class FoodService implements FoodQueryUseCase, FoodCommandUseCase {
                 FoodResponse.builder()
                         .id(food.getId())
                         .foodName(food.getFoodName())
+                        .foodType(food.getFoodInfo().getFoodType().toString())
                         .savingType(food.getSavingType().toString())
                         .expirationDate(food.getExpirationDate())
                         .build()

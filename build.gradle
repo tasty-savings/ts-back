@@ -42,6 +42,9 @@ dependencies {
     // mysql
 //    runtimeOnly 'com.mysql:mysql-connector-j'
 
+    // mongo
+    implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
+
     // h2
     runtimeOnly 'com.h2database:h2'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'

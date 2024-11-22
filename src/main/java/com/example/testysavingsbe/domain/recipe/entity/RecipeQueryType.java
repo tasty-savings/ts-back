@@ -1,6 +1,5 @@
 package com.example.testysavingsbe.domain.recipe.entity;
 
-import java.util.function.Function;
 
 public enum RecipeQueryType {
     BOOKMARK, EATEN;

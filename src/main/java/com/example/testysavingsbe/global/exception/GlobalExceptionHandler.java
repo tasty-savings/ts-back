@@ -19,7 +19,7 @@ public class GlobalExceptionHandler {
      * 잘못된 인자로 접근할경우 예외처리
      */
     @ExceptionHandler({IllegalArgumentException.class, BadRequestException.class, EntityNotFoundException.class})
-    public ResponseEntity<Map<String, Object>> handleIllegalArgumentException(IllegalArgumentException e) {
+    public ResponseEntity<Map<String, Object>> handleIllegalArgumentException(Exception e) {
         Map<String, Object> map = new HashMap<>();
         map.put("code", HttpStatus.BAD_REQUEST);
         map.put("message", e.getMessage());

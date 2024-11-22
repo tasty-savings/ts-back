@@ -17,7 +17,7 @@ endif::[]
 include::api/auth/Oauth.adoc[]
 
 == Recipe API
-include::api/recipe/recipe-api.adoc[]
+include::api/customRecipe/customRecipe-api.adoc[]
 
 == Food API
 include::api/food/food-api.adoc[]

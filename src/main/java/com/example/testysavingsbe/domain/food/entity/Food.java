@@ -14,6 +14,7 @@ import java.time.LocalDate;
 @Getter
 @NoArgsConstructor
 public class Food {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
