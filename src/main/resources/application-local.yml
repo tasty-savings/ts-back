@@ -32,7 +32,7 @@ spring:
     type: redis
   data:
     mongodb:
-      uri: mongodb://localhost:27017/tasty-saving
+      uri: ${MONGO_URL}
     redis:
       host: ${REDIS_HOST}
       port: ${REDIS_PORT}
