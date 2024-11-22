@@ -1,41 +1,79 @@
 package com.example.testysavingsbe.domain.recipe.entity;
 
-import com.example.testysavingsbe.domain.user.entity.User;
-import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.ToString;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
-@Entity
-@NoArgsConstructor
+import java.io.Serializable;
+import java.util.List;
+
+@ToString
+@Document(collection = "custom_recipe")
 @Getter
-@Table(name = "custom_recipe")
-public class CustomRecipe {
+public class CustomRecipe implements Serializable {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    @Column
-    private String content;
-    @Column
-    private Boolean isEaten;
-    @Column
-    private Boolean isBookMarked;
-    @ManyToOne(fetch = FetchType.LAZY)
-    private User user;
+    private String id;
+
+    @Field("user_id")
+    private Long userId;
+
+    @Field("title")
+    private String title;
+
+    @Field("main_img")
+    private String mainImg;
+
+    @Field("type_key")
+    private String typeKey;
+
+    @Field("method_key")
+    private String methodKey;
+
+    @Field("servings")
+    private String servings;
+
+    @Field("cooking_time")
+    private String cookingTime;
+
+    @Field("difficulty")
+    private String difficulty;
+
+    @Field("ingredients")
+    private List<String> ingredients;
+
+    @Field("cooking_order")
+    private List<String> cookingOrder;
+
+    @Field("cooking_img")
+    private List<String> cookingImg;
+
+    @Field("hashtag")
+    private List<String> hashtag;
+
+    @Field("tips")
+    private List<String> tips;
+
+    @Field("recipe_type")
+    private List<String> recipeType;
 
     @Builder
-    public CustomRecipe(String content, User user) {
-        this.content = content;
-        this.user = user;
-        this.isEaten = false;
-        this.isBookMarked = false;
-    }
-
-    public void updateEaten(){
-        this.isEaten = !this.isEaten;
-    }
-
-    public void updateBookMarked(){
-        this.isBookMarked = !this.isBookMarked;
+    public CustomRecipe(Long userId, String title, String mainImg, String typeKey, String methodKey, String servings, String cookingTime, String difficulty, List<String> ingredients, List<String> cookingOrder, List<String> cookingImg, List<String> hashtag, List<String> tips, List<String> recipeType) {
+        this.userId = userId;
+        this.title = title;
+        this.mainImg = mainImg;
+        this.typeKey = typeKey;
+        this.methodKey = methodKey;
+        this.servings = servings;
+        this.cookingTime = cookingTime;
+        this.difficulty = difficulty;
+        this.ingredients = ingredients;
+        this.cookingOrder = cookingOrder;
+        this.cookingImg = cookingImg;
+        this.hashtag = hashtag;
+        this.tips = tips;
+        this.recipeType = recipeType;
     }
 }

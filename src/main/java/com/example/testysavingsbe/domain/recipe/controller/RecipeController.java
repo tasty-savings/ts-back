@@ -65,15 +65,27 @@ public class RecipeController {
         return ResponseEntity.ok(recipeById);
     }
 
-    /**
-     * 메뉴 이름으로 레시피 생성
-     * @param principalDetails
-     * @param request
-     */
-    @PostMapping
-    public ResponseEntity<RecipeResponse> getRecipeByMenuName(@AuthenticationPrincipal PrincipalDetails principalDetails, @RequestBody @Valid RecipeSearchByMenuNameRequest request) {
+    // todo 1. 편집 레시피 전부 가져오기
+    @GetMapping("/custom/all")
+    public ResponseEntity<List<CustomRecipe>> getRecipesByUser(@AuthenticationPrincipal PrincipalDetails details, @RequestParam(name = "page", defaultValue = "0") int page, @RequestParam(name = "page_size", defaultValue = "10") int pageSize) {
+        Page<CustomRecipe> mongoRecipeByUser = recipeQueryUseCase.getCustomRecipeByUser(details.getUser(), page, pageSize);
+        return ResponseEntity.ok(mongoRecipeByUser.getContent());
+    }
 
-        RecipeResponse recipeResponse = recipeCommandUseCase.generateRecipe(new RecipeCommandUseCase.RecipeGenerateServiceRequest(principalDetails.getUser(), request.menuName()));
+    // todo 1.1 커스텀한 레시피 상제 정보 가져오기
+    @GetMapping("/custom/{recipeId}")
+    public ResponseEntity<CustomRecipe> getCustomRecipe(@AuthenticationPrincipal PrincipalDetails principalDetails, @PathVariable(name = "recipeId") String id) {
+        CustomRecipe response = recipeQueryUseCase.getCustomRecipe(principalDetails.getUser(), id);
+        return ResponseEntity.ok(response);
+    }
+
+    // todo 2. 편집 레시피 저장
+    @PostMapping("/custom/save")
+    public ResponseEntity<CustomRecipe> saveCustomRecipe(@AuthenticationPrincipal PrincipalDetails principalDetails, @RequestBody SaveCustomRecipeRequest request) {
+        CustomRecipe mongoRecipe = recipeCommandUseCase.saveCustomRecipe(principalDetails.getUser(), request);
+        log.info(mongoRecipe.toString());
+        return ResponseEntity.status(HttpStatus.CREATED).body(mongoRecipe);
+    }
 
         return ResponseEntity.ok().body(recipeResponse);
     }
