@@ -15,6 +15,8 @@ import org.springframework.data.redis.serializer.*;
 
 import java.time.Duration;
 
+import static org.springframework.data.redis.serializer.RedisSerializationContext.SerializationPair.fromSerializer;
+
 
 @Configuration
 public class RedisConfig {
@@ -41,7 +43,7 @@ public class RedisConfig {
 
         // 특정 캐시 설정
         RedisCacheConfiguration foodSearchCacheConfig = RedisCacheConfiguration.defaultCacheConfig()
-                .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(new RedisGsonSerializer(RedisGsonSerializer.asList(FoodInfoDto.class))));
+                .serializeValuesWith(fromSerializer(new RedisGsonSerializer(RedisGsonSerializer.asList(FoodInfoDto.class))));
 
 
         return RedisCacheManager.builder(redisConnectionFactory)

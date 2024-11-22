@@ -51,7 +51,7 @@ public class RedisGsonSerializer implements RedisSerializer{
         return TypeToken.getParameterized(List.class, clazz).getType();
     }
 
-    private class UtcIsoDateAdapter implements JsonSerializer<Date>, JsonDeserializer<Date> {
+    private static class  UtcIsoDateAdapter implements JsonSerializer<Date>, JsonDeserializer<Date> {
         final String ISO_DATE_FROMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX";
         final SimpleDateFormat dateFormat;
 

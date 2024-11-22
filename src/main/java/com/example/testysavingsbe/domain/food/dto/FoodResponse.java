@@ -11,6 +11,7 @@ public record FoodResponse(
         Long id,
         String foodName,
         String savingType,
+        String foodType,
         @JsonFormat(pattern = "yyyy-MM-dd") LocalDate expirationDate
 ) {
 }

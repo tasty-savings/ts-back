@@ -5,6 +5,7 @@ import com.example.testysavingsbe.domain.food.service.FoodService;
 import com.example.testysavingsbe.domain.food.service.usecase.FoodCommandUseCase;
 import com.example.testysavingsbe.domain.food.service.usecase.FoodQueryUseCase;
 import com.example.testysavingsbe.global.config.PrincipalDetails;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +24,7 @@ public class FoodController {
 
 
     @GetMapping("/search")
-    public ResponseEntity<List<FoodInfoDto>> search(@RequestParam(name = "food") String foodName) {
+    public ResponseEntity<List<FoodInfoDto>> search(@RequestParam(name = "food") @NotBlank(message = "빈 문자열 입니다.") String foodName) {
         return ResponseEntity.ok(foodQueryUseCase.searchFood(foodName));
     }
 
