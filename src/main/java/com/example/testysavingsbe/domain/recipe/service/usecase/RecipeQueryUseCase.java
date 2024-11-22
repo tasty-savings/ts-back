@@ -13,4 +13,10 @@ public interface RecipeQueryUseCase {
     Page<Recipe> getRecommendedRecipe(User user, int page, int size);
 
     Recipe getRecipeById(User user, String id);
+
+    Page<CustomRecipe> getCustomRecipeByUser(User user, int page, int pageSize);
+
+    boolean checkBookmarked(User user, String recipeId);
+
+    List<Recipe> getBookmarkedRecipes(User user);
 }

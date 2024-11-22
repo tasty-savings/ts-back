@@ -87,25 +87,28 @@ public class RecipeController {
         return ResponseEntity.status(HttpStatus.CREATED).body(mongoRecipe);
     }
 
-        return ResponseEntity.ok().body(recipeResponse);
+    // todo 3. 레시피 북마크(원본)
+    @PutMapping("/{recipeId}/bookmark")
+    public ResponseEntity<BookmarkedRecipe> bookMarkRecipe(@AuthenticationPrincipal PrincipalDetails principalDetails, @PathVariable(name = "recipeId") String recipeId) {
+        BookmarkedRecipe bookmarkedRecipe = recipeCommandUseCase.bookmarkRecipe(principalDetails.getUser(), recipeId);
+        return ResponseEntity.ok(bookmarkedRecipe);
     }
 
-    /**
-     * 레시피 북마크
-     */
-    @PutMapping("/bookmark/{recipeId}")
-    public ResponseEntity<RecipeResponse> bookmarkRecipe(@PathVariable Long recipeId) {
-        RecipeResponse recipeResponse = recipeCommandUseCase.bookmarkRecipe(new RecipeCommandUseCase.RecipeUpdateServiceRequest(recipeId));
-        return ResponseEntity.ok().body(recipeResponse);
+    // todo 3.1 북마크했는지 조회
+    @GetMapping("/{recipeId}/bookmark")
+    public ResponseEntity<IsBookmarkedResponse> checkBookmarked(@AuthenticationPrincipal PrincipalDetails principalDetails, @PathVariable(name = "recipeId") String recipeId) {
+        boolean isBookmarked = recipeQueryUseCase.checkBookmarked(principalDetails.getUser(), recipeId);
+        IsBookmarkedResponse response = new IsBookmarkedResponse(recipeId, isBookmarked);
+
+        return ResponseEntity.ok(response);
     }
 
-    /**
-     * 레시피 먹었어요
-     */
-    @PutMapping("/eat/{recipeId}")
-    public ResponseEntity<RecipeResponse> eatRecipe(@PathVariable Long recipeId) {
-        RecipeResponse recipeResponse = recipeCommandUseCase.checkEatRecipe(new RecipeCommandUseCase.RecipeUpdateServiceRequest(recipeId));
-        return ResponseEntity.ok().body(recipeResponse);
+
+    // todo 3.2 북마크한 레시피 전부 가져오기
+    @GetMapping("/bookmark/all")
+    public ResponseEntity<List<Recipe>> getAllBookmarkedRecipes(@AuthenticationPrincipal PrincipalDetails principalDetails) {
+        List<Recipe> response = recipeQueryUseCase.getBookmarkedRecipes(principalDetails.getUser());
+        return ResponseEntity.ok(response);
     }
 
 

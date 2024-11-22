@@ -27,12 +27,10 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
     private final RecommendRecipeRepository recipeRecommendRepository;
 
     @Override
-    @Transactional
-    public RecipeResponse generateRecipe(RecipeGenerateServiceRequest request) {
-        String recipeValue = generateRecipeByAI(request.recipeName());
-        CustomRecipe customRecipe = CustomRecipe.builder()
-                .user(request.user())
-                .content(recipeValue)
+    public BookmarkedRecipe bookmarkRecipe(User user, String recipeId) {
+        BookmarkedRecipe bookmarkedRecipe = BookmarkedRecipe.builder()
+                .userId(user.getId())
+                .recipeId(recipeId)
                 .build();
         recipeRepository.save(customRecipe);
 
@@ -50,13 +48,21 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
     }
 
     @Override
-    @Transactional
-    public RecipeResponse bookmarkRecipe(RecipeUpdateServiceRequest request) {
-        CustomRecipe customRecipe = recipeRepository.findById(request.recipeId())
-                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 레시피입니다."));
-        customRecipe.updateBookMarked();
+    public boolean checkBookmarked(User user, String recipeId) {
+        Optional<BookmarkedRecipe> byUserIdAndRecipeId = bookmarkedRepository.findByUserIdAndRecipeId(user.getId(), recipeId);
+        return byUserIdAndRecipeId.isPresent();
+    }
 
-        return mapToRecipeResponse(customRecipe);
+    @Override
+    public List<Recipe> getBookmarkedRecipes(User user) {
+        List<BookmarkedRecipe> allByUserId = bookmarkedRepository.findAllByUserId(user.getId());
+        List<Recipe> response = new ArrayList<>();
+        allByUserId.forEach(r -> {
+            Optional<Recipe> recipe = recipeRepository.findById(r.getRecipeId());
+            recipe.ifPresent(response::add);
+        });
+
+        return response;
     }
 
 
