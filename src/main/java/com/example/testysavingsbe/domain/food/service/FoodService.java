@@ -2,7 +2,6 @@ package com.example.testysavingsbe.domain.food.service;
 
 import com.example.testysavingsbe.domain.food.dto.FoodInfoDto;
 import com.example.testysavingsbe.domain.food.dto.FoodResponse;
-import com.example.testysavingsbe.domain.food.dto.FoodUpdateRequest;
 import com.example.testysavingsbe.domain.food.entity.Food;
 import com.example.testysavingsbe.domain.food.entity.FoodInfo;
 import com.example.testysavingsbe.domain.food.entity.SavingType;
@@ -25,7 +24,7 @@ public class FoodService implements FoodQueryUseCase, FoodCommandUseCase {
     private final FoodInfoRepository foodInfoRepository;
 
     @Override
-//    @Cacheable(cacheNames = "foodSearchCache", key = "#foodName")
+    @Cacheable(cacheNames = "foodSearchCache", key = "#foodName")
     public List<FoodInfoDto> searchFood(String foodName) {
         List<FoodInfo> byNameContaining = foodInfoRepository.findByNameContaining(foodName);
         return byNameContaining.stream()
@@ -52,6 +51,7 @@ public class FoodService implements FoodQueryUseCase, FoodCommandUseCase {
                 .id(food.getId())
                 .foodName(food.getFoodName())
                 .savingType(food.getSavingType().toString())
+                .foodType(food.getFoodInfo().getFoodType().toString())
                 .expirationDate(food.getExpirationDate())
                 .build();
     }
@@ -74,6 +74,7 @@ public class FoodService implements FoodQueryUseCase, FoodCommandUseCase {
                 .id(food.getId())
                 .foodName(food.getFoodName())
                 .savingType(food.getSavingType().toString())
+                .foodType(food.getFoodInfo().getFoodType().toString())
                 .expirationDate(food.getExpirationDate())
                 .build();
     }
@@ -92,6 +93,7 @@ public class FoodService implements FoodQueryUseCase, FoodCommandUseCase {
                 FoodResponse.builder()
                         .id(food.getId())
                         .foodName(food.getFoodName())
+                        .foodType(food.getFoodInfo().getFoodType().toString())
                         .savingType(food.getSavingType().toString())
                         .expirationDate(food.getExpirationDate())
                         .build()
