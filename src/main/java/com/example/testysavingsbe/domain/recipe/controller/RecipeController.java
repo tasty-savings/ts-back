@@ -112,12 +112,13 @@ public class RecipeController {
     }
 
 
-    /**
-     * 북마크 or 먹은 레시피 전체 가져오기
-     */
-    @GetMapping
-    public ResponseEntity<List<RecipeResponse>> getRecipeListByQuery(@RequestParam(name = "type") String queryType, @AuthenticationPrincipal PrincipalDetails principalDetails) {
-         List<RecipeResponse> responses  = recipeQueryUseCase.getRecipeByQuery(queryType, principalDetails.getUser());
-        return ResponseEntity.ok(responses);
+    // todo 4. 레시피 먹기 기능(커스텀 + 원본)
+    @PutMapping("/{recipeId}/eat")
+    public ResponseEntity<UserEaten> eatRecipe(@AuthenticationPrincipal PrincipalDetails principalDetails,
+                                       @PathVariable(name = "recipeId") String recipeId,
+                                       @RequestParam(name = "type") String recipeType) {    // [original, custom]
+        EatRecipeRequest request = new EatRecipeRequest(recipeId, recipeType);
+        UserEaten userEaten = recipeCommandUseCase.checkEatRecipe(principalDetails.getUser(), request);
+        return ResponseEntity.ok(userEaten);
     }
 }
