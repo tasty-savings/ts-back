@@ -2,6 +2,8 @@ package com.example.testysavingsbe.domain.recipe.controller;
 
 import com.example.testysavingsbe.domain.recipe.dto.request.EatRecipeRequest;
 import com.example.testysavingsbe.domain.recipe.dto.request.SaveCustomRecipeRequest;
+import com.example.testysavingsbe.domain.recipe.dto.request.UseAllIngredientsRequest;
+import com.example.testysavingsbe.domain.recipe.dto.response.AIRecipeResponse;
 import com.example.testysavingsbe.domain.recipe.dto.response.IsBookmarkedResponse;
 import com.example.testysavingsbe.domain.recipe.entity.BookmarkedRecipe;
 import com.example.testysavingsbe.domain.recipe.entity.CustomRecipe;
@@ -23,6 +25,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/recipe")
 public class RecipeController {
+
     private final RecipeCommandUseCase recipeCommandUseCase;
     private final RecipeQueryUseCase recipeQueryUseCase;
 
@@ -32,19 +35,37 @@ public class RecipeController {
      * RAG를 통해 추천된 레시피 전송
      */
     @GetMapping("/recommend")
-    public ResponseEntity<?> getRecommendedRecipe(@AuthenticationPrincipal PrincipalDetails principalDetails) {
-        Page<Recipe> response = recipeQueryUseCase.getRecommendedRecipe(principalDetails.getUser(), 0, 10);
+    public ResponseEntity<?> getRecommendedRecipe(
+        @AuthenticationPrincipal PrincipalDetails principalDetails) {
+        Page<Recipe> response = recipeQueryUseCase.getRecommendedRecipe(principalDetails.getUser(),
+            0, 10);
 
         return ResponseEntity.ok(response.getContent());
     }
 
     /**
-     * todo 냉장고 파먹기
+     * 레시피 단축하기
      */
-    public ResponseEntity<?> getRecommendedRecipes(@AuthenticationPrincipal PrincipalDetails principalDetails) {
-//        recipeQueryUseCase.getRecommendedRecipe(principalDetails.getUser());
 
-        return ResponseEntity.ok(null);
+    /**
+     * 냉장고 파먹기
+     */
+    @PostMapping("/custom/ai/generate")
+    public ResponseEntity<?> createRecipeFromUserIngredients(
+        @AuthenticationPrincipal PrincipalDetails principalDetails,
+        @RequestBody UseAllIngredientsRequest request
+    ) {
+        AIRecipeResponse response = recipeCommandUseCase.createRecipeFromIngredients(
+            principalDetails.getUser(),
+            RecipeCommandUseCase
+                .RecipeFromIngredientsRequest.builder()
+                .originalRecipeId(request.originalRecipeId())
+                .dislikeIngredients(request.dislikeIngredients())
+                .basicSeasoning(request.basicSeasoning())
+                .mustUseIngredients(request.mustUseIngredients())
+                .build());
+
+        return ResponseEntity.ok(response);
     }
 
     /**
@@ -53,43 +74,59 @@ public class RecipeController {
      * @param principalDetails
      */
     @GetMapping("/{id}")
-    public ResponseEntity<?> getRecipe(@AuthenticationPrincipal PrincipalDetails principalDetails, @PathVariable("id") String id) {
+    public ResponseEntity<?> getRecipe(@AuthenticationPrincipal PrincipalDetails principalDetails,
+        @PathVariable("id") String id) {
         Recipe recipeById = recipeQueryUseCase.getRecipeById(principalDetails.getUser(), id);
         return ResponseEntity.ok(recipeById);
     }
 
     // todo 1. 편집 레시피 전부 가져오기
     @GetMapping("/custom/all")
-    public ResponseEntity<List<CustomRecipe>> getRecipesByUser(@AuthenticationPrincipal PrincipalDetails details, @RequestParam(name = "page", defaultValue = "0") int page, @RequestParam(name = "page_size", defaultValue = "10") int pageSize) {
-        Page<CustomRecipe> mongoRecipeByUser = recipeQueryUseCase.getCustomRecipeByUser(details.getUser(), page, pageSize);
+    public ResponseEntity<List<CustomRecipe>> getRecipesByUser(
+        @AuthenticationPrincipal PrincipalDetails details,
+        @RequestParam(name = "page", defaultValue = "0") int page,
+        @RequestParam(name = "page_size", defaultValue = "10") int pageSize) {
+        Page<CustomRecipe> mongoRecipeByUser = recipeQueryUseCase.getCustomRecipeByUser(
+            details.getUser(), page, pageSize);
         return ResponseEntity.ok(mongoRecipeByUser.getContent());
     }
 
     // todo 1.1 커스텀한 레시피 상제 정보 가져오기
     @GetMapping("/custom/{recipeId}")
-    public ResponseEntity<CustomRecipe> getCustomRecipe(@AuthenticationPrincipal PrincipalDetails principalDetails, @PathVariable(name = "recipeId") String id) {
+    public ResponseEntity<CustomRecipe> getCustomRecipe(
+        @AuthenticationPrincipal PrincipalDetails principalDetails,
+        @PathVariable(name = "recipeId") String id) {
         CustomRecipe response = recipeQueryUseCase.getCustomRecipe(principalDetails.getUser(), id);
         return ResponseEntity.ok(response);
     }
 
     // todo 2. 편집 레시피 저장
     @PostMapping("/custom/save")
-    public ResponseEntity<CustomRecipe> saveCustomRecipe(@AuthenticationPrincipal PrincipalDetails principalDetails, @RequestBody SaveCustomRecipeRequest request) {
-        CustomRecipe mongoRecipe = recipeCommandUseCase.saveCustomRecipe(principalDetails.getUser(), request);
+    public ResponseEntity<CustomRecipe> saveCustomRecipe(
+        @AuthenticationPrincipal PrincipalDetails principalDetails,
+        @RequestBody SaveCustomRecipeRequest request) {
+        CustomRecipe mongoRecipe = recipeCommandUseCase.saveCustomRecipe(principalDetails.getUser(),
+            request);
         return ResponseEntity.status(HttpStatus.CREATED).body(mongoRecipe);
     }
 
     // todo 3. 레시피 북마크(원본)
     @PutMapping("/{recipeId}/bookmark")
-    public ResponseEntity<BookmarkedRecipe> bookMarkRecipe(@AuthenticationPrincipal PrincipalDetails principalDetails, @PathVariable(name = "recipeId") String recipeId) {
-        BookmarkedRecipe bookmarkedRecipe = recipeCommandUseCase.bookmarkRecipe(principalDetails.getUser(), recipeId);
+    public ResponseEntity<BookmarkedRecipe> bookMarkRecipe(
+        @AuthenticationPrincipal PrincipalDetails principalDetails,
+        @PathVariable(name = "recipeId") String recipeId) {
+        BookmarkedRecipe bookmarkedRecipe = recipeCommandUseCase.bookmarkRecipe(
+            principalDetails.getUser(), recipeId);
         return ResponseEntity.ok(bookmarkedRecipe);
     }
 
     // todo 3.1 북마크했는지 조회
     @GetMapping("/{recipeId}/bookmark")
-    public ResponseEntity<IsBookmarkedResponse> checkBookmarked(@AuthenticationPrincipal PrincipalDetails principalDetails, @PathVariable(name = "recipeId") String recipeId) {
-        boolean isBookmarked = recipeQueryUseCase.checkBookmarked(principalDetails.getUser(), recipeId);
+    public ResponseEntity<IsBookmarkedResponse> checkBookmarked(
+        @AuthenticationPrincipal PrincipalDetails principalDetails,
+        @PathVariable(name = "recipeId") String recipeId) {
+        boolean isBookmarked = recipeQueryUseCase.checkBookmarked(principalDetails.getUser(),
+            recipeId);
         IsBookmarkedResponse response = new IsBookmarkedResponse(recipeId, isBookmarked);
 
         return ResponseEntity.ok(response);
@@ -98,7 +135,8 @@ public class RecipeController {
 
     // todo 3.2 북마크한 레시피 전부 가져오기
     @GetMapping("/bookmark/all")
-    public ResponseEntity<List<Recipe>> getAllBookmarkedRecipes(@AuthenticationPrincipal PrincipalDetails principalDetails) {
+    public ResponseEntity<List<Recipe>> getAllBookmarkedRecipes(
+        @AuthenticationPrincipal PrincipalDetails principalDetails) {
         List<Recipe> response = recipeQueryUseCase.getBookmarkedRecipes(principalDetails.getUser());
         return ResponseEntity.ok(response);
     }
@@ -106,11 +144,13 @@ public class RecipeController {
 
     // todo 4. 레시피 먹기 기능(커스텀 + 원본)
     @PutMapping("/{recipeId}/eat")
-    public ResponseEntity<UserEaten> eatRecipe(@AuthenticationPrincipal PrincipalDetails principalDetails,
-                                       @PathVariable(name = "recipeId") String recipeId,
-                                       @RequestParam(name = "type") String recipeType) {    // [original, custom]
+    public ResponseEntity<UserEaten> eatRecipe(
+        @AuthenticationPrincipal PrincipalDetails principalDetails,
+        @PathVariable(name = "recipeId") String recipeId,
+        @RequestParam(name = "type") String recipeType) {    // [original, custom]
         EatRecipeRequest request = new EatRecipeRequest(recipeId, recipeType);
-        UserEaten userEaten = recipeCommandUseCase.checkEatRecipe(principalDetails.getUser(), request);
+        UserEaten userEaten = recipeCommandUseCase.checkEatRecipe(principalDetails.getUser(),
+            request);
         return ResponseEntity.ok(userEaten);
     }
 
@@ -118,7 +158,6 @@ public class RecipeController {
     public ResponseEntity<?> shareCustomRecipe() {
         return ResponseEntity.ok(null);
     }
-
 
     // 최종적으로 편집 창에서 편집 완료를 누르게 되면 내 레시피로 레시피를 완료되게
     // 2. AI 맞춤형
