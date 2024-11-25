@@ -10,8 +10,8 @@ import com.example.testysavingsbe.domain.recipe.entity.CustomRecipe;
 import com.example.testysavingsbe.domain.recipe.entity.Recipe;
 import com.example.testysavingsbe.domain.recipe.entity.UserEaten;
 import com.example.testysavingsbe.domain.recipe.service.usecase.RecipeCommandUseCase;
-import com.example.testysavingsbe.domain.recipe.service.usecase.RecipeCommandUseCase.RecipeFromIngredientsRequest;
 import com.example.testysavingsbe.domain.recipe.service.usecase.RecipeQueryUseCase;
+import com.example.testysavingsbe.domain.recipe.service.usecase.RecipeQueryUseCase.RecipeFromIngredientsRequest;
 import com.example.testysavingsbe.global.config.PrincipalDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -47,17 +47,27 @@ public class RecipeController {
     /**
      * 레시피 단축하기
      */
+    @GetMapping("/custom/simplify/{recipeId}")
+    public ResponseEntity<AIChangeRecipeResponse> simplifyRecipe(
+        @AuthenticationPrincipal PrincipalDetails principalDetails,
+        @PathVariable("recipeId") String recipeId) {
+        AIChangeRecipeResponse response = recipeQueryUseCase.simplifyRecipe(
+            principalDetails.getUser(), recipeId);
+
+        return ResponseEntity.ok(response);
+    }
+
 
     /**
      * 냉장고 파먹기
      */
     @PostMapping("/custom/ai/generate")
-    public ResponseEntity<?> createRecipeFromUserIngredients(
+    public ResponseEntity<AIChangeRecipeResponse> createRecipeFromUserIngredients(
         @AuthenticationPrincipal PrincipalDetails principalDetails,
         @RequestBody UseAllIngredientsRequest request
     ) {
 
-        AIChangeRecipeResponse response = recipeCommandUseCase.createRecipeFromIngredients(
+        AIChangeRecipeResponse response = recipeQueryUseCase.createRecipeFromIngredients(
             principalDetails.getUser(),
             RecipeFromIngredientsRequest.builder()
                 .originalRecipeId(request.originalRecipeId())
