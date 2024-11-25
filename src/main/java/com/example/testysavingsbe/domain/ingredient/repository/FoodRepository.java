@@ -1,6 +1,6 @@
-package com.example.testysavingsbe.domain.food.repository;
+package com.example.testysavingsbe.domain.ingredient.repository;
 
-import com.example.testysavingsbe.domain.food.entity.Food;
+import com.example.testysavingsbe.domain.ingredient.entity.Food;
 import com.example.testysavingsbe.domain.user.entity.User;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;

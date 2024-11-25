@@ -1,4 +1,4 @@
-package com.example.testysavingsbe.domain.recipe.dto;
+package com.example.testysavingsbe.domain.recipe.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;

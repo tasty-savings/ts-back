@@ -1,4 +1,4 @@
-package com.example.testysavingsbe.domain.food.dto;
+package com.example.testysavingsbe.domain.ingredient.dto;
 
 import java.time.LocalDate;
 

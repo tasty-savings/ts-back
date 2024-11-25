@@ -1,9 +1,8 @@
-package com.example.testysavingsbe.domain.food.controller;
+package com.example.testysavingsbe.domain.ingredient.controller;
 
-import com.example.testysavingsbe.domain.food.dto.*;
-import com.example.testysavingsbe.domain.food.service.FoodService;
-import com.example.testysavingsbe.domain.food.service.usecase.FoodCommandUseCase;
-import com.example.testysavingsbe.domain.food.service.usecase.FoodQueryUseCase;
+import com.example.testysavingsbe.domain.ingredient.dto.*;
+import com.example.testysavingsbe.domain.ingredient.service.usecase.FoodCommandUseCase;
+import com.example.testysavingsbe.domain.ingredient.service.usecase.FoodQueryUseCase;
 import com.example.testysavingsbe.global.config.PrincipalDetails;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;

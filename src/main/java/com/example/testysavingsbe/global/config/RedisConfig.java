@@ -1,6 +1,6 @@
 package com.example.testysavingsbe.global.config;
 
-import com.example.testysavingsbe.domain.food.dto.FoodInfoDto;
+import com.example.testysavingsbe.domain.ingredient.dto.FoodInfoDto;
 import com.example.testysavingsbe.global.redis.serializer.RedisGsonSerializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
