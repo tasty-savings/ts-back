@@ -43,11 +43,17 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
     private final WebClient aiWebClient;
 
     @Override
-    public BookmarkedRecipe bookmarkRecipe(User user, String recipeId) {
-        BookmarkedRecipe bookmarkedRecipe = BookmarkedRecipe.builder()
-            .userId(user.getId())
-            .recipeId(recipeId)
-            .build();
+    public BookmarkedRecipe bookmarkRecipe(User user, String recipeId){
+        Optional<BookmarkedRecipe> byUserIdAndRecipeId = bookmarkedRepository.findByUserIdAndRecipeId(
+            user.getId(), recipeId);
+
+        if (byUserIdAndRecipeId.isPresent()){
+            throw new IllegalStateException("북마크된 레시피입니다.");
+        }
+
+
+        BookmarkedRecipe bookmarkedRecipe = BookmarkedRecipe.builder().userId(user.getId())
+            .recipeId(recipeId).build();
 
         bookmarkedRepository.save(bookmarkedRecipe);
 
