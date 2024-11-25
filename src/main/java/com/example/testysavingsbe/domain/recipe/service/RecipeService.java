@@ -83,37 +83,27 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
 
     // todo
     @Override
-    public AIRecipeResponse createRecipeFromIngredients(User user,
+    public AIChangeRecipeResponse createRecipeFromIngredients(User user,
         RecipeFromIngredientsRequest request) {
         Recipe orignalRecipe = recipeRepository.findById(request.originalRecipeId())
             .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 레시피입니다."));
-        List<String> userAllergy = user.getAllergy().stream()
-            .map(Allergy::getAllergy)
-            .toList();
+        List<String> userAllergy = user.getAllergy().stream().map(Allergy::getAllergy).toList();
         List<String> userIngredients = foodRepository.findAllByUser(user).stream()
-            .map(Food::getFoodName)
-            .toList();
+            .map(Food::getFoodName).toList();
 
         Mono<LeftoverCookingRequest> aiRequest = Mono.just(
-            LeftoverCookingRequest.builder()
-                .userAllergyIngredients(userAllergy)
+            LeftoverCookingRequest.builder().userAllergyIngredients(userAllergy)
                 .userDislikeIngredients(request.dislikeIngredients())
                 .userSpicyLevel(String.valueOf(user.getSpicyLevel()))
                 .userCookingLevel(String.valueOf(user.getCookingLevel()))
-                .userOwnedIngredients(userIngredients)
-                .userBasicSeasoning(request.basicSeasoning())
-                .mustUseIngredients(request.mustUseIngredients())
-                .build()
-        );
+                .userOwnedIngredients(userIngredients).userBasicSeasoning(request.basicSeasoning())
+                .mustUseIngredients(request.mustUseIngredients()).build());
 
-        AIRecipeResponse block = aiWebClient.post()
-            .uri(urlBuilder -> urlBuilder
-                .path("/recipe")
-                .queryParam("recipe_change_type", 1)
-                .queryParam("recipe_info_index",
-                    request.originalRecipeId()) // 몽고 DB에 저장되어 있는 레시피 id
-                .build())
-            .body(aiRequest, LeftoverCookingRequest.class)
+        AIRecipeResponse after = aiWebClient.post().uri(
+                urlBuilder -> urlBuilder.path("/recipe").queryParam("recipe_change_type", 1)
+                    .queryParam("recipe_info_index",
+                        request.originalRecipeId()) // 몽고 DB에 저장되어 있는 레시피 id
+                    .build()).body(aiRequest, LeftoverCookingRequest.class)
 //                .retrieve()
             .exchangeToMono(response -> {
                 log.info("Status code: {}", response.statusCode());
@@ -123,15 +113,12 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
 //                .bodyToMono(AIRecipeResponse.class)
             .block();
 
-        OriginalRecipeResponse before = OriginalRecipeResponse.builder()
-            .id(orignalRecipe.getId())
+        OriginalRecipeResponse before = OriginalRecipeResponse.builder().id(orignalRecipe.getId())
             .title(orignalRecipe.getTitle())
-
-
             .build();
-        AIChangeRecipeResponse response = new AIChangeRecipeResponse(before, block);
+        AIChangeRecipeResponse response = new AIChangeRecipeResponse(before, after);
 
-        return block;
+        return response;
     }
 
 

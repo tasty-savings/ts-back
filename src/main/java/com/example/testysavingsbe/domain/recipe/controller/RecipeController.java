@@ -3,13 +3,14 @@ package com.example.testysavingsbe.domain.recipe.controller;
 import com.example.testysavingsbe.domain.recipe.dto.request.EatRecipeRequest;
 import com.example.testysavingsbe.domain.recipe.dto.request.SaveCustomRecipeRequest;
 import com.example.testysavingsbe.domain.recipe.dto.request.UseAllIngredientsRequest;
-import com.example.testysavingsbe.domain.recipe.dto.response.AIRecipeResponse;
+import com.example.testysavingsbe.domain.recipe.dto.response.AIChangeRecipeResponse;
 import com.example.testysavingsbe.domain.recipe.dto.response.IsBookmarkedResponse;
 import com.example.testysavingsbe.domain.recipe.entity.BookmarkedRecipe;
 import com.example.testysavingsbe.domain.recipe.entity.CustomRecipe;
 import com.example.testysavingsbe.domain.recipe.entity.Recipe;
 import com.example.testysavingsbe.domain.recipe.entity.UserEaten;
 import com.example.testysavingsbe.domain.recipe.service.usecase.RecipeCommandUseCase;
+import com.example.testysavingsbe.domain.recipe.service.usecase.RecipeCommandUseCase.RecipeFromIngredientsRequest;
 import com.example.testysavingsbe.domain.recipe.service.usecase.RecipeQueryUseCase;
 import com.example.testysavingsbe.global.config.PrincipalDetails;
 import lombok.RequiredArgsConstructor;
@@ -55,10 +56,10 @@ public class RecipeController {
         @AuthenticationPrincipal PrincipalDetails principalDetails,
         @RequestBody UseAllIngredientsRequest request
     ) {
-        AIRecipeResponse response = recipeCommandUseCase.createRecipeFromIngredients(
+
+        AIChangeRecipeResponse response = recipeCommandUseCase.createRecipeFromIngredients(
             principalDetails.getUser(),
-            RecipeCommandUseCase
-                .RecipeFromIngredientsRequest.builder()
+            RecipeFromIngredientsRequest.builder()
                 .originalRecipeId(request.originalRecipeId())
                 .dislikeIngredients(request.dislikeIngredients())
                 .basicSeasoning(request.basicSeasoning())
