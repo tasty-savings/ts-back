@@ -18,23 +18,7 @@ public interface RecipeCommandUseCase {
 
     UserEaten checkEatRecipe(User user, EatRecipeRequest request);
 
-    // todo
-    // 1. 냉장고 파먹기 기능
-    AIChangeRecipeResponse createRecipeFromIngredients(User user,
-        RecipeFromIngredientsRequest request);
-
     CustomRecipe saveCustomRecipe(User user, SaveCustomRecipeRequest request);
-    // 2. 레시피 간소화
-
-    @Builder
-    record RecipeFromIngredientsRequest(
-        String originalRecipeId,
-        List<String> dislikeIngredients,
-        List<String> basicSeasoning,
-        List<String> mustUseIngredients
-    ) {
-
-    }
 
     record RecipeGenerateServiceRequest(
         User user,
