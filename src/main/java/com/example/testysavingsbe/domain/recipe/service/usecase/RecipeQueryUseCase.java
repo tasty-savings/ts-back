@@ -1,6 +1,7 @@
 package com.example.testysavingsbe.domain.recipe.service.usecase;
 
 import com.example.testysavingsbe.domain.recipe.dto.response.AIChangeRecipeResponse;
+import com.example.testysavingsbe.domain.recipe.dto.response.EatenRecipeResponse;
 import com.example.testysavingsbe.domain.recipe.entity.CustomRecipe;
 import com.example.testysavingsbe.domain.recipe.entity.Recipe;
 import com.example.testysavingsbe.domain.user.entity.User;
@@ -18,7 +19,7 @@ public interface RecipeQueryUseCase {
 
     AIChangeRecipeResponse simplifyRecipe(User user, String recipeId);
 
-    Page<Recipe> getRecommendedRecipe(User user, int page, int size);
+    List<Recipe> getRecommendedRecipe(User user, int page, int size);
 
     Recipe getRecipeById(User user, String id);
 

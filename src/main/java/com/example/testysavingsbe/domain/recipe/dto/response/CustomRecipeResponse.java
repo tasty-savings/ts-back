@@ -1,13 +1,11 @@
 package com.example.testysavingsbe.domain.recipe.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.List;
 import lombok.Builder;
 
-import java.util.List;
-
 @Builder
-public class OriginalRecipeResponse implements RecipeResponse {
-
+public class CustomRecipeResponse implements RecipeResponse{
     @JsonProperty("id")
     String id;
 
@@ -49,5 +47,4 @@ public class OriginalRecipeResponse implements RecipeResponse {
 
     @JsonProperty("recipe_type")
     List<String> recipeType;
-
 }

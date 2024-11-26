@@ -53,7 +53,7 @@ public class UserEaten {
             this.eatenRecipes = new ArrayList<>();
         }
 
-        if (isEaten(recipeId)){
+        if (isEaten(recipeId)) {
             throw new IllegalArgumentException("Recipe with ID " + recipeId + " is already eaten.");
         }
 

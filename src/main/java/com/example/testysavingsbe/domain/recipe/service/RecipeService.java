@@ -8,6 +8,8 @@ import com.example.testysavingsbe.domain.recipe.dto.request.SaveCustomRecipeRequ
 import com.example.testysavingsbe.domain.recipe.dto.request.SimplifyRecipeToAiRequest;
 import com.example.testysavingsbe.domain.recipe.dto.response.AIChangeRecipeResponse;
 import com.example.testysavingsbe.domain.recipe.dto.response.AIRecipeResponse;
+import com.example.testysavingsbe.domain.recipe.dto.response.CustomRecipeResponse;
+import com.example.testysavingsbe.domain.recipe.dto.response.EatenRecipeResponse;
 import com.example.testysavingsbe.domain.recipe.dto.response.OriginalRecipeResponse;
 import com.example.testysavingsbe.domain.recipe.entity.*;
 import com.example.testysavingsbe.domain.recipe.entity.UserEaten.EatenRecipe;
@@ -140,7 +142,6 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
     }
 
 
-
     @Override
     public AIChangeRecipeResponse simplifyRecipe(User user, String recipeId) {
         Recipe recipe = recipeRepository.findById(recipeId)
@@ -186,7 +187,7 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
     }
 
     public List<EatenRecipeResponse> getAllEatenRecipe(User user) {
-        UserEaten userEaten = userEatenRepository.findById(user.getId())
+        UserEaten userEaten = userEatenRepository.findByUserId(user.getId())
             .orElseThrow(() -> new EntityNotFoundException("먹은 레시피가 존재하지 않습니다."));
 
         List<EatenRecipe> eatenRecipes = userEaten.getEatenRecipes();
@@ -256,8 +257,9 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
 
     @Override
     public void removeEatenRecipe(User user, String recipeId) {
-        UserEaten userEaten = userEatenRepository.findById(user.getId()).orElseThrow(() -> new EntityNotFoundException(""));
-        if (!userEaten.isEaten(recipeId)){
+        UserEaten userEaten = userEatenRepository.findById(user.getId())
+            .orElseThrow(() -> new EntityNotFoundException(""));
+        if (!userEaten.isEaten(recipeId)) {
             throw new EntityNotFoundException("먹지않은 레시피입니다.");
         }
         userEaten.deleteEatenRecipe(recipeId);
@@ -279,13 +281,50 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
             .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 레시피입니다."));
         return recipe;
     }
-    // todo
 
     @Override
-    public Page<Recipe> getRecommendedRecipe(User user, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        Page<Recipe> response = recipeRecommendRepository.findAll(pageable);
-        return response;
+    public List<Recipe> getRecommendedRecipe(User user, int page, int size) {
+        // todo 추천 레시피 기능 완성되면 적용
+        // 10개의 아이디 리스트를 가져옴
+        List<UserPreferType> userPreferTypes = userPreferTypeRepository.findAllByUser(user);
+        List<String> userPreferTypeStrings = userPreferTypes.stream()
+            .map(UserPreferType::getDisplayName).toList();
+        Map<String, List<String>> request = new HashMap<>();
+        request.put("search_types", userPreferTypeStrings);
+
+        List<String> recipeIds = aiWebClient.post()
+            .uri(uriBuilder -> uriBuilder.path("/recommend").build())
+            .bodyValue(request)
+            .retrieve()
+            .bodyToMono(new ParameterizedTypeReference<List<String>>() {
+            })
+            .block();
+
+        recipeIds.forEach(log::info);
+
+        List<Recipe> allById = recipeRepository.findAllById(recipeIds);
+
+        return allById;
+
+    }
+
+    private EatenRecipeResponse buildEatenRecipeResponse(Recipe recipe) {
+        OriginalRecipeResponse originalRecipeResponse = convertOriginalRecipeToDto(recipe);
+        return EatenRecipeResponse.builder()
+            .tag("original")
+            .data(originalRecipeResponse)
+            .build();
+
+    }
+
+    private EatenRecipeResponse buildEatenRecipeResponse(CustomRecipe customRecipe) {
+        CustomRecipeResponse customRecipeResponse = convertCustomRecipeToDto(customRecipe);
+
+        return EatenRecipeResponse.builder()
+            .tag("custom")
+            .data(customRecipeResponse)
+            .build();
+
     }
 
     private OriginalRecipeResponse convertOriginalRecipeToDto(Recipe orignalRecipe) {
@@ -307,9 +346,9 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
             .build();
     }
 
-    private EatenRecipeResponse buildEatenRecipeResponse(CustomRecipe customRecipe) {
-        return EatenRecipeResponse.builder()
-            .recipeCategory("custom")
+
+    private CustomRecipeResponse convertCustomRecipeToDto(CustomRecipe customRecipe) {
+        return CustomRecipeResponse.builder()
             .id(customRecipe.getId())
             .title(customRecipe.getTitle())
             .mainImg(customRecipe.getMainImg())
@@ -327,23 +366,4 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
             .build();
     }
 
-    private EatenRecipeResponse buildEatenRecipeResponse(Recipe recipe) {
-        return EatenRecipeResponse.builder()
-            .recipeCategory("original")
-            .id(recipe.getId())
-            .title(recipe.getTitle())
-            .mainImg(recipe.getMainImg())
-            .typeKey(recipe.getTypeKey())
-            .methodKey(recipe.getMethodKey())
-            .servings(recipe.getServings())
-            .cookingTime(recipe.getCookingTime())
-            .difficulty(recipe.getDifficulty())
-            .ingredients(recipe.getIngredients())
-            .cookingOrder(recipe.getCookingOrder())
-            .cookingImg(recipe.getCookingImg())
-            .hashtag(recipe.getHashtag())
-            .tips(recipe.getTips())
-            .recipeType(recipe.getRecipeType())
-            .build();
-    }
 }
