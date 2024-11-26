@@ -19,6 +19,10 @@ public class UserPreferType {
     @ManyToOne
     private User user;
 
+    public String getDisplayName(){
+        return this.type.getKoreanName();
+    }
+
     @Builder
     public UserPreferType(PreferType type, User user) {
         this.type = type;

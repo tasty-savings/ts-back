@@ -10,14 +10,23 @@ import com.example.testysavingsbe.domain.recipe.dto.response.AIChangeRecipeRespo
 import com.example.testysavingsbe.domain.recipe.dto.response.AIRecipeResponse;
 import com.example.testysavingsbe.domain.recipe.dto.response.OriginalRecipeResponse;
 import com.example.testysavingsbe.domain.recipe.entity.*;
+import com.example.testysavingsbe.domain.recipe.entity.UserEaten.EatenRecipe;
 import com.example.testysavingsbe.domain.recipe.repository.*;
 import com.example.testysavingsbe.domain.recipe.service.usecase.RecipeCommandUseCase;
 import com.example.testysavingsbe.domain.recipe.service.usecase.RecipeQueryUseCase;
 import com.example.testysavingsbe.domain.user.entity.Allergy;
 import com.example.testysavingsbe.domain.user.entity.User;
+import com.example.testysavingsbe.domain.user.entity.UserPreferType;
+import com.example.testysavingsbe.domain.user.repository.UserPreferTypeRepository;
 import jakarta.persistence.EntityNotFoundException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -42,6 +51,7 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
     private final RecipeRepository recipeRepository;
     private final FoodRepository foodRepository;
     private final WebClient aiWebClient;
+    private final UserPreferTypeRepository userPreferTypeRepository;
 
     @Override
     public BookmarkedRecipe bookmarkRecipe(User user, String recipeId) {
@@ -177,6 +187,50 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
         return response;
     }
 
+    public List<EatenRecipeResponse> getAllEatenRecipe(User user) {
+        UserEaten userEaten = userEatenRepository.findById(user.getId())
+            .orElseThrow(() -> new EntityNotFoundException("먹은 레시피가 존재하지 않습니다."));
+
+        List<EatenRecipe> eatenRecipes = userEaten.getEatenRecipes();
+
+        // Recipe ID와 CustomRecipe ID를 분리하여 한 번에 조회
+        Map<Boolean, List<String>> recipeIdsByType = eatenRecipes.stream()
+            .collect(Collectors.partitioningBy(
+                r -> "original".equals(r.getRecipeType()),
+                Collectors.mapping(EatenRecipe::getRecipeId, Collectors.toList())
+            ));
+
+        // 각각의 타입에 대해 일괄 조회
+        List<Recipe> recipes = recipeRepository.findAllById(recipeIdsByType.get(true));
+        List<CustomRecipe> customRecipes = customRecipeRepository.findAllById(
+            recipeIdsByType.get(false));
+
+        // 조회된 데이터를 Map으로 변환해 빠르게 접근
+        Map<String, Recipe> recipeMap = recipes.stream()
+            .collect(Collectors.toMap(Recipe::getId, Function.identity()));
+        Map<String, CustomRecipe> customRecipeMap = customRecipes.stream()
+            .collect(Collectors.toMap(CustomRecipe::getId, Function.identity()));
+
+        // 결과 생성
+        return eatenRecipes.stream()
+            .map(r -> {
+                if ("original".equals(r.getRecipeType())) {
+                    Recipe originalRecipe = recipeMap.get(r.getRecipeId());
+                    if (originalRecipe != null) {
+                        return buildEatenRecipeResponse(originalRecipe);
+                    }
+                } else {
+                    CustomRecipe customRecipe = customRecipeMap.get(r.getRecipeId());
+                    if (customRecipe != null) {
+                        return buildEatenRecipeResponse(customRecipe);
+                    }
+                }
+                return null;
+            })
+            .filter(Objects::nonNull)
+            .collect(Collectors.toList());
+    }
+
     /**
      * 유저가 커스텀한 레시피 전부 가져오기
      *
@@ -243,6 +297,46 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
             .hashtag(orignalRecipe.getHashtag())
             .tips(orignalRecipe.getTips())
             .recipeType(orignalRecipe.getRecipeType())
+            .build();
+    }
+
+    private EatenRecipeResponse buildEatenRecipeResponse(CustomRecipe customRecipe) {
+        return EatenRecipeResponse.builder()
+            .recipeCategory("custom")
+            .id(customRecipe.getId())
+            .title(customRecipe.getTitle())
+            .mainImg(customRecipe.getMainImg())
+            .typeKey(customRecipe.getTypeKey())
+            .methodKey(customRecipe.getMethodKey())
+            .servings(customRecipe.getServings())
+            .cookingTime(customRecipe.getCookingTime())
+            .difficulty(customRecipe.getDifficulty())
+            .ingredients(customRecipe.getIngredients())
+            .cookingOrder(customRecipe.getCookingOrder())
+            .cookingImg(customRecipe.getCookingImg())
+            .hashtag(customRecipe.getHashtag())
+            .tips(customRecipe.getTips())
+            .recipeType(customRecipe.getRecipeType())
+            .build();
+    }
+
+    private EatenRecipeResponse buildEatenRecipeResponse(Recipe recipe) {
+        return EatenRecipeResponse.builder()
+            .recipeCategory("original")
+            .id(recipe.getId())
+            .title(recipe.getTitle())
+            .mainImg(recipe.getMainImg())
+            .typeKey(recipe.getTypeKey())
+            .methodKey(recipe.getMethodKey())
+            .servings(recipe.getServings())
+            .cookingTime(recipe.getCookingTime())
+            .difficulty(recipe.getDifficulty())
+            .ingredients(recipe.getIngredients())
+            .cookingOrder(recipe.getCookingOrder())
+            .cookingImg(recipe.getCookingImg())
+            .hashtag(recipe.getHashtag())
+            .tips(recipe.getTips())
+            .recipeType(recipe.getRecipeType())
             .build();
     }
 }

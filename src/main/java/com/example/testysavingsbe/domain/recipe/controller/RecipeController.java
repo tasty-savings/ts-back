@@ -154,6 +154,19 @@ public class RecipeController {
 
 
     // todo 4. 레시피 먹기 기능(커스텀 + 원본)
+
+    @GetMapping("/eat/all")
+    public ResponseEntity<List<EatenRecipeResponse>> getAllEatenRecipe(
+        @AuthenticationPrincipal PrincipalDetails principalDetails
+    ) {
+        List<EatenRecipeResponse> allEatenRecipe = recipeQueryUseCase.getAllEatenRecipe(
+            principalDetails.getUser());
+
+        return ResponseEntity.ok(allEatenRecipe);
+
+    }
+
+
     @PutMapping("/{recipeId}/eat")
     public ResponseEntity<UserEaten> eatRecipe(
         @AuthenticationPrincipal PrincipalDetails principalDetails,

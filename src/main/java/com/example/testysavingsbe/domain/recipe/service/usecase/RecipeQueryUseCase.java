@@ -28,6 +28,8 @@ public interface RecipeQueryUseCase {
 
     List<Recipe> getBookmarkedRecipes(User user);
 
+    List<EatenRecipeResponse> getAllEatenRecipe(User user);
+
     @Builder
     record RecipeFromIngredientsRequest(
         String originalRecipeId,
