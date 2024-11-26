@@ -73,14 +73,12 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
 
     @Override
     public UserEaten checkEatRecipe(User user, EatRecipeRequest request) {
-        UserEaten userEaten = userEatenRepository.findById(user.getId()).orElse(
+        UserEaten userEaten = userEatenRepository.findByUserId(user.getId()).orElse(
             UserEaten.userEatenBuilder().userId(user.getId()).eatenRecipes(new ArrayList<>())
                 .build());
 
-        userEaten.getEatenRecipes().add(
-            UserEaten.EatenRecipe.emptyEatenBuilder().recipeId(request.recipeId())
-                .recipeType(request.recipeType()).createAt(LocalDateTime.now().toString()).build());
-
+        userEaten.addEatenRecipe(request.recipeId(), request.recipeType(),
+            LocalDateTime.now().toString());
         userEatenRepository.save(userEaten);
 
         return userEaten;
