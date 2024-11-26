@@ -1,4 +1,4 @@
-package com.example.testysavingsbe.domain.food.entity;
+package com.example.testysavingsbe.domain.ingredient.entity;
 
 public enum SavingType {
     ROOM_TEMPERATURE,

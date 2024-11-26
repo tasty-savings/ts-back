@@ -1,14 +1,14 @@
-package com.example.testysavingsbe.domain.food.service;
+package com.example.testysavingsbe.domain.ingredient.service;
 
-import com.example.testysavingsbe.domain.food.dto.FoodInfoDto;
-import com.example.testysavingsbe.domain.food.dto.FoodResponse;
-import com.example.testysavingsbe.domain.food.entity.Food;
-import com.example.testysavingsbe.domain.food.entity.FoodInfo;
-import com.example.testysavingsbe.domain.food.entity.SavingType;
-import com.example.testysavingsbe.domain.food.repository.FoodRepository;
-import com.example.testysavingsbe.domain.food.repository.FoodInfoRepository;
-import com.example.testysavingsbe.domain.food.service.usecase.FoodCommandUseCase;
-import com.example.testysavingsbe.domain.food.service.usecase.FoodQueryUseCase;
+import com.example.testysavingsbe.domain.ingredient.dto.FoodInfoDto;
+import com.example.testysavingsbe.domain.ingredient.dto.FoodResponse;
+import com.example.testysavingsbe.domain.ingredient.entity.Food;
+import com.example.testysavingsbe.domain.ingredient.entity.FoodInfo;
+import com.example.testysavingsbe.domain.ingredient.entity.SavingType;
+import com.example.testysavingsbe.domain.ingredient.repository.FoodRepository;
+import com.example.testysavingsbe.domain.ingredient.repository.FoodInfoRepository;
+import com.example.testysavingsbe.domain.ingredient.service.usecase.FoodCommandUseCase;
+import com.example.testysavingsbe.domain.ingredient.service.usecase.FoodQueryUseCase;
 import com.example.testysavingsbe.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;

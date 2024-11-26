@@ -16,7 +16,7 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 @Slf4j
-public class RedisGsonSerializer implements RedisSerializer{
+public class RedisGsonSerializer implements RedisSerializer {
 
     final Type type;
     final Gson gson;
@@ -25,8 +25,8 @@ public class RedisGsonSerializer implements RedisSerializer{
         log.info("<< GSON Init >>...type: {}", type);
         this.type = type;
         this.gson = new GsonBuilder()
-                .registerTypeAdapter(Date.class, new UtcIsoDateAdapter())
-                .create();
+            .registerTypeAdapter(Date.class, new UtcIsoDateAdapter())
+            .create();
     }
 
     @Override
@@ -51,7 +51,8 @@ public class RedisGsonSerializer implements RedisSerializer{
         return TypeToken.getParameterized(List.class, clazz).getType();
     }
 
-    private static class  UtcIsoDateAdapter implements JsonSerializer<Date>, JsonDeserializer<Date> {
+    private static class UtcIsoDateAdapter implements JsonSerializer<Date>, JsonDeserializer<Date> {
+
         final String ISO_DATE_FROMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX";
         final SimpleDateFormat dateFormat;
 
@@ -68,7 +69,8 @@ public class RedisGsonSerializer implements RedisSerializer{
         }
 
         @Override
-        public Date deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+        public Date deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
+            throws JsonParseException {
             try {
                 String ds = json.getAsString();
                 log.info("< Deserialize Date > {}", ds);

@@ -6,6 +6,10 @@ import jakarta.validation.Payload;
 
 import java.lang.annotation.*;
 
+
+/**
+ * 유저의 선호 타입을 판별하는 어노테이션
+*/
 @Documented
 @Constraint(validatedBy = UserTypesValidator.class)
 @Target({ElementType.FIELD, ElementType.PARAMETER})

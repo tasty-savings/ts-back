@@ -1,6 +1,6 @@
-package com.example.testysavingsbe.domain.food.service;
+package com.example.testysavingsbe.domain.ingredient.service;
 
-import com.example.testysavingsbe.domain.food.repository.FoodInfoRepository;
+import com.example.testysavingsbe.domain.ingredient.repository.FoodInfoRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
