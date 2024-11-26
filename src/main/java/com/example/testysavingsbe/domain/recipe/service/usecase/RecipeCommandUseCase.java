@@ -20,6 +20,8 @@ public interface RecipeCommandUseCase {
 
     CustomRecipe saveCustomRecipe(User user, SaveCustomRecipeRequest request);
 
+    void removeEatenRecipe(User user, String recipeId);
+
     record RecipeGenerateServiceRequest(
         User user,
         String recipeName

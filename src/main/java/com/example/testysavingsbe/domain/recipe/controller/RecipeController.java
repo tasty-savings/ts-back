@@ -180,6 +180,17 @@ public class RecipeController {
 
     // todo 5. 레시피 공유하기(인증된 사용자 아니여도 접근가능, 편집 불가능)
     public ResponseEntity<?> shareCustomRecipe() {
+
+    @DeleteMapping("/{recipeId}/eat")
+    public ResponseEntity<Void> deleteRecipe(
+        @AuthenticationPrincipal PrincipalDetails principalDetails,
+        @PathVariable String recipeId
+        ){
+        recipeCommandUseCase.removeEatenRecipe(principalDetails.getUser(), recipeId);
+
+        return ResponseEntity.noContent().build();
+    }
+
         return ResponseEntity.ok(null);
     }
 

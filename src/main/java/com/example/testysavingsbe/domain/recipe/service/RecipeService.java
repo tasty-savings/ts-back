@@ -256,6 +256,15 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
         return recipe;
     }
 
+    @Override
+    public void removeEatenRecipe(User user, String recipeId) {
+        UserEaten userEaten = userEatenRepository.findById(user.getId()).orElseThrow(() -> new EntityNotFoundException(""));
+        if (!userEaten.isEaten(recipeId)){
+            throw new EntityNotFoundException("먹지않은 레시피입니다.");
+        }
+        userEaten.deleteEatenRecipe(recipeId);
+    }
+
 
     @Override
     public CustomRecipe getCustomRecipe(User user, String id) {

@@ -12,6 +12,7 @@ import java.util.List;
 @Builder
 @Getter
 public class UserEaten {
+
     @Id
     private Long userId;
 
@@ -24,20 +25,29 @@ public class UserEaten {
         this.eatenRecipes = eatenRecipes;
     }
 
-    public boolean isEaten(String recipeId, String recipeType) {
+    public boolean isEaten(String recipeId) {
         if (this.eatenRecipes == null || this.eatenRecipes.isEmpty()) {
             return false;
         }
 
         return this.eatenRecipes.stream()
-                .anyMatch(recipe ->
-                        recipe.recipeId.equals(recipeId) &&
-                        recipe.recipeType.equals(recipeType)
-                );
+            .anyMatch(recipe ->
+                recipe.recipeId.equals(recipeId));
+    }
+
+    public void deleteEatenRecipe(String recipeId) {
+        if (this.eatenRecipes == null || this.eatenRecipes.isEmpty()) {
+            return;
+        }
+        this.eatenRecipes.stream()
+            .filter(recipe -> recipe.recipeId.equals(recipeId))
+            .findFirst()
+            .ifPresent(recipe -> this.eatenRecipes.remove(recipe));
     }
 
     @Getter
     public static class EatenRecipe {
+
         private String recipeId;
         private String recipeType;
         private String createAt;
