@@ -174,7 +174,7 @@ public class RecipeController {
     @DeleteMapping("/{recipeId}/eat")
     public ResponseEntity<Void> deleteRecipe(
         @AuthenticationPrincipal PrincipalDetails principalDetails,
-        @PathVariable String recipeId
+        @PathVariable(name = "recipeId") String recipeId
     ) {
         recipeCommandUseCase.removeEatenRecipe(principalDetails.getUser(), recipeId);
 
