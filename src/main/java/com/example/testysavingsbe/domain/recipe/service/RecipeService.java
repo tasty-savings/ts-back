@@ -146,6 +146,7 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
     public AIChangeRecipeResponse simplifyRecipe(User user, String recipeId) {
         Recipe recipe = recipeRepository.findById(recipeId)
             .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 레시피입니다."));
+
         List<String> userAllergy = user.getAllergy().stream().map(Allergy::getAllergy).toList();
 
         SimplifyRecipeToAiRequest request = new SimplifyRecipeToAiRequest(
@@ -156,7 +157,7 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
                 .queryParam("recipe_change_type", 2)
                 .queryParam("recipe_info_index", recipeId)
                 .build())
-            .body(request, AIRecipeResponse.class)
+            .body(Mono.just(request), AIRecipeResponse.class)
             .retrieve()
             .bodyToMono(AIRecipeResponse.class)
             .block();

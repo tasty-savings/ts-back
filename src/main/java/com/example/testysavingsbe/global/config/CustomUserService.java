@@ -1,5 +1,6 @@
 package com.example.testysavingsbe.global.config;
 
+import com.example.testysavingsbe.domain.user.entity.CookingLevel;
 import com.example.testysavingsbe.domain.user.entity.User;
 import com.example.testysavingsbe.domain.user.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +17,7 @@ import java.util.Optional;
 @Slf4j
 @Service
 public class CustomUserService extends DefaultOAuth2UserService {
+
     private final UserRepository userRepository;
 
     public CustomUserService(UserRepository userRepository) {
@@ -30,9 +32,10 @@ public class CustomUserService extends DefaultOAuth2UserService {
         String username = extractUsername(oAuth2User);
         if (userEntity == null) {
             userEntity = User.builder()
-                    .username(username)
-                    .socialId(socialId)
-                    .build();
+                .username(username)
+                .socialId(socialId)
+                .cookingLevel(CookingLevel.BEGINNER)
+                .build();
             userRepository.save(userEntity);
         }
         return new PrincipalDetails(userEntity, oAuth2User.getAttributes());
@@ -40,10 +43,10 @@ public class CustomUserService extends DefaultOAuth2UserService {
 
     private String extractUsername(OAuth2User oAuth2User) {
         return Optional.ofNullable(oAuth2User.getAttribute("properties"))
-                .filter(Map.class::isInstance)
-                .map(Map.class::cast)
-                .map(properties -> (String) properties.get("nickname"))
-                .orElse("Unknown");
+            .filter(Map.class::isInstance)
+            .map(Map.class::cast)
+            .map(properties -> (String) properties.get("nickname"))
+            .orElse("Unknown");
     }
 
 }

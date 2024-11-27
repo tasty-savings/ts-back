@@ -36,10 +36,12 @@ public class User {
     private Set<Allergy> allergy;
 
     @Builder
-    public User(String username, Long socialId) {
+    public User(String username, Long socialId, CookingLevel cookingLevel) {
         this.username = username;
         this.socialId = socialId;
+        this.cookingLevel = cookingLevel;
     }
+
 
     public void registerAllergy(Allergy allergy) {
         if (this.allergy == null) {
