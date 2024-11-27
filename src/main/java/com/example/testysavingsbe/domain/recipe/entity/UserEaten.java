@@ -16,7 +16,7 @@ public class UserEaten {
     @Id
     private String id;
 
-    private Long userId;
+    private final Long userId;
 
     @Field("eaten_recipes")
     private List<EatenRecipe> eatenRecipes;
@@ -67,17 +67,14 @@ public class UserEaten {
     }
 
     @Getter
-    public static class EatenRecipe {
-
-        private String recipeId;
-        private String recipeType;
-        private String createAt;
+    public record EatenRecipe(
+        String recipeId,
+        String recipeType,
+        String createAt
+    ) {
 
         @Builder(builderMethodName = "emptyEatenBuilder")
-        public EatenRecipe(String recipeId, String recipeType, String createAt) {
-            this.recipeId = recipeId;
-            this.recipeType = recipeType;
-            this.createAt = createAt;
+        public EatenRecipe {
         }
 
     }
