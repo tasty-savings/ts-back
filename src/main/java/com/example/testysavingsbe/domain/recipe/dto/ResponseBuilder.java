@@ -5,26 +5,24 @@ import com.example.testysavingsbe.domain.recipe.dto.response.EatenRecipeResponse
 import com.example.testysavingsbe.domain.recipe.dto.response.OriginalRecipeResponse;
 import com.example.testysavingsbe.domain.recipe.entity.CustomRecipe;
 import com.example.testysavingsbe.domain.recipe.entity.Recipe;
-import org.springframework.stereotype.Component;
 
 
-@Component
 public class ResponseBuilder {
 
     public static final String ORIGINAL_RECIPE_TYPE = "original";
     public static final String CUSTOM_RECIPE_TYPE = "custom";
 
-    public EatenRecipeResponse buildEatenRecipeResponse(Recipe recipe) {
+    public static EatenRecipeResponse buildEatenRecipeResponse(Recipe recipe) {
         OriginalRecipeResponse originalRecipeResponse = buildOriginalRecipeResponse(recipe);
         return EatenRecipeResponse.builder().tag(ORIGINAL_RECIPE_TYPE).data(originalRecipeResponse).build();
     }
 
-    public EatenRecipeResponse buildEatenRecipeResponse(CustomRecipe customRecipe) {
+    public static EatenRecipeResponse buildEatenRecipeResponse(CustomRecipe customRecipe) {
         CustomRecipeResponse customRecipeResponse = buildCustomRecipeResponse(customRecipe);
         return EatenRecipeResponse.builder().tag(CUSTOM_RECIPE_TYPE).data(customRecipeResponse).build();
     }
 
-    public OriginalRecipeResponse buildOriginalRecipeResponse(Recipe orignalRecipe) {
+    public static OriginalRecipeResponse buildOriginalRecipeResponse(Recipe orignalRecipe) {
         return OriginalRecipeResponse.builder().id(orignalRecipe.getId())
             .title(orignalRecipe.getTitle()).mainImg(orignalRecipe.getMainImg())
             .typeKey(orignalRecipe.getTypeKey()).methodKey(orignalRecipe.getMethodKey())
@@ -35,7 +33,7 @@ public class ResponseBuilder {
             .recipeType(orignalRecipe.getRecipeType()).build();
     }
 
-    public CustomRecipeResponse buildCustomRecipeResponse(CustomRecipe customRecipe) {
+    public static CustomRecipeResponse buildCustomRecipeResponse(CustomRecipe customRecipe) {
         return CustomRecipeResponse.builder().id(customRecipe.getId())
             .title(customRecipe.getTitle()).mainImg(customRecipe.getMainImg())
             .typeKey(customRecipe.getTypeKey()).methodKey(customRecipe.getMethodKey())
