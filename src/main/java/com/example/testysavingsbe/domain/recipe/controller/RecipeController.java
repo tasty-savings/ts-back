@@ -38,7 +38,8 @@ public class RecipeController {
     public ResponseEntity<?> getRecommendedRecipe(
         @AuthenticationPrincipal PrincipalDetails principalDetails) {
 
-        List<Recipe> response = recipeQueryUseCase.getRecommendedRecipe(principalDetails.getUser(),
+        List<OriginalRecipeResponse> response = recipeQueryUseCase.getRecommendedRecipe(
+            principalDetails.getUser(),
             0, 10);
 
         return ResponseEntity.ok(response);
@@ -140,9 +141,10 @@ public class RecipeController {
 
 
     @GetMapping("/bookmark/all")
-    public ResponseEntity<List<Recipe>> getAllBookmarkedRecipes(
+    public ResponseEntity<List<OriginalRecipeResponse>> getAllBookmarkedRecipes(
         @AuthenticationPrincipal PrincipalDetails principalDetails) {
-        List<Recipe> response = recipeQueryUseCase.getBookmarkedRecipes(principalDetails.getUser());
+        List<OriginalRecipeResponse> response = recipeQueryUseCase.getBookmarkedRecipes(
+            principalDetails.getUser());
         return ResponseEntity.ok(response);
     }
 
