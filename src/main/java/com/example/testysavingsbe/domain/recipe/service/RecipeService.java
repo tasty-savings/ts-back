@@ -119,7 +119,6 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
                 .userOwnedIngredients(userIngredients).userBasicSeasoning(request.basicSeasoning())
                 .mustUseIngredients(request.mustUseIngredients()).build());
 
-        // 요청
         AIRecipeResponse after = aiWebClient.post()
             .uri(urlBuilder -> urlBuilder.path("/recipe")
                 .queryParam("recipe_change_type", 1)
@@ -127,13 +126,11 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
                     request.originalRecipeId()) // 몽고 DB에 저장되어 있는 레시피 id
                 .build())
             .body(aiRequest, LeftoverCookingRequest.class)
-//                .retrieve()
             .exchangeToMono(response -> {
                 log.info("Status code: {}", response.statusCode());
                 log.info(response.toString());
                 return response.bodyToMono(AIRecipeResponse.class);
             })
-//                .bodyToMono(AIRecipeResponse.class)
             .block();
 
         OriginalRecipeResponse before = convertOriginalRecipeToDto(orignalRecipe);
