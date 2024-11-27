@@ -45,6 +45,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
 
+    public static final String ORIGINAL_TYPE = "original";
     private final RecipeRepository recipeRecommendRepository;
     private final CustomRecipeRepository customRecipeRepository;
     private final UserEatenRepository userEatenRepository;
@@ -64,9 +65,10 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
             throw new IllegalStateException("북마크된 레시피입니다.");
         }
 
-        BookmarkedRecipe bookmarkedRecipe = BookmarkedRecipe
-            .builder().userId(user.getId())
-            .recipeId(recipeId).build();
+        BookmarkedRecipe bookmarkedRecipe = BookmarkedRecipe.builder()
+            .userId(user.getId())
+            .recipeId(recipeId)
+            .build();
 
         bookmarkedRepository.save(bookmarkedRecipe);
 
@@ -76,11 +78,11 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
 
     @Override
     public UserEaten checkEatRecipe(User user, EatRecipeRequest request) {
-        UserEaten userEaten = userEatenRepository.findByUserId(user.getId()).orElse(
-            UserEaten.userEatenBuilder().userId(user.getId()).eatenRecipes(new ArrayList<>())
-                .build());
+        UserEaten userEaten = userEatenRepository.findByUserId(user.getId())
+            .orElse(buildUserEaten(user));
 
-        userEaten.addEatenRecipe(request.recipeId(), request.recipeType(),
+        userEaten.addEatenRecipe(request.recipeId(),
+            request.recipeType(),
             LocalDateTime.now().toString());
         userEatenRepository.save(userEaten);
 
@@ -106,20 +108,13 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
     @Override
     public AIChangeRecipeResponse createRecipeFromIngredients(User user,
         RecipeFromIngredientsRequest request) {
-        Recipe orignalRecipe = recipeRepository.findById(request.originalRecipeId())
-            .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 레시피입니다."));
-
-        List<String> userAllergy = user.getAllergy().stream().map(Allergy::getAllergy).toList();
+        Recipe orignalRecipe = returnExistOriginalRecipe(request.originalRecipeId());
+        List<String> userAllergy = getUserAllergyInfo(user);
         List<String> userIngredients = foodRepository.findAllByUser(user).stream()
             .map(Food::getFoodName).toList();
 
         Mono<LeftoverCookingRequest> aiRequest = Mono.just(
-            LeftoverCookingRequest.builder().userAllergyIngredients(userAllergy)
-                .userDislikeIngredients(request.dislikeIngredients())
-                .userSpicyLevel(String.valueOf(user.getSpicyLevel()))
-                .userCookingLevel(String.valueOf(user.getCookingLevel()))
-                .userOwnedIngredients(userIngredients).userBasicSeasoning(request.basicSeasoning())
-                .mustUseIngredients(request.mustUseIngredients()).build());
+            buildLeftoverCookingRequest(user, request, userAllergy, userIngredients));
 
         AIRecipeResponse after = aiAdapter.requestCreateRecipeUseIngredients(request,
             aiRequest);
@@ -132,16 +127,13 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
 
     @Override
     public AIChangeRecipeResponse simplifyRecipe(User user, String recipeId) {
-        Recipe recipe = recipeRepository.findById(recipeId)
-            .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 레시피입니다."));
-
-        List<String> userAllergy = user.getAllergy().stream().map(Allergy::getAllergy).toList();
+        Recipe recipe = returnExistOriginalRecipe(recipeId);
+        List<String> userAllergy = getUserAllergyInfo(user);
 
         SimplifyRecipeToAiRequest request = new SimplifyRecipeToAiRequest(userAllergy,
             user.getCookingLevel().getDisplayName());
 
         AIRecipeResponse after = aiAdapter.requestRecipeMakeSimplify(recipeId, request);
-
         OriginalRecipeResponse before = responseBuilder.buildOriginalRecipeResponse(recipe);
 
         return new AIChangeRecipeResponse(before, after);
@@ -157,18 +149,16 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
 
     @Override
     public List<OriginalRecipeResponse> getBookmarkedRecipes(User user) {
-        List<BookmarkedRecipe> allByUserId = bookmarkedRepository.findAllByUserId(user.getId());
-        List<OriginalRecipeResponse> response = new ArrayList<>();
-        allByUserId.forEach(r -> {
-            Optional<Recipe> recipe = recipeRepository.findById(r.getRecipeId());
-            if (recipe.isPresent()) {
-                OriginalRecipeResponse originalRecipeResponse = responseBuilder.buildOriginalRecipeResponse(
-                    recipe.get());
-                response.add(originalRecipeResponse);
-            }
-        });
+        List<String> recipeIds = bookmarkedRepository.findAllByUserId(user.getId())
+            .stream()
+            .map(BookmarkedRecipe::getRecipeId)
+            .collect(Collectors.toList());
 
-        return response;
+        List<Recipe> recipes = recipeRepository.findAllById(recipeIds);
+
+        return recipes.stream()
+            .map(responseBuilder::buildOriginalRecipeResponse)
+            .collect(Collectors.toList());
     }
 
     @Override
@@ -176,40 +166,17 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
         UserEaten userEaten = userEatenRepository.findByUserId(user.getId())
             .orElseThrow(() -> new EntityNotFoundException("먹은 레시피가 존재하지 않습니다."));
 
-        List<EatenRecipe> eatenRecipes = userEaten.getEatenRecipes();
+        Map<Boolean, List<String>> recipeIdsByType = classifyRecipeIdsByType(
+            userEaten.getEatenRecipes());
 
-        // Recipe ID와 CustomRecipe ID를 분리하여 한 번에 조회
-        Map<Boolean, List<String>> recipeIdsByType = eatenRecipes.stream().collect(
-            Collectors.partitioningBy(r -> "original".equals(r.getRecipeType()),
-                Collectors.mapping(EatenRecipe::getRecipeId, Collectors.toList())));
-
-        // 각각의 타입에 대해 일괄 조회
-        List<Recipe> recipes = recipeRepository.findAllById(recipeIdsByType.get(true));
-        List<CustomRecipe> customRecipes = customRecipeRepository.findAllById(
+        Map<String, Recipe> originalRecipeMap = fetchRecipesByIds(recipeIdsByType.get(true));
+        Map<String, CustomRecipe> customRecipeMap = fetchCustomRecipesByIds(
             recipeIdsByType.get(false));
 
-        // 조회된 데이터를 Map으로 변환해 빠르게 접근
-        Map<String, Recipe> recipeMap = recipes.stream()
-            .collect(Collectors.toMap(Recipe::getId, Function.identity()));
-        Map<String, CustomRecipe> customRecipeMap = customRecipes.stream()
-            .collect(Collectors.toMap(CustomRecipe::getId, Function.identity()));
-
-        // 결과 생성
-        return eatenRecipes.stream().map(r -> {
-            if ("original".equals(r.getRecipeType())) {
-                Recipe originalRecipe = recipeMap.get(r.getRecipeId());
-                if (originalRecipe != null) {
-                    return responseBuilder.buildEatenRecipeResponse(originalRecipe);
-                }
-            } else {
-                CustomRecipe customRecipe = customRecipeMap.get(r.getRecipeId());
-                if (customRecipe != null) {
-                    return responseBuilder.buildEatenRecipeResponse(customRecipe);
-                }
-            }
-            return null;
-        }).filter(Objects::nonNull).collect(Collectors.toList());
+        return buildEatenRecipeResponses(userEaten.getEatenRecipes(), originalRecipeMap,
+            customRecipeMap);
     }
+
 
     /**
      * 유저가 커스텀한 레시피 전부 가져오기
@@ -225,19 +192,8 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
     @Override
     public CustomRecipe saveCustomRecipe(User user, SaveCustomRecipeRequest request) {
         CustomRecipe recipe = buildCustomRecipe(user, request);
-
         customRecipeRepository.save(recipe);
         return recipe;
-    }
-
-    private CustomRecipe buildCustomRecipe(User user, SaveCustomRecipeRequest request) {
-        return CustomRecipe.builder().userId(user.getId()).title(request.title())
-            .mainImg(request.mainImg()).typeKey(request.typeKey()).methodKey(request.methodKey())
-            .servings(request.servings()).cookingTime(request.cookingTime())
-            .difficulty(request.difficulty()).ingredients(request.ingredients())
-            .cookingOrder(request.cookingOrder()).cookingImg(request.cookingImg())
-            .hashtag(request.hashtag()).tips(request.tips()).recipeType(request.recipeType())
-            .build();
     }
 
     @Override
@@ -283,5 +239,93 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
 
     }
 
+    private Recipe returnExistOriginalRecipe(String recipeId) {
+        return recipeRepository.findById(recipeId)
+            .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 레시피입니다."));
+    }
 
+
+    private List<String> getUserAllergyInfo(User user) {
+        return user.getAllergy().stream()
+            .map(Allergy::getAllergy)
+            .toList();
+    }
+
+    private CustomRecipe buildCustomRecipe(User user, SaveCustomRecipeRequest request) {
+        return CustomRecipe.builder().userId(user.getId()).title(request.title())
+            .mainImg(request.mainImg()).typeKey(request.typeKey()).methodKey(request.methodKey())
+            .servings(request.servings()).cookingTime(request.cookingTime())
+            .difficulty(request.difficulty()).ingredients(request.ingredients())
+            .cookingOrder(request.cookingOrder()).cookingImg(request.cookingImg())
+            .hashtag(request.hashtag()).tips(request.tips()).recipeType(request.recipeType())
+            .build();
+    }
+
+
+    private LeftoverCookingRequest buildLeftoverCookingRequest(User user,
+        RecipeFromIngredientsRequest request,
+        List<String> userAllergy, List<String> userIngredients) {
+        return LeftoverCookingRequest.builder()
+            .userAllergyIngredients(userAllergy)
+            .userDislikeIngredients(request.dislikeIngredients())
+            .userSpicyLevel(String.valueOf(user.getSpicyLevel()))
+            .userCookingLevel(String.valueOf(user.getCookingLevel()))
+            .userOwnedIngredients(userIngredients).userBasicSeasoning(request.basicSeasoning())
+            .mustUseIngredients(request.mustUseIngredients()).build();
+    }
+
+    private UserEaten buildUserEaten(User user) {
+        return UserEaten.userEatenBuilder()
+            .userId(user.getId())
+            .eatenRecipes(new ArrayList<>())
+            .build();
+    }
+
+    private Map<Boolean, List<String>> classifyRecipeIdsByType(List<EatenRecipe> eatenRecipes) {
+        return eatenRecipes.stream()
+            .collect(Collectors.partitioningBy(
+                r -> ORIGINAL_TYPE.equals(r.recipeType()),
+                Collectors.mapping(EatenRecipe::recipeId, Collectors.toList())
+            ));
+    }
+
+    private Map<String, Recipe> fetchRecipesByIds(List<String> recipeIds) {
+        return recipeRepository.findAllById(recipeIds).stream()
+            .collect(Collectors.toMap(Recipe::getId, Function.identity()));
+    }
+
+    private Map<String, CustomRecipe> fetchCustomRecipesByIds(List<String> customRecipeIds) {
+        return customRecipeRepository.findAllById(customRecipeIds).stream()
+            .collect(Collectors.toMap(CustomRecipe::getId, Function.identity()));
+    }
+
+    private List<EatenRecipeResponse> buildEatenRecipeResponses(
+        List<EatenRecipe> eatenRecipes,
+        Map<String, Recipe> recipeMap,
+        Map<String, CustomRecipe> customRecipeMap
+    ) {
+        return eatenRecipes.stream()
+            .map(r -> buildEatenRecipeResponse(r, recipeMap, customRecipeMap))
+            .filter(Objects::nonNull)
+            .collect(Collectors.toList());
+    }
+
+    private EatenRecipeResponse buildEatenRecipeResponse(
+        EatenRecipe eatenRecipe,
+        Map<String, Recipe> recipeMap,
+        Map<String, CustomRecipe> customRecipeMap
+    ) {
+        if (ORIGINAL_TYPE.equals(eatenRecipe.recipeType())) {
+            Recipe recipe = recipeMap.get(eatenRecipe.recipeId());
+            if (recipe != null) {
+                return responseBuilder.buildEatenRecipeResponse(recipe);
+            }
+        } else {
+            CustomRecipe customRecipe = customRecipeMap.get(eatenRecipe.recipeId());
+            if (customRecipe != null) {
+                return responseBuilder.buildEatenRecipeResponse(customRecipe);
+            }
+        }
+        return null;
+    }
 }
