@@ -10,15 +10,18 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class ResponseBuilder {
+
+    public static final String ORIGINAL_RECIPE_TYPE = "original";
+    public static final String CUSTOM_RECIPE_TYPE = "custom";
+
     public EatenRecipeResponse buildEatenRecipeResponse(Recipe recipe) {
         OriginalRecipeResponse originalRecipeResponse = buildOriginalRecipeResponse(recipe);
-        return EatenRecipeResponse.builder().tag("original").data(originalRecipeResponse).build();
+        return EatenRecipeResponse.builder().tag(ORIGINAL_RECIPE_TYPE).data(originalRecipeResponse).build();
     }
 
     public EatenRecipeResponse buildEatenRecipeResponse(CustomRecipe customRecipe) {
         CustomRecipeResponse customRecipeResponse = buildCustomRecipeResponse(customRecipe);
-        return EatenRecipeResponse.builder().tag("custom").data(customRecipeResponse).build();
-
+        return EatenRecipeResponse.builder().tag(CUSTOM_RECIPE_TYPE).data(customRecipeResponse).build();
     }
 
     public OriginalRecipeResponse buildOriginalRecipeResponse(Recipe orignalRecipe) {
