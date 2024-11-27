@@ -66,7 +66,6 @@ public class UserEaten {
         this.eatenRecipes.add(eatenRecipe);
     }
 
-    @Getter
     public record EatenRecipe(
         String recipeId,
         String recipeType,
