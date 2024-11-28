@@ -1,10 +1,8 @@
 package com.example.testysavingsbe.domain.recipe.service;
 
-import static com.example.testysavingsbe.domain.recipe.dto.ResponseBuilder.buildOriginalRecipeResponse;
 
 import com.example.testysavingsbe.domain.ingredient.entity.Food;
 import com.example.testysavingsbe.domain.ingredient.repository.FoodRepository;
-import com.example.testysavingsbe.domain.recipe.dto.ResponseBuilder;
 import com.example.testysavingsbe.domain.recipe.dto.request.LeftoverCookingRequest;
 import com.example.testysavingsbe.domain.recipe.dto.request.EatRecipeRequest;
 import com.example.testysavingsbe.domain.recipe.dto.request.SaveCustomRecipeRequest;
@@ -112,7 +110,8 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
         Recipe orignalRecipe = returnExistOriginalRecipe(request.originalRecipeId());
         List<String> userAllergy = getUserAllergyInfo(user);
         List<String> userIngredients = foodRepository.findAllByUser(user).stream()
-            .map(Food::getFoodName).toList();
+            .map(Food::getFoodName)
+            .toList();
 
         Mono<LeftoverCookingRequest> aiRequest = Mono.just(
             buildLeftoverCookingRequest(user, request, userAllergy, userIngredients));
@@ -120,7 +119,7 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
         AIRecipeResponse after = aiAdapter.requestCreateRecipeUseIngredients(request,
             aiRequest);
 
-        OriginalRecipeResponse before = buildOriginalRecipeResponse(orignalRecipe);
+        OriginalRecipeResponse before = OriginalRecipeResponse.fromRecipe(orignalRecipe);
 
         return new AIChangeRecipeResponse(before, after);
     }
@@ -135,7 +134,7 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
             user.getCookingLevel().getDisplayName());
 
         AIRecipeResponse after = aiAdapter.requestRecipeMakeSimplify(recipeId, request);
-        OriginalRecipeResponse before = buildOriginalRecipeResponse(recipe);
+        OriginalRecipeResponse before = OriginalRecipeResponse.fromRecipe(recipe);
 
         return new AIChangeRecipeResponse(before, after);
     }
@@ -158,7 +157,7 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
         List<Recipe> recipes = recipeRepository.findAllById(recipeIds);
 
         return recipes.stream()
-            .map(ResponseBuilder::buildOriginalRecipeResponse)
+            .map(OriginalRecipeResponse::fromRecipe)
             .collect(Collectors.toList());
     }
 
@@ -236,7 +235,7 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
         List<Recipe> allById = recipeRepository.findAllById(recipeIds);
 
         return allById.stream()
-            .map(ResponseBuilder::buildOriginalRecipeResponse).toList();
+            .map(OriginalRecipeResponse::fromRecipe).toList();
 
     }
 
@@ -319,12 +318,12 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
         if (ORIGINAL_TYPE.equals(eatenRecipe.recipeType())) {
             Recipe recipe = recipeMap.get(eatenRecipe.recipeId());
             if (recipe != null) {
-                return ResponseBuilder.buildEatenRecipeResponse(recipe);
+                return EatenRecipeResponse.parseOriginal(recipe);
             }
         } else {
             CustomRecipe customRecipe = customRecipeMap.get(eatenRecipe.recipeId());
             if (customRecipe != null) {
-                return ResponseBuilder.buildEatenRecipeResponse(customRecipe);
+                return EatenRecipeResponse.parseCustom(customRecipe);
             }
         }
         return null;

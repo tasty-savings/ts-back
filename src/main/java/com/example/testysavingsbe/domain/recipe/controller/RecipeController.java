@@ -6,6 +6,7 @@ import com.example.testysavingsbe.domain.recipe.dto.request.UseAllIngredientsReq
 import com.example.testysavingsbe.domain.recipe.dto.response.AIChangeRecipeResponse;
 import com.example.testysavingsbe.domain.recipe.dto.response.EatenRecipeResponse;
 import com.example.testysavingsbe.domain.recipe.dto.response.IsBookmarkedResponse;
+import com.example.testysavingsbe.domain.recipe.dto.response.OriginalRecipeResponse;
 import com.example.testysavingsbe.domain.recipe.entity.BookmarkedRecipe;
 import com.example.testysavingsbe.domain.recipe.entity.CustomRecipe;
 import com.example.testysavingsbe.domain.recipe.entity.Recipe;
