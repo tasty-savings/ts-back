@@ -1,5 +1,6 @@
 package com.example.testysavingsbe.domain.user.controller;
 
+import com.example.testysavingsbe.domain.user.dto.request.DeleteUserTypeRequest;
 import com.example.testysavingsbe.domain.user.dto.request.RegisterAllergyRequest;
 import com.example.testysavingsbe.domain.user.dto.request.SetUserTypesRequest;
 import com.example.testysavingsbe.domain.user.dto.response.RegisteredAllergyResponse;
@@ -13,7 +14,6 @@ import com.example.testysavingsbe.domain.user.service.UserInfoSettingUseCase;
 import com.example.testysavingsbe.domain.user.service.UserinfoQueryUseCase;
 import com.example.testysavingsbe.global.config.PrincipalDetails;
 import jakarta.validation.Valid;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpStatus;
@@ -42,6 +42,15 @@ public class UserInfoController {
         UserInfoResponse response = userinfoQueryUseCase.getUserInfo(principalDetails.getUser());
 
         return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/preferences")
+    public ResponseEntity<Void> deleteUserPreferInfo(
+        @AuthenticationPrincipal PrincipalDetails principalDetails,
+        @RequestBody DeleteUserTypeRequest request
+    ) {
+        userInfoSettingUseCase.deletePreferType(principalDetails.getUser(), request);
+        return ResponseEntity.noContent().build();
     }
 
 

@@ -1,5 +1,6 @@
 package com.example.testysavingsbe.domain.user.service;
 
+import com.example.testysavingsbe.domain.user.dto.request.DeleteUserTypeRequest;
 import com.example.testysavingsbe.domain.user.dto.response.UserInfoResponse;
 import com.example.testysavingsbe.domain.user.dto.response.UserPreferTypeResponse;
 import com.example.testysavingsbe.domain.user.entity.*;
@@ -57,6 +58,15 @@ public class UserService implements UserInfoSettingUseCase, UserinfoQueryUseCase
     public String updateCookingLevel(User user, CookingLevel level) {
         user.updateCookingLevel(level);
         return level.getDisplayName();
+    }
+
+    @Override
+    @Transactional
+    public void deletePreferType(User user, DeleteUserTypeRequest request) {
+        List<PreferType> preferTypes = request.type().stream()
+            .map(PreferType::fromKoreanName)
+            .toList();
+        userPreferTypeRepository.deleteAllByUserAndType(user, preferTypes);
     }
 
     @Override
