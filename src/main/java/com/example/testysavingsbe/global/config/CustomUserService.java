@@ -28,16 +28,16 @@ public class CustomUserService extends DefaultOAuth2UserService {
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
         OAuth2User oAuth2User = super.loadUser(userRequest);
         Long socialId = oAuth2User.getAttribute("id");
-        User userEntity = userRepository.findBySocialId(socialId);
         String username = extractUsername(oAuth2User);
-        if (userEntity == null) {
-            userEntity = User.builder()
-                .username(username)
-                .socialId(socialId)
-                .cookingLevel(CookingLevel.BEGINNER)
-                .build();
-            userRepository.save(userEntity);
-        }
+        User userEntity = userRepository.findBySocialId(socialId)
+            .orElseGet(() -> {
+                User newUser = User.builder()
+                    .username(username)
+                    .socialId(socialId)
+                    .cookingLevel(CookingLevel.BEGINNER)
+                    .build();
+                return userRepository.save(newUser);
+            });
         return new PrincipalDetails(userEntity, oAuth2User.getAttributes());
     }
 
