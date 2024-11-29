@@ -4,9 +4,11 @@ import com.example.testysavingsbe.domain.recipe.dto.request.EatRecipeRequest;
 import com.example.testysavingsbe.domain.recipe.dto.request.SaveCustomRecipeRequest;
 import com.example.testysavingsbe.domain.recipe.dto.request.UseAllIngredientsRequest;
 import com.example.testysavingsbe.domain.recipe.dto.response.AIChangeRecipeResponse;
+import com.example.testysavingsbe.domain.recipe.dto.response.CustomRecipeResponse;
 import com.example.testysavingsbe.domain.recipe.dto.response.EatenRecipeResponse;
 import com.example.testysavingsbe.domain.recipe.dto.response.IsBookmarkedResponse;
 import com.example.testysavingsbe.domain.recipe.dto.response.OriginalRecipeResponse;
+import com.example.testysavingsbe.domain.recipe.dto.response.SharedRecipeResponse;
 import com.example.testysavingsbe.domain.recipe.entity.BookmarkedRecipe;
 import com.example.testysavingsbe.domain.recipe.entity.CustomRecipe;
 import com.example.testysavingsbe.domain.recipe.entity.Recipe;
@@ -40,8 +42,8 @@ public class RecipeController {
         @AuthenticationPrincipal PrincipalDetails principalDetails) {
 
         List<OriginalRecipeResponse> response = recipeQueryUseCase.getRecommendedRecipe(
-            principalDetails.getUser(),
-            0, 10);
+            principalDetails.getUser()
+        );
 
         return ResponseEntity.ok(response);
     }
@@ -166,7 +168,7 @@ public class RecipeController {
     public ResponseEntity<UserEaten> eatRecipe(
         @AuthenticationPrincipal PrincipalDetails principalDetails,
         @PathVariable(name = "recipeId") String recipeId,
-        @RequestParam(name = "type") String recipeType) {    // [original, custom]
+        @RequestParam(name = "type") String recipeType) {
         EatRecipeRequest request = new EatRecipeRequest(recipeId, recipeType);
         UserEaten userEaten = recipeCommandUseCase.checkEatRecipe(principalDetails.getUser(),
             request);
@@ -184,22 +186,36 @@ public class RecipeController {
         return ResponseEntity.noContent().build();
     }
 
-    public ResponseEntity<?> shareCustomRecipe(
-        @AuthenticationPrincipal PrincipalDetails principalDetails,
-        @PathVariable() String recipeId
-    ) {
-        // 1. 존재하는지 확인
-        // 2. 링크 생성
 
-        return ResponseEntity.ok(null);
+    @PostMapping("/custom/share/{customRecipeId}")
+    public ResponseEntity<SharedRecipeResponse> shareCustomRecipe(
+        @AuthenticationPrincipal PrincipalDetails principalDetails,
+        @PathVariable("customRecipeId") String customRecipeId
+    ) {
+        SharedRecipeResponse sharedRecipeResponse = recipeCommandUseCase.generateCustomRecipeShareUrl(
+            principalDetails.getUser(), customRecipeId);
+        return ResponseEntity.ok(sharedRecipeResponse);
     }
 
-    // 최종적으로 편집 창에서 편집 완료를 누르게 되면 내 레시피로 레시피를 완료되게
-    // 2. AI 맞춤형
-    // 1. 수동으로 레시피 편집
-    /* todo 레시피 편집
-     * 레시피 단락 별로 인공지능을 이용해서 편집한다.
-     * */
-    // 내가 저장한 레시피 전부 가져오기
+    @GetMapping("/share/{uuid}")
+    public ResponseEntity<CustomRecipeResponse> getCustomRecipes(
+        @PathVariable("uuid") String uuid
+    ) {
+        CustomRecipeResponse customRecipeBySharedLink = recipeQueryUseCase.getCustomRecipeBySharedLink(
+            uuid);
+
+        return ResponseEntity.ok(customRecipeBySharedLink);
+    }
+
+    @DeleteMapping("/custom/share/{customRecipeId}")
+    public ResponseEntity<Void> deleteSharedRecipe(
+        @AuthenticationPrincipal PrincipalDetails principalDetails,
+        @PathVariable("customRecipeId") String customRecipeId
+    ) {
+        recipeCommandUseCase.deleteSharedRecipe(customRecipeId);
+        return ResponseEntity.noContent().build();
+
+    }
 
 }
+

@@ -9,8 +9,10 @@ import com.example.testysavingsbe.domain.recipe.dto.request.SaveCustomRecipeRequ
 import com.example.testysavingsbe.domain.recipe.dto.request.SimplifyRecipeToAiRequest;
 import com.example.testysavingsbe.domain.recipe.dto.response.AIChangeRecipeResponse;
 import com.example.testysavingsbe.domain.recipe.dto.response.AIRecipeResponse;
+import com.example.testysavingsbe.domain.recipe.dto.response.CustomRecipeResponse;
 import com.example.testysavingsbe.domain.recipe.dto.response.EatenRecipeResponse;
 import com.example.testysavingsbe.domain.recipe.dto.response.OriginalRecipeResponse;
+import com.example.testysavingsbe.domain.recipe.dto.response.SharedRecipeResponse;
 import com.example.testysavingsbe.domain.recipe.entity.*;
 import com.example.testysavingsbe.domain.recipe.entity.UserEaten.EatenRecipe;
 import com.example.testysavingsbe.domain.recipe.port.AiWebClientAdapter;
@@ -25,6 +27,7 @@ import jakarta.persistence.EntityNotFoundException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -46,12 +49,15 @@ import java.util.Optional;
 public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
 
     public static final String ORIGINAL_TYPE = "original";
+    public static final int RECOMMEND_RECIPE_MAX_SIZE = 10;
+
     private final RecipeRepository recipeRecommendRepository;
     private final CustomRecipeRepository customRecipeRepository;
     private final UserEatenRepository userEatenRepository;
     private final BookmarkedRepository bookmarkedRepository;
     private final RecipeRepository recipeRepository;
     private final FoodRepository foodRepository;
+    private final SharedRecipeRepository sharedRecipeRepository;
     private final UserPreferTypeRepository userPreferTypeRepository;
     private final AiWebClientAdapter aiAdapter;
 
@@ -108,6 +114,7 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
     public AIChangeRecipeResponse createRecipeFromIngredients(User user,
         RecipeFromIngredientsRequest request) {
         Recipe orignalRecipe = returnExistOriginalRecipe(request.originalRecipeId());
+
         List<String> userAllergy = getUserAllergyInfo(user);
         List<String> userIngredients = foodRepository.findAllByUser(user).stream()
             .map(Food::getFoodName)
@@ -208,6 +215,43 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
         userEatenRepository.save(userEaten);
     }
 
+    @Override
+    public SharedRecipeResponse generateCustomRecipeShareUrl(User user, String customRecipeId) {
+        customRecipeRepository.findById(customRecipeId)
+            .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 레시피입니다."));
+
+        return sharedRecipeRepository.findByCustomRecipeId(customRecipeId)
+            .map(recipe -> new SharedRecipeResponse(recipe.getUuid())) // 기존 UUID로 응답 생성
+            .orElseGet(() -> {
+                String uuid = UUID.randomUUID().toString();
+                SharedRecipe newSharedRecipe = sharedRecipeRepository.save(
+                    SharedRecipe.builder()
+                        .uuid(uuid)
+                        .customRecipeId(customRecipeId)
+                        .build()
+                );
+                return new SharedRecipeResponse(newSharedRecipe.getUuid());
+            });
+    }
+
+
+    @Override
+    public void deleteSharedRecipe(String customRecipeId) {
+        sharedRecipeRepository.deleteByCustomRecipeId(customRecipeId);
+    }
+
+
+    @Override
+    public CustomRecipeResponse getCustomRecipeBySharedLink(String uuid) {
+        SharedRecipe byUuid = sharedRecipeRepository.findByUuid(uuid)
+            .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 링크입니다."));
+        String customRecipeId = byUuid.getCustomRecipeId();
+        CustomRecipe customRecipe = customRecipeRepository.findById(customRecipeId)
+            .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 레시피입니다."));
+
+        return CustomRecipeResponse.from(customRecipe);
+    }
+
 
     @Override
     public CustomRecipe getCustomRecipe(User user, String id) {
@@ -223,19 +267,27 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
     }
 
     @Override
-    public List<OriginalRecipeResponse> getRecommendedRecipe(User user, int page, int size) {
+    public List<OriginalRecipeResponse> getRecommendedRecipe(User user) {
+
         List<UserPreferType> userPreferTypes = userPreferTypeRepository.findAllByUser(user);
         List<String> userPreferTypeStrings = userPreferTypes.stream()
             .map(UserPreferType::getDisplayName).toList();
+
         Map<String, List<String>> request = new HashMap<>();
         request.put("search_types", userPreferTypeStrings);
 
         List<String> recipeIds = aiAdapter.requestRecommendRecipeList(request);
 
         List<Recipe> allById = recipeRepository.findAllById(recipeIds);
+        if (allById.size() < RECOMMEND_RECIPE_MAX_SIZE) {
+            List<Recipe> additionalRecipes = recipeRepository.findRandomRecipes(
+                RECOMMEND_RECIPE_MAX_SIZE  - allById.size());
+            allById.addAll(additionalRecipes);
+        }
 
         return allById.stream()
-            .map(OriginalRecipeResponse::fromRecipe).toList();
+            .map(OriginalRecipeResponse::fromRecipe)
+            .toList();
 
     }
 

@@ -25,6 +25,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
                 .requestMatchers("/recipe/original/**").permitAll()
+                .requestMatchers("/recipe/share/**").permitAll()
                 .requestMatchers("/healthcheck/userinfo").authenticated()
                 .requestMatchers("/recipe/**").authenticated()
                 .requestMatchers("/recipes/**").authenticated()
