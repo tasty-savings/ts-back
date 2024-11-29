@@ -14,42 +14,44 @@ import org.springframework.web.cors.CorsUtils;
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfig {
+
     private final CustomUserService customUserService;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .cors(AbstractHttpConfigurer::disable)
-                .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
-                        .requestMatchers("/healthcheck/userinfo").authenticated()
-                        .requestMatchers("/recipe/**").authenticated()
-                        .requestMatchers("/recipes/**").authenticated()
-                        .requestMatchers("/userinfo/**").authenticated()
-                        .anyRequest().permitAll()
+            .cors(AbstractHttpConfigurer::disable)
+            .csrf(AbstractHttpConfigurer::disable)
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
+                .requestMatchers("/recipe/original/**").permitAll()
+                .requestMatchers("/healthcheck/userinfo").authenticated()
+                .requestMatchers("/recipe/**").authenticated()
+                .requestMatchers("/recipes/**").authenticated()
+                .requestMatchers("/userinfo/**").authenticated()
+                .anyRequest().permitAll()
+            )
+            .oauth2Login(oauth2 -> oauth2
+                .redirectionEndpoint(endpoint -> endpoint
+                    .baseUri("/login/oauth2/code")
                 )
-                .oauth2Login(oauth2 -> oauth2
-                        .redirectionEndpoint(endpoint -> endpoint
-                                .baseUri("/login/oauth2/code")
-                        )
-                        .userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig
-                                .userService(customUserService)
-                        )
-                        .successHandler((request, response, authentication) -> {
-                            response.sendRedirect("/");         // baseurl
-                        })
+                .userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig
+                    .userService(customUserService)
                 )
-                .logout(logout -> logout
-                        .logoutUrl("/logout")
-                        .logoutSuccessUrl("/")      // {baseurl 설정}
-                        .permitAll()
-                )
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
-                        .invalidSessionUrl("/login/oauth2/code")
-                        .maximumSessions(1)
-                );
+                .successHandler((request, response, authentication) -> {
+                    response.sendRedirect("/");         // baseurl
+                })
+            )
+            .logout(logout -> logout
+                .logoutUrl("/logout")
+                .logoutSuccessUrl("/")      // {baseurl 설정}
+                .permitAll()
+            )
+            .sessionManagement(session -> session
+                .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                .invalidSessionUrl("/login/oauth2/code")
+                .maximumSessions(1)
+            );
 
         return http.build();
     }

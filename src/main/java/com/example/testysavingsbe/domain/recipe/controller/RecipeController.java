@@ -86,7 +86,7 @@ public class RecipeController {
      *
      * @param principalDetails
      */
-    @GetMapping("/{id}")
+    @GetMapping("/original/{id}")
     public ResponseEntity<?> getRecipe(@AuthenticationPrincipal PrincipalDetails principalDetails,
         @PathVariable("id") String id) {
         Recipe recipeById = recipeQueryUseCase.getRecipeById(principalDetails.getUser(), id);
