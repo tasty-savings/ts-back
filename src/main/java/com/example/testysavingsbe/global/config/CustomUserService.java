@@ -1,5 +1,6 @@
 package com.example.testysavingsbe.global.config;
 
+import com.example.testysavingsbe.domain.user.entity.CookingLevel;
 import com.example.testysavingsbe.domain.user.entity.User;
 import com.example.testysavingsbe.domain.user.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +17,7 @@ import java.util.Optional;
 @Slf4j
 @Service
 public class CustomUserService extends DefaultOAuth2UserService {
+
     private final UserRepository userRepository;
 
     public CustomUserService(UserRepository userRepository) {
@@ -26,24 +28,25 @@ public class CustomUserService extends DefaultOAuth2UserService {
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
         OAuth2User oAuth2User = super.loadUser(userRequest);
         Long socialId = oAuth2User.getAttribute("id");
-        User userEntity = userRepository.findBySocialId(socialId);
         String username = extractUsername(oAuth2User);
-        if (userEntity == null) {
-            userEntity = User.builder()
+        User userEntity = userRepository.findBySocialId(socialId)
+            .orElseGet(() -> {
+                User newUser = User.builder()
                     .username(username)
                     .socialId(socialId)
+                    .cookingLevel(CookingLevel.BEGINNER)
                     .build();
-            userRepository.save(userEntity);
-        }
+                return userRepository.save(newUser);
+            });
         return new PrincipalDetails(userEntity, oAuth2User.getAttributes());
     }
 
     private String extractUsername(OAuth2User oAuth2User) {
         return Optional.ofNullable(oAuth2User.getAttribute("properties"))
-                .filter(Map.class::isInstance)
-                .map(Map.class::cast)
-                .map(properties -> (String) properties.get("nickname"))
-                .orElse("Unknown");
+            .filter(Map.class::isInstance)
+            .map(Map.class::cast)
+            .map(properties -> (String) properties.get("nickname"))
+            .orElse("Unknown");
     }
 
 }

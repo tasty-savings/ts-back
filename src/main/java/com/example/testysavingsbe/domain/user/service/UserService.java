@@ -1,5 +1,7 @@
 package com.example.testysavingsbe.domain.user.service;
 
+import com.example.testysavingsbe.domain.user.dto.request.DeleteUserTypeRequest;
+import com.example.testysavingsbe.domain.user.dto.response.UserInfoResponse;
 import com.example.testysavingsbe.domain.user.dto.response.UserPreferTypeResponse;
 import com.example.testysavingsbe.domain.user.entity.*;
 import com.example.testysavingsbe.domain.user.repository.AllergyRepository;
@@ -12,7 +14,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class UserService implements UserInfoSettingUseCase {
+public class UserService implements UserInfoSettingUseCase, UserinfoQueryUseCase {
     private final UserPreferTypeRepository userPreferTypeRepository;
     private final AllergyRepository allergyRepository;
 
@@ -56,5 +58,26 @@ public class UserService implements UserInfoSettingUseCase {
     public String updateCookingLevel(User user, CookingLevel level) {
         user.updateCookingLevel(level);
         return level.getDisplayName();
+    }
+
+    @Override
+    @Transactional
+    public void deletePreferType(User user, DeleteUserTypeRequest request) {
+        List<PreferType> preferTypes = request.type().stream()
+            .map(PreferType::fromKoreanName)
+            .toList();
+        userPreferTypeRepository.deleteAllByUserAndType(user, preferTypes);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public UserInfoResponse getUserInfo(User user) {
+        return UserInfoResponse.builder()
+            .username(user.getUsername())
+            .cookingLevel(user.getCookingLevel().getDisplayName())
+            .spicyLevel(user.getSpicyLevel().getDisplayName())
+            .allergy(user.getAllergy().stream().map(Allergy::getAllergy).toList())
+            .build();
+
     }
 }

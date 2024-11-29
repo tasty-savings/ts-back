@@ -15,6 +15,7 @@ import java.util.Set;
 @Table(name = "users")
 @NoArgsConstructor
 public class User {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
@@ -29,16 +30,23 @@ public class User {
     private CookingLevel cookingLevel;
 
     @Enumerated(EnumType.STRING)
-    private SpicyLevel spicyLevel;
+    private SpicyLevel spicyLevel = SpicyLevel.LEVEL_2;
 
-    // todo 이후 알러지 정보는 DB에 등록해서 관리할 예정
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<Allergy> allergy;
 
     @Builder
-    public User(String username, Long socialId) {
+    public User(String username, Long socialId, CookingLevel cookingLevel) {
         this.username = username;
         this.socialId = socialId;
+        this.cookingLevel = cookingLevel;
+    }
+
+    public Set<Allergy> getAllergy() {
+        if (allergy == null) {
+            allergy = new HashSet<>();
+        }
+        return allergy;
     }
 
     public void registerAllergy(Allergy allergy) {

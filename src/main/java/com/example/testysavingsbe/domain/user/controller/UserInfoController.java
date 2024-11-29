@@ -1,14 +1,17 @@
 package com.example.testysavingsbe.domain.user.controller;
 
+import com.example.testysavingsbe.domain.user.dto.request.DeleteUserTypeRequest;
 import com.example.testysavingsbe.domain.user.dto.request.RegisterAllergyRequest;
 import com.example.testysavingsbe.domain.user.dto.request.SetUserTypesRequest;
 import com.example.testysavingsbe.domain.user.dto.response.RegisteredAllergyResponse;
 import com.example.testysavingsbe.domain.user.dto.response.UserCookingLevelResponse;
+import com.example.testysavingsbe.domain.user.dto.response.UserInfoResponse;
 import com.example.testysavingsbe.domain.user.dto.response.UserPreferTypeResponse;
 import com.example.testysavingsbe.domain.user.dto.response.UserSpicyLevelResponse;
 import com.example.testysavingsbe.domain.user.entity.CookingLevel;
 import com.example.testysavingsbe.domain.user.entity.SpicyLevel;
 import com.example.testysavingsbe.domain.user.service.UserInfoSettingUseCase;
+import com.example.testysavingsbe.domain.user.service.UserinfoQueryUseCase;
 import com.example.testysavingsbe.global.config.PrincipalDetails;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -27,13 +30,37 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 public class UserInfoController {
+
+    private final UserinfoQueryUseCase userinfoQueryUseCase;
     private final UserInfoSettingUseCase userInfoSettingUseCase;
 
+    // get and delete
+
+    @GetMapping
+    public ResponseEntity<UserInfoResponse> getUserinfo(
+        @AuthenticationPrincipal PrincipalDetails principalDetails) {
+        UserInfoResponse response = userinfoQueryUseCase.getUserInfo(principalDetails.getUser());
+
+        return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/preferences")
+    public ResponseEntity<Void> deleteUserPreferInfo(
+        @AuthenticationPrincipal PrincipalDetails principalDetails,
+        @RequestBody DeleteUserTypeRequest request
+    ) {
+        userInfoSettingUseCase.deletePreferType(principalDetails.getUser(), request);
+        return ResponseEntity.noContent().build();
+    }
+
+
     @PostMapping("/prefer")
-    public ResponseEntity<UserPreferTypeResponse> setUserPreferUserType(@AuthenticationPrincipal PrincipalDetails principal,
-                                                   @Valid @RequestBody SetUserTypesRequest request){
-        UserPreferTypeResponse userPreferTypeResponse = userInfoSettingUseCase.registerPreferType(new UserInfoSettingUseCase.
-                SettingPreferTypeRequest(principal.getUser(), request.types()));
+    public ResponseEntity<UserPreferTypeResponse> setUserPreferUserType(
+        @AuthenticationPrincipal PrincipalDetails principal,
+        @Valid @RequestBody SetUserTypesRequest request) {
+        UserPreferTypeResponse userPreferTypeResponse = userInfoSettingUseCase.registerPreferType(
+            new UserInfoSettingUseCase.SettingPreferTypeRequest(principal.getUser(),
+                request.types()));
         return ResponseEntity.status(HttpStatus.CREATED).body(userPreferTypeResponse);
     }
 
@@ -41,29 +68,35 @@ public class UserInfoController {
     // todo
     // 1. 알러지 받기
     @PostMapping("/allergy")
-    public ResponseEntity<RegisteredAllergyResponse> registerAllergy(@AuthenticationPrincipal PrincipalDetails principal,
-                                             @RequestBody RegisterAllergyRequest request
-    ){
-        List<String> allergy = userInfoSettingUseCase.registerAllergy(principal.getUser(), request.allergy());
-        return ResponseEntity.status(HttpStatus.CREATED).body(new RegisteredAllergyResponse(allergy));
+    public ResponseEntity<RegisteredAllergyResponse> registerAllergy(
+        @AuthenticationPrincipal PrincipalDetails principal,
+        @RequestBody RegisterAllergyRequest request) {
+        List<String> allergy = userInfoSettingUseCase.registerAllergy(principal.getUser(),
+            request.allergy());
+        return ResponseEntity.status(HttpStatus.CREATED)
+            .body(new RegisteredAllergyResponse(allergy));
     }
 
 
     @PutMapping("/settings/spicy-level")
-    public ResponseEntity<UserSpicyLevelResponse> updateUserSpicyLevel(@AuthenticationPrincipal PrincipalDetails principal,
-                                                  @RequestParam("value") int spicyLevel
-    ) throws BadRequestException {
-        if (spicyLevel < 0 || spicyLevel > 5) throw new BadRequestException("Spicy level must be between 0 and 5");
-        String response = userInfoSettingUseCase.updateSpicyLevel(principal.getUser(), SpicyLevel.of(spicyLevel));
+    public ResponseEntity<UserSpicyLevelResponse> updateUserSpicyLevel(
+        @AuthenticationPrincipal PrincipalDetails principal, @RequestParam("value") int spicyLevel)
+        throws BadRequestException {
+        if (spicyLevel < 0 || spicyLevel > 5) {
+            throw new BadRequestException("Spicy level must be between 0 and 5");
+        }
+        String response = userInfoSettingUseCase.updateSpicyLevel(principal.getUser(),
+            SpicyLevel.of(spicyLevel));
 
         return ResponseEntity.ok(new UserSpicyLevelResponse(response));
     }
 
     @PutMapping("/settings/cooking-level")
-    public ResponseEntity<UserCookingLevelResponse> updateUserCookingLevel(@AuthenticationPrincipal PrincipalDetails principal,
-                                                                           @RequestParam("value") String cookingLevel
-    ){
-        String response = userInfoSettingUseCase.updateCookingLevel(principal.getUser(), CookingLevel.fromDisplayName(cookingLevel));
+    public ResponseEntity<UserCookingLevelResponse> updateUserCookingLevel(
+        @AuthenticationPrincipal PrincipalDetails principal,
+        @RequestParam("value") String cookingLevel) {
+        String response = userInfoSettingUseCase.updateCookingLevel(principal.getUser(),
+            CookingLevel.fromDisplayName(cookingLevel));
         return ResponseEntity.ok(new UserCookingLevelResponse(response));
     }
 

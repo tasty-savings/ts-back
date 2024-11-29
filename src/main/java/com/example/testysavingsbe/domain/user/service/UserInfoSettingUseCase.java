@@ -1,5 +1,6 @@
 package com.example.testysavingsbe.domain.user.service;
 
+import com.example.testysavingsbe.domain.user.dto.request.DeleteUserTypeRequest;
 import com.example.testysavingsbe.domain.user.dto.response.UserPreferTypeResponse;
 import com.example.testysavingsbe.domain.user.entity.CookingLevel;
 import com.example.testysavingsbe.domain.user.entity.SpicyLevel;
@@ -12,6 +13,8 @@ public interface UserInfoSettingUseCase {
     List<String> registerAllergy(User user, List<String> allergy);
     String updateSpicyLevel(User user, SpicyLevel level);
     String updateCookingLevel(User user, CookingLevel level);
+
+    void deletePreferType(User user, DeleteUserTypeRequest request);
 
     record SettingPreferTypeRequest(
             User user,

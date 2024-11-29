@@ -1,5 +1,6 @@
 package com.example.testysavingsbe.global.config;
 
+import com.mongodb.ReadPreference;
 import com.mongodb.client.MongoClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,6 +19,8 @@ public class MongoConfig {
     @Bean
     public MongoTemplate mongoTemplate(MongoClient mongoClient) {
         MongoDatabaseFactory mongoDatabaseFactory = new SimpleMongoClientDatabaseFactory(mongoClient, "tasty-saving");
-        return new MongoTemplate(mongoDatabaseFactory);
+        MongoTemplate mongoTemplate = new MongoTemplate(mongoDatabaseFactory);
+        mongoTemplate.setReadPreference(ReadPreference.secondaryPreferred());
+        return mongoTemplate;
     }
 }
