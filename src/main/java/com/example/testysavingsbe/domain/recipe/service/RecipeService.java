@@ -10,8 +10,8 @@ import com.example.testysavingsbe.domain.recipe.dto.request.SimplifyRecipeToAiRe
 import com.example.testysavingsbe.domain.recipe.dto.response.AIChangeRecipeResponse;
 import com.example.testysavingsbe.domain.recipe.dto.response.AIRecipeResponse;
 import com.example.testysavingsbe.domain.recipe.dto.response.CustomRecipeResponse;
-import com.example.testysavingsbe.domain.recipe.dto.response.EatenRecipeResponse;
 import com.example.testysavingsbe.domain.recipe.dto.response.OriginalRecipeResponse;
+import com.example.testysavingsbe.domain.recipe.dto.response.RecipeResponse;
 import com.example.testysavingsbe.domain.recipe.dto.response.SharedRecipeResponse;
 import com.example.testysavingsbe.domain.recipe.entity.*;
 import com.example.testysavingsbe.domain.recipe.entity.UserEaten.EatenRecipe;
@@ -169,7 +169,7 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
     }
 
     @Override
-    public List<EatenRecipeResponse> getAllEatenRecipe(User user) {
+    public List<RecipeResponse> getAllEatenRecipe(User user) {
         UserEaten userEaten = userEatenRepository.findByUserId(user.getId())
             .orElseThrow(() -> new EntityNotFoundException("먹은 레시피가 존재하지 않습니다."));
 
@@ -351,7 +351,7 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
             .collect(Collectors.toMap(CustomRecipe::getId, Function.identity()));
     }
 
-    private List<EatenRecipeResponse> buildEatenRecipeResponses(
+    private List<RecipeResponse> buildEatenRecipeResponses(
         List<EatenRecipe> eatenRecipes,
         Map<String, Recipe> recipeMap,
         Map<String, CustomRecipe> customRecipeMap
@@ -362,7 +362,7 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
             .collect(Collectors.toList());
     }
 
-    private EatenRecipeResponse buildEatenRecipeResponse(
+    private RecipeResponse buildEatenRecipeResponse(
         EatenRecipe eatenRecipe,
         Map<String, Recipe> recipeMap,
         Map<String, CustomRecipe> customRecipeMap
@@ -370,12 +370,12 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
         if (ORIGINAL_TYPE.equals(eatenRecipe.recipeType())) {
             Recipe recipe = recipeMap.get(eatenRecipe.recipeId());
             if (recipe != null) {
-                return EatenRecipeResponse.parseOriginal(recipe);
+                return OriginalRecipeResponse.fromRecipe(recipe);
             }
         } else {
             CustomRecipe customRecipe = customRecipeMap.get(eatenRecipe.recipeId());
             if (customRecipe != null) {
-                return EatenRecipeResponse.parseCustom(customRecipe);
+                return CustomRecipeResponse.from(customRecipe);
             }
         }
         return null;

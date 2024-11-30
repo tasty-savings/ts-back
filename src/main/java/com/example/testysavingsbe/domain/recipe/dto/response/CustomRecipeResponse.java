@@ -5,9 +5,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 import lombok.Builder;
 
-public class CustomRecipeResponse implements RecipeResponse{
+public class CustomRecipeResponse implements RecipeResponse {
+
     @JsonProperty("id")
     String id;
+
+    @JsonProperty("tag")
+    String tag = "custom";
 
     @JsonProperty("title")
     String title;

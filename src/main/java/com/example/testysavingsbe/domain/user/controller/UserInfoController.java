@@ -34,8 +34,6 @@ public class UserInfoController {
     private final UserinfoQueryUseCase userinfoQueryUseCase;
     private final UserInfoSettingUseCase userInfoSettingUseCase;
 
-    // get and delete
-
     @GetMapping
     public ResponseEntity<UserInfoResponse> getUserinfo(
         @AuthenticationPrincipal PrincipalDetails principalDetails) {
