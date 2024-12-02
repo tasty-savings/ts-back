@@ -30,10 +30,9 @@ public class CustomUserService extends DefaultOAuth2UserService {
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
         OAuth2User oAuth2User = super.loadUser(userRequest);
         Long socialId = oAuth2User.getAttribute("id");
-        String username = extractUsername(oAuth2User);
+        String username = extractArgument(oAuth2User, "nickname");
         String gender = extractArgument(oAuth2User, "gender");
         String ageRange = extractArgument(oAuth2User, "age_range");
-
 
         User userEntity = userRepository.findBySocialId(socialId)
             .orElseGet(() -> {
@@ -50,18 +49,12 @@ public class CustomUserService extends DefaultOAuth2UserService {
     }
 
     private String extractArgument(OAuth2User oAuth2User, String argument) {
-        return Optional.ofNullable(oAuth2User.getAttributes().get("kakao_account"))
+        String attributeKey = argument.equals("nickname") ? "properties" : "kakao_account";
+
+        return Optional.ofNullable(oAuth2User.getAttribute(attributeKey))
             .filter(Map.class::isInstance)
             .map(Map.class::cast)
             .map(properties -> (String) properties.get(argument))
-            .orElse("Unknown");
-    }
-
-    private String extractUsername(OAuth2User oAuth2User) {
-        return Optional.ofNullable(oAuth2User.getAttribute("properties"))
-            .filter(Map.class::isInstance)
-            .map(Map.class::cast)
-            .map(properties -> (String) properties.get("nickname"))
             .orElse("Unknown");
     }
 
