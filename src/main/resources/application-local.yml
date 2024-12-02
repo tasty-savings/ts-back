@@ -5,14 +5,11 @@ server:
 spring:
   application:
     name: testy-savings-be
-    datasource:
-      driver-class-name: org.h2.Driver
-      url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
-      username: sa
-  h2:
-    console:
-      enabled: true
-      path: /h2-console
+  datasource:
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      url: ${SPRING_DATASOURCE_URL}
+      username: ${SPRING_DATASOURCE_USERNAME}
+      password: ${SPRING_DATASOURCE_PASSWORD}
 
   jpa:
     properties:
@@ -23,8 +20,7 @@ spring:
     open-in-view: false
     hibernate:
       ddl-auto: create
-    database: h2
-    database-platform: org.hibernate.dialect.H2Dialect
+    database: mysql
 
 
 
