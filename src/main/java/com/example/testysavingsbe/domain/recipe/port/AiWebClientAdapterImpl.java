@@ -4,6 +4,7 @@ import com.example.testysavingsbe.domain.recipe.dto.request.LeftoverCookingReque
 import com.example.testysavingsbe.domain.recipe.dto.request.SimplifyRecipeToAiRequest;
 import com.example.testysavingsbe.domain.recipe.dto.response.AIRecipeResponse;
 import com.example.testysavingsbe.domain.recipe.service.usecase.RecipeQueryUseCase.RecipeFromIngredientsRequest;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,7 @@ import reactor.core.publisher.Mono;
 @Service
 @RequiredArgsConstructor
 public class AiWebClientAdapterImpl implements AiWebClientAdapter {
+
     private final WebClient aiWebClient;
 
     @Override
@@ -58,8 +60,13 @@ public class AiWebClientAdapterImpl implements AiWebClientAdapter {
         return aiWebClient.post()
             .uri(uriBuilder -> uriBuilder.path("/recommend").build())
             .bodyValue(request)
-            .retrieve()
-            .bodyToMono(new ParameterizedTypeReference<List<String>>() {
+            .exchangeToMono(response -> {
+                if (response.statusCode().is2xxSuccessful()) {
+                    return response.bodyToMono(new ParameterizedTypeReference<List<String>>() {
+                    });
+                } else {
+                    return Mono.just(Collections.emptyList());
+                }
             })
             .block();
     }

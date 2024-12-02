@@ -5,9 +5,9 @@ import com.example.testysavingsbe.domain.recipe.dto.request.SaveCustomRecipeRequ
 import com.example.testysavingsbe.domain.recipe.dto.request.UseAllIngredientsRequest;
 import com.example.testysavingsbe.domain.recipe.dto.response.AIChangeRecipeResponse;
 import com.example.testysavingsbe.domain.recipe.dto.response.CustomRecipeResponse;
-import com.example.testysavingsbe.domain.recipe.dto.response.EatenRecipeResponse;
 import com.example.testysavingsbe.domain.recipe.dto.response.IsBookmarkedResponse;
 import com.example.testysavingsbe.domain.recipe.dto.response.OriginalRecipeResponse;
+import com.example.testysavingsbe.domain.recipe.dto.response.RecipeResponse;
 import com.example.testysavingsbe.domain.recipe.dto.response.SharedRecipeResponse;
 import com.example.testysavingsbe.domain.recipe.entity.BookmarkedRecipe;
 import com.example.testysavingsbe.domain.recipe.entity.CustomRecipe;
@@ -86,12 +86,12 @@ public class RecipeController {
     /**
      * 단일 레시피 가져오기(원본)
      *
-     * @param principalDetails
+     * @param id 원본 레시피 Id
      */
     @GetMapping("/original/{id}")
-    public ResponseEntity<?> getRecipe(@AuthenticationPrincipal PrincipalDetails principalDetails,
+    public ResponseEntity<?> getRecipe(
         @PathVariable("id") String id) {
-        Recipe recipeById = recipeQueryUseCase.getRecipeById(principalDetails.getUser(), id);
+        Recipe recipeById = recipeQueryUseCase.getRecipeById(id);
         return ResponseEntity.ok(recipeById);
     }
 
@@ -153,10 +153,10 @@ public class RecipeController {
 
 
     @GetMapping("/eat/all")
-    public ResponseEntity<List<EatenRecipeResponse>> getAllEatenRecipe(
+    public ResponseEntity<List<RecipeResponse>> getAllEatenRecipe(
         @AuthenticationPrincipal PrincipalDetails principalDetails
     ) {
-        List<EatenRecipeResponse> allEatenRecipe = recipeQueryUseCase.getAllEatenRecipe(
+        List<RecipeResponse> allEatenRecipe = recipeQueryUseCase.getAllEatenRecipe(
             principalDetails.getUser());
 
         return ResponseEntity.ok(allEatenRecipe);

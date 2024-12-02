@@ -2,8 +2,8 @@ package com.example.testysavingsbe.domain.recipe.service.usecase;
 
 import com.example.testysavingsbe.domain.recipe.dto.response.AIChangeRecipeResponse;
 import com.example.testysavingsbe.domain.recipe.dto.response.CustomRecipeResponse;
-import com.example.testysavingsbe.domain.recipe.dto.response.EatenRecipeResponse;
 import com.example.testysavingsbe.domain.recipe.dto.response.OriginalRecipeResponse;
+import com.example.testysavingsbe.domain.recipe.dto.response.RecipeResponse;
 import com.example.testysavingsbe.domain.recipe.entity.CustomRecipe;
 import com.example.testysavingsbe.domain.recipe.entity.Recipe;
 import com.example.testysavingsbe.domain.user.entity.User;
@@ -23,7 +23,7 @@ public interface RecipeQueryUseCase {
 
     List<OriginalRecipeResponse> getRecommendedRecipe(User user);
 
-    Recipe getRecipeById(User user, String id);
+    Recipe getRecipeById(String id);
 
     Page<CustomRecipe> getCustomRecipeByUser(User user, int page, int pageSize);
 
@@ -31,7 +31,7 @@ public interface RecipeQueryUseCase {
 
     List<OriginalRecipeResponse> getBookmarkedRecipes(User user);
 
-    List<EatenRecipeResponse> getAllEatenRecipe(User user);
+    List<RecipeResponse> getAllEatenRecipe(User user);
 
     CustomRecipeResponse getCustomRecipeBySharedLink(String uuid);
 

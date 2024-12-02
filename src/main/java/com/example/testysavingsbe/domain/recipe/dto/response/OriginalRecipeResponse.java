@@ -11,6 +11,9 @@ public class OriginalRecipeResponse implements RecipeResponse {
     @JsonProperty("id")
     String id;
 
+    @JsonProperty("tag")
+    String tag = "original";
+
     @JsonProperty("title")
     String title;
 
@@ -51,7 +54,8 @@ public class OriginalRecipeResponse implements RecipeResponse {
     List<String> recipeType;
 
     @Builder
-    public OriginalRecipeResponse(String id, String title, String mainImg, String typeKey,
+    public OriginalRecipeResponse(String id,String title, String mainImg,
+        String typeKey,
         String methodKey, String servings, String cookingTime, String difficulty,
         List<String> ingredients, List<String> cookingOrder, List<String> cookingImg,
         List<String> hashtag, List<String> tips, List<String> recipeType) {
