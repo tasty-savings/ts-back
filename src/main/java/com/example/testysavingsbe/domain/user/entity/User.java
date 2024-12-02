@@ -24,6 +24,12 @@ public class User {
     private String username;
     @Column(name = "social_id")
     private Long socialId;
+    @Column(name = "gender")
+    @Enumerated(EnumType.STRING)
+    private Gender gender;
+    @Column(name = "age_group")
+    @Enumerated(EnumType.STRING)
+    private AgeGroup ageRange;
 
     // 추가 할 거
     @Enumerated(EnumType.STRING)
@@ -36,10 +42,12 @@ public class User {
     private Set<Allergy> allergy;
 
     @Builder
-    public User(String username, Long socialId, CookingLevel cookingLevel) {
+    public User(String username, Long socialId, CookingLevel cookingLevel, Gender gender, AgeGroup ageRange) {
         this.username = username;
         this.socialId = socialId;
         this.cookingLevel = cookingLevel;
+        this.gender = gender;
+        this.ageRange = ageRange;
     }
 
     public Set<Allergy> getAllergy() {
