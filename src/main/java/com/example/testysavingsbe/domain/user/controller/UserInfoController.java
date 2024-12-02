@@ -63,8 +63,6 @@ public class UserInfoController {
     }
 
 
-    // todo
-    // 1. 알러지 받기
     @PostMapping("/allergy")
     public ResponseEntity<RegisteredAllergyResponse> registerAllergy(
         @AuthenticationPrincipal PrincipalDetails principal,

@@ -23,9 +23,8 @@ public class UserTypesValidator implements ConstraintValidator<ValidUserType, Li
     @Override
     public boolean isValid(List<String> types, ConstraintValidatorContext context) {
         if (types == null || types.isEmpty()) {
-            return true; // @NotEmpty와 함께 사용하지 않는 경우
+            return true;
         }
-        // 모든 값이 VALID_TYPES에 포함되어 있는지 검증
         return VALID_TYPES.containsAll(types);
     }
 }

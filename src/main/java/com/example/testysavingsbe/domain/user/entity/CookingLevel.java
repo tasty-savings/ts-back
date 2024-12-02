@@ -7,17 +7,14 @@ public enum CookingLevel {
 
     private final String displayName;
 
-    // 생성자
     CookingLevel(String displayName) {
         this.displayName = displayName;
     }
 
-    // Getter 메서드
     public String getDisplayName() {
         return displayName;
     }
 
-    // 문자열로 Enum을 찾는 메서드
     public static CookingLevel fromDisplayName(String displayName) {
         for (CookingLevel level : CookingLevel.values()) {
             if (level.displayName.equals(displayName)) {

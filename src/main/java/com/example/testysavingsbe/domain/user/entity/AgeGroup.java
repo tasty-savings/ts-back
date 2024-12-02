@@ -13,9 +13,9 @@ public enum AgeGroup {
     AGE_80_89("80~89", 80, 90),
     AGE_90_PLUS("90+", 90, Integer.MAX_VALUE);
 
-    private final String label; // 연령대 레이블
-    private final int minAge;   // 최소 나이
-    private final int maxAge;   // 최대 나이 (exclusive)
+    private final String label;
+    private final int minAge;
+    private final int maxAge;
 
     AgeGroup(String label, int minAge, int maxAge) {
         this.label = label;

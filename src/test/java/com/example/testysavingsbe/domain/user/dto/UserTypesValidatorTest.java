@@ -35,7 +35,6 @@ class UserTypesValidatorTest {
                 Arguments.of(List.of("건강식", "삶기", "죽"), true),
                 Arguments.of(List.of("InvalidType1", "InvalidType2"), false),
                 Arguments.of(List.of("건강식", "UnknownType"), false)
-                // 추가 데이터
         );
     }
 
