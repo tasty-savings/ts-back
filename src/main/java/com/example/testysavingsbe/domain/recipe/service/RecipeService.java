@@ -261,7 +261,7 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
 
 
     @Override
-    public Recipe getRecipeById(User user, String id) {
+    public Recipe getRecipeById(String id) {
         return recipeRecommendRepository.findById(id)
             .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 레시피입니다."));
     }
@@ -273,6 +273,7 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
         List<String> userPreferTypeStrings = userPreferTypes.stream()
             .map(UserPreferType::getDisplayName).toList();
 
+        // TODO: request dto로 변환 2024. 12. 2. by kong
         Map<String, List<String>> request = new HashMap<>();
         request.put("search_types", userPreferTypeStrings);
 
