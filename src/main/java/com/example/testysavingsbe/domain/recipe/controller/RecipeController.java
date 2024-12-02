@@ -86,12 +86,12 @@ public class RecipeController {
     /**
      * 단일 레시피 가져오기(원본)
      *
-     * @param principalDetails
+     * @param id 원본 레시피 Id
      */
     @GetMapping("/original/{id}")
-    public ResponseEntity<?> getRecipe(@AuthenticationPrincipal PrincipalDetails principalDetails,
+    public ResponseEntity<?> getRecipe(
         @PathVariable("id") String id) {
-        Recipe recipeById = recipeQueryUseCase.getRecipeById(principalDetails.getUser(), id);
+        Recipe recipeById = recipeQueryUseCase.getRecipeById(id);
         return ResponseEntity.ok(recipeById);
     }
 

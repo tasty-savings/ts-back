@@ -23,7 +23,7 @@ public interface RecipeQueryUseCase {
 
     List<OriginalRecipeResponse> getRecommendedRecipe(User user);
 
-    Recipe getRecipeById(User user, String id);
+    Recipe getRecipeById(String id);
 
     Page<CustomRecipe> getCustomRecipeByUser(User user, int page, int pageSize);
 
