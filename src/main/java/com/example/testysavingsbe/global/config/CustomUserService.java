@@ -20,6 +20,13 @@ import java.util.Optional;
 @Service
 public class CustomUserService extends DefaultOAuth2UserService {
 
+    public static final String KAKAO_SOCIAL_ID_PROPERTY = "id";
+    public static final String KAKAO_NAME_PROPERTY = "nickname";
+    public static final String KAKAO_GENDER_PROPERTY = "gender";
+    public static final String KAKAO_AGE_GROUP_PROPERTY = "age_range";
+    public static final String KAKAO_PROPERTIES_KEY = "properties";
+    public static final String KAKAO_ACCOUNT_KEY = "kakao_account";
+    public static final String UNKNOWN_VALUE = "Unknown";
     private final UserRepository userRepository;
 
     public CustomUserService(UserRepository userRepository) {
@@ -29,10 +36,10 @@ public class CustomUserService extends DefaultOAuth2UserService {
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
         OAuth2User oAuth2User = super.loadUser(userRequest);
-        Long socialId = oAuth2User.getAttribute("id");
-        String username = extractArgument(oAuth2User, "nickname");
-        String gender = extractArgument(oAuth2User, "gender");
-        String ageRange = extractArgument(oAuth2User, "age_range");
+        Long socialId = oAuth2User.getAttribute(KAKAO_SOCIAL_ID_PROPERTY);
+        String username = extractArgument(oAuth2User, KAKAO_NAME_PROPERTY);
+        String gender = extractArgument(oAuth2User, KAKAO_GENDER_PROPERTY);
+        String ageRange = extractArgument(oAuth2User, KAKAO_AGE_GROUP_PROPERTY);
 
         User userEntity = userRepository.findBySocialId(socialId)
             .orElseGet(() -> {
@@ -49,13 +56,14 @@ public class CustomUserService extends DefaultOAuth2UserService {
     }
 
     private String extractArgument(OAuth2User oAuth2User, String argument) {
-        String attributeKey = argument.equals("nickname") ? "properties" : "kakao_account";
+        String attributeKey =
+            argument.equals(KAKAO_NAME_PROPERTY) ? KAKAO_PROPERTIES_KEY : KAKAO_ACCOUNT_KEY;
 
         return Optional.ofNullable(oAuth2User.getAttribute(attributeKey))
             .filter(Map.class::isInstance)
             .map(Map.class::cast)
             .map(properties -> (String) properties.get(argument))
-            .orElse("Unknown");
+            .orElse(UNKNOWN_VALUE);
     }
 
 }
