@@ -1,6 +1,5 @@
 package com.example.testysavingsbe.global.config;
 
-import com.example.testysavingsbe.domain.user.entity.AgeGroup;
 import com.example.testysavingsbe.domain.user.entity.CookingLevel;
 import com.example.testysavingsbe.domain.user.entity.Gender;
 import com.example.testysavingsbe.domain.user.entity.User;
@@ -39,7 +38,6 @@ public class CustomUserService extends DefaultOAuth2UserService {
         Long socialId = oAuth2User.getAttribute(KAKAO_SOCIAL_ID_PROPERTY);
         String username = extractArgument(oAuth2User, KAKAO_NAME_PROPERTY);
         String gender = extractArgument(oAuth2User, KAKAO_GENDER_PROPERTY);
-        String ageRange = extractArgument(oAuth2User, KAKAO_AGE_GROUP_PROPERTY);
 
         User userEntity = userRepository.findBySocialId(socialId)
             .orElseGet(() -> {
@@ -48,7 +46,6 @@ public class CustomUserService extends DefaultOAuth2UserService {
                     .socialId(socialId)
                     .cookingLevel(CookingLevel.BEGINNER)
                     .gender(Gender.of(gender))
-                    .ageRange(AgeGroup.fromAgeGroup(ageRange))
                     .build();
                 return userRepository.save(newUser);
             });

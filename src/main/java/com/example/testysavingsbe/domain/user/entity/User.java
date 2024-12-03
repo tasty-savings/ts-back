@@ -1,6 +1,7 @@
 package com.example.testysavingsbe.domain.user.entity;
 
 
+import com.example.testysavingsbe.global.config.PrincipalDetails;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -31,9 +32,8 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Gender gender;
 
-    @Column(name = "age_group")
-    @Enumerated(EnumType.STRING)
-    private AgeGroup ageRange;
+    @Column(name = "age")
+    private int age;
 
     @Enumerated(EnumType.STRING)
     private CookingLevel cookingLevel;
@@ -48,16 +48,15 @@ public class User {
     private Set<Allergy> allergy;
 
     @Builder
-    public User(String username, Long socialId, CookingLevel cookingLevel, Gender gender,
-        AgeGroup ageRange) {
+    public User(String username, Long socialId, CookingLevel cookingLevel, Gender gender) {
         this.username = username;
         this.socialId = socialId;
         this.cookingLevel = cookingLevel;
         this.gender = gender;
-        this.ageRange = ageRange;
     }
 
-    public void updatePhysicalAttributes(float height, float weight, int activityLevel) {
+    public void updatePhysicalAttributes(int age, float height, float weight, int activityLevel) {
+        this.age = age;
         this.physicalAttributes = PhysicalAttributes.builder()
             .height(height)
             .weight(weight)
