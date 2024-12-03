@@ -70,4 +70,10 @@ public class AiWebClientAdapterImpl implements AiWebClientAdapter {
             })
             .block();
     }
+
+    // TODO: AI 개발 완성시 연결 2024. 12. 2. by kong
+    @Override
+    public void requestRecipeForUserNutrition() {
+
+    }
 }

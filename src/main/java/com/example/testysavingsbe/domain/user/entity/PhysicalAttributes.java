@@ -9,9 +9,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Getter
 public class PhysicalAttributes {
-    float height;
-    float weight;
-    int activityLevel;
+    Float height;
+    Float weight;
+    Integer activityLevel;
 
     @Builder
     public PhysicalAttributes(float height, float weight, int activityLevel) {
