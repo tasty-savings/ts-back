@@ -20,9 +20,12 @@ import com.example.testysavingsbe.domain.recipe.repository.*;
 import com.example.testysavingsbe.domain.recipe.service.usecase.RecipeCommandUseCase;
 import com.example.testysavingsbe.domain.recipe.service.usecase.RecipeQueryUseCase;
 import com.example.testysavingsbe.domain.user.entity.Allergy;
+import com.example.testysavingsbe.domain.user.entity.Gender;
+import com.example.testysavingsbe.domain.user.entity.PhysicalAttributes;
 import com.example.testysavingsbe.domain.user.entity.User;
 import com.example.testysavingsbe.domain.user.entity.UserPreferType;
 import com.example.testysavingsbe.domain.user.repository.UserPreferTypeRepository;
+import com.example.testysavingsbe.global.util.CalorieCalculationType;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.HashMap;
 import java.util.Map;
@@ -240,6 +243,66 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
         sharedRecipeRepository.deleteByCustomRecipeId(customRecipeId);
     }
 
+    @Override
+    public void generateRecipeBasedOnNutrients(User user) {
+        // TODO: 사용자 영양소에 맞게 레시피 추천해주기 2024. 12. 2. by kong
+        // 넘겨야할 정보 (사용자 기준 한끼 식사중 필요한 영양소 정보들) -> 사용자 키/몸무게/신체활동단계를 기준으로 계산
+        PhysicalAttributes physicalAttributes = user.getPhysicalAttributes();
+        calculateUserRequiredNutrition(user);
+        // ai server에 넘겨야함
+        aiAdapter.requestRecipeForUserNutrition();
+
+
+    }
+
+    private void calculateUserRequiredNutrition(User user) {
+        validUserPhysicalAttribute(user);
+        // 식사 구성안 작성방법
+        // 1. 자신에게 적합한 1일 에너지 필요량 확인 -> 에너지 필요량 계산
+
+        // 칼로리 근사치 확인
+        int userCalories = calculateCalories(user.getGender(), user.getAge(),
+            user.getPhysicalAttributes().getWeight(),
+            user.getPhysicalAttributes().getHeight());
+        // 2. 에너지 필요량에 적절한 권장식사패턴 선택
+        // 18세 이하 A타입 / 19세 부터 B타입
+
+        // 3. 각 식품군별 식품의 섭취회수 확인 및 세 끼 배분
+
+        // 4. 식품 섭취량 계산 및 메뉴 결정
+
+
+    }
+
+    private int calculateCalories(Gender gender, int age, float weight, float height) {
+        double result = 0;
+        if (gender == Gender.MALE) {
+            result = CalorieCalculationType.MALE.calculate(age, weight, height);
+        } else {
+            result = CalorieCalculationType.FEMALE.calculate(age, weight, height);
+        }
+
+        return (int) result;
+    }
+
+    private void validUserPhysicalAttribute(User user) {
+        if (user == null) {
+            throw new IllegalArgumentException("User 정보가 없습니다.");
+        }
+
+        PhysicalAttributes physicalAttributes = user.getPhysicalAttributes();
+        if (physicalAttributes == null
+            || physicalAttributes.getActivityLevel() == null
+            || physicalAttributes.getWeight() == null
+            || physicalAttributes.getHeight() == null) {
+            throw new IllegalArgumentException("PhysicalAttributes 정보가 없습니다.");
+        }
+
+        if (user.getAge() == null || user.getGender() == null) {
+            throw new IllegalArgumentException("유저 나이 또는 성별 정보가 없습니다.");
+        }
+    }
+
 
     @Override
     public CustomRecipeResponse getCustomRecipeBySharedLink(String uuid) {
@@ -261,9 +324,11 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
 
 
     @Override
-    public Recipe getRecipeById(String id) {
-        return recipeRecommendRepository.findById(id)
+    public OriginalRecipeResponse getRecipeById(String id) {
+        Recipe recipe = recipeRecommendRepository.findById(id)
             .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 레시피입니다."));
+
+        return OriginalRecipeResponse.fromRecipe(recipe);
     }
 
     @Override
@@ -282,7 +347,7 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
         List<Recipe> allById = recipeRepository.findAllById(recipeIds);
         if (allById.size() < RECOMMEND_RECIPE_MAX_SIZE) {
             List<Recipe> additionalRecipes = recipeRepository.findRandomRecipes(
-                RECOMMEND_RECIPE_MAX_SIZE  - allById.size());
+                RECOMMEND_RECIPE_MAX_SIZE - allById.size());
             allById.addAll(additionalRecipes);
         }
 

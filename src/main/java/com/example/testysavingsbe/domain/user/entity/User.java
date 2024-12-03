@@ -1,6 +1,7 @@
 package com.example.testysavingsbe.domain.user.entity;
 
 
+import com.example.testysavingsbe.global.config.PrincipalDetails;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,14 +21,25 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
+
     @Column(name = "username")
     private String username;
+
     @Column(name = "social_id")
     private Long socialId;
 
-    // 추가 할 거
+    @Column(name = "gender")
+    @Enumerated(EnumType.STRING)
+    private Gender gender;
+
+    @Column(name = "age")
+    private int age;
+
     @Enumerated(EnumType.STRING)
     private CookingLevel cookingLevel;
+
+    @Embedded
+    private PhysicalAttributes physicalAttributes = new PhysicalAttributes();
 
     @Enumerated(EnumType.STRING)
     private SpicyLevel spicyLevel = SpicyLevel.LEVEL_2;
@@ -36,10 +48,20 @@ public class User {
     private Set<Allergy> allergy;
 
     @Builder
-    public User(String username, Long socialId, CookingLevel cookingLevel) {
+    public User(String username, Long socialId, CookingLevel cookingLevel, Gender gender) {
         this.username = username;
         this.socialId = socialId;
         this.cookingLevel = cookingLevel;
+        this.gender = gender;
+    }
+
+    public void updatePhysicalAttributes(int age, float height, float weight, int activityLevel) {
+        this.age = age;
+        this.physicalAttributes = PhysicalAttributes.builder()
+            .height(height)
+            .weight(weight)
+            .activityLevel(activityLevel)
+            .build();
     }
 
     public Set<Allergy> getAllergy() {

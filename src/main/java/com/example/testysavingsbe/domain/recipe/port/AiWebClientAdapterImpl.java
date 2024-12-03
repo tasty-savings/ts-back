@@ -30,7 +30,7 @@ public class AiWebClientAdapterImpl implements AiWebClientAdapter {
             .uri(urlBuilder -> urlBuilder.path("/recipe")
                 .queryParam("recipe_change_type", 1)
                 .queryParam("recipe_info_index",
-                    request.originalRecipeId()) // 몽고 DB에 저장되어 있는 레시피 id
+                    request.originalRecipeId())
                 .build())
             .body(aiRequest, LeftoverCookingRequest.class)
             .exchangeToMono(response -> {

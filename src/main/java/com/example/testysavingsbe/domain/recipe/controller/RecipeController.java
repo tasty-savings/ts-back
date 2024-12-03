@@ -11,7 +11,6 @@ import com.example.testysavingsbe.domain.recipe.dto.response.RecipeResponse;
 import com.example.testysavingsbe.domain.recipe.dto.response.SharedRecipeResponse;
 import com.example.testysavingsbe.domain.recipe.entity.BookmarkedRecipe;
 import com.example.testysavingsbe.domain.recipe.entity.CustomRecipe;
-import com.example.testysavingsbe.domain.recipe.entity.Recipe;
 import com.example.testysavingsbe.domain.recipe.entity.UserEaten;
 import com.example.testysavingsbe.domain.recipe.service.usecase.RecipeCommandUseCase;
 import com.example.testysavingsbe.domain.recipe.service.usecase.RecipeQueryUseCase;
@@ -89,9 +88,9 @@ public class RecipeController {
      * @param id 원본 레시피 Id
      */
     @GetMapping("/original/{id}")
-    public ResponseEntity<?> getRecipe(
+    public ResponseEntity<OriginalRecipeResponse> getRecipe(
         @PathVariable("id") String id) {
-        Recipe recipeById = recipeQueryUseCase.getRecipeById(id);
+        OriginalRecipeResponse recipeById = recipeQueryUseCase.getRecipeById(id);
         return ResponseEntity.ok(recipeById);
     }
 

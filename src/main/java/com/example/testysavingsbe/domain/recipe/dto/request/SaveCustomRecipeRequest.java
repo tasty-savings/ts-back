@@ -8,7 +8,7 @@ public record SaveCustomRecipeRequest(
         String mainImg,
         String typeKey,
         String methodKey,
-        String servings,        // n인분
+        String servings,
         String cookingTime,
         String difficulty,
         List<String> ingredients,

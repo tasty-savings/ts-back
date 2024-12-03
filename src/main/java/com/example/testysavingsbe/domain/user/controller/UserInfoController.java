@@ -1,6 +1,7 @@
 package com.example.testysavingsbe.domain.user.controller;
 
 import com.example.testysavingsbe.domain.user.dto.request.DeleteUserTypeRequest;
+import com.example.testysavingsbe.domain.user.dto.request.PhysicalInfoRegisterRequest;
 import com.example.testysavingsbe.domain.user.dto.request.RegisterAllergyRequest;
 import com.example.testysavingsbe.domain.user.dto.request.SetUserTypesRequest;
 import com.example.testysavingsbe.domain.user.dto.response.RegisteredAllergyResponse;
@@ -63,8 +64,6 @@ public class UserInfoController {
     }
 
 
-    // todo
-    // 1. 알러지 받기
     @PostMapping("/allergy")
     public ResponseEntity<RegisteredAllergyResponse> registerAllergy(
         @AuthenticationPrincipal PrincipalDetails principal,
@@ -98,5 +97,15 @@ public class UserInfoController {
         return ResponseEntity.ok(new UserCookingLevelResponse(response));
     }
 
+
+    @PutMapping("/setting/physical")
+    public ResponseEntity<Void> updateUserSpicyLevel(
+        @AuthenticationPrincipal PrincipalDetails principalDetails,
+        @RequestBody PhysicalInfoRegisterRequest request
+        ) {
+        userInfoSettingUseCase.updateUserPhysicalAttribute(principalDetails.getUser(), request);
+
+        return ResponseEntity.noContent().build();
+    }
 
 }

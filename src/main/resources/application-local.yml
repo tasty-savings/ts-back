@@ -47,6 +47,7 @@ spring:
             client-name: kakao
             scope:
               - profile_nickname
+              - gender
         provider:
           kakao:
             authorization-uri: https://kauth.kakao.com/oauth/authorize

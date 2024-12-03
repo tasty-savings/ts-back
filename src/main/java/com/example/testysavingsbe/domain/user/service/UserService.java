@@ -1,6 +1,7 @@
 package com.example.testysavingsbe.domain.user.service;
 
 import com.example.testysavingsbe.domain.user.dto.request.DeleteUserTypeRequest;
+import com.example.testysavingsbe.domain.user.dto.request.PhysicalInfoRegisterRequest;
 import com.example.testysavingsbe.domain.user.dto.response.UserInfoResponse;
 import com.example.testysavingsbe.domain.user.dto.response.UserPreferTypeResponse;
 import com.example.testysavingsbe.domain.user.entity.*;
@@ -15,6 +16,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class UserService implements UserInfoSettingUseCase, UserinfoQueryUseCase {
+
     private final UserPreferTypeRepository userPreferTypeRepository;
     private final AllergyRepository allergyRepository;
 
@@ -24,8 +26,8 @@ public class UserService implements UserInfoSettingUseCase, UserinfoQueryUseCase
         User user = request.user();
 
         List<UserPreferType> userPreferTypeList = request.preferredTypes().stream()
-                .map(type -> new UserPreferType(PreferType.fromKoreanName(type), user))
-                .toList();
+            .map(type -> new UserPreferType(PreferType.fromKoreanName(type), user))
+            .toList();
         userPreferTypeRepository.saveAll(userPreferTypeList);
 
         return new UserPreferTypeResponse(request.preferredTypes());
@@ -35,10 +37,10 @@ public class UserService implements UserInfoSettingUseCase, UserinfoQueryUseCase
     @Override
     @Transactional
     public List<String> registerAllergy(User user, List<String> allergy) {
-        allergy.forEach(name ->{
-            Allergy allergy1 = new Allergy(name);
-            allergyRepository.save(allergy1);
-            user.registerAllergy(allergy1);
+        allergy.forEach(name -> {
+                Allergy allergy1 = new Allergy(name);
+                allergyRepository.save(allergy1);
+                user.registerAllergy(allergy1);
             }
         );
 
@@ -58,6 +60,13 @@ public class UserService implements UserInfoSettingUseCase, UserinfoQueryUseCase
     public String updateCookingLevel(User user, CookingLevel level) {
         user.updateCookingLevel(level);
         return level.getDisplayName();
+    }
+
+    @Override
+    @Transactional
+    public void updateUserPhysicalAttribute(User user, PhysicalInfoRegisterRequest request) {
+        user.updatePhysicalAttributes(request.age(), request.height(), request.weight(),
+            request.activityLevel());
     }
 
     @Override

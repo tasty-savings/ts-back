@@ -5,7 +5,6 @@ import com.example.testysavingsbe.domain.recipe.dto.response.CustomRecipeRespons
 import com.example.testysavingsbe.domain.recipe.dto.response.OriginalRecipeResponse;
 import com.example.testysavingsbe.domain.recipe.dto.response.RecipeResponse;
 import com.example.testysavingsbe.domain.recipe.entity.CustomRecipe;
-import com.example.testysavingsbe.domain.recipe.entity.Recipe;
 import com.example.testysavingsbe.domain.user.entity.User;
 import lombok.Builder;
 import org.springframework.data.domain.Page;
@@ -23,7 +22,7 @@ public interface RecipeQueryUseCase {
 
     List<OriginalRecipeResponse> getRecommendedRecipe(User user);
 
-    Recipe getRecipeById(String id);
+    OriginalRecipeResponse getRecipeById(String id);
 
     Page<CustomRecipe> getCustomRecipeByUser(User user, int page, int pageSize);
 
