@@ -23,6 +23,8 @@ public interface RecipeCommandUseCase {
 
     void deleteSharedRecipe(String customRecipeId);
 
+    void generateRecipeBasedOnNutrients(User user);
+
     record RecipeGenerateServiceRequest(
         User user,
         String recipeName

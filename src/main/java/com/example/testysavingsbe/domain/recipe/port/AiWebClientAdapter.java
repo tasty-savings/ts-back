@@ -18,4 +18,6 @@ public interface AiWebClientAdapter {
 
     List<String> requestRecommendRecipeList(Map<String, List<String>> request);
 
+    void requestRecipeForUserNutrition();
+
 }

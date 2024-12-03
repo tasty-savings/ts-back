@@ -33,7 +33,7 @@ public class User {
     private Gender gender;
 
     @Column(name = "age")
-    private int age;
+    private Integer age;
 
     @Enumerated(EnumType.STRING)
     private CookingLevel cookingLevel;
