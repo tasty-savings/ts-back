@@ -281,13 +281,8 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
     }
 
     private int calculateCalories(Gender gender, int age, float weight, float height) {
-        double result = 0;
-        if (gender == Gender.MALE) {
-            result = CalorieCalculationType.MALE.calculate(age, weight, height);
-        } else {
-            result = CalorieCalculationType.FEMALE.calculate(age, weight, height);
-        }
-
+        double result = CalorieCalculationType.valueOf(gender.toString())
+            .calculate(age, weight, height);
         return (int) result;
     }
 
