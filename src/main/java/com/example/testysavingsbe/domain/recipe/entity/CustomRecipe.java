@@ -14,53 +14,57 @@ import java.util.List;
 @Document(collection = "custom_recipe")
 @Getter
 public class CustomRecipe implements Serializable {
+
     @Id
     private String id;
 
     @Field("user_id")
-    private Long userId;
+    private final Long userId;
 
     @Field("title")
-    private String title;
+    private final String title;
 
     @Field("main_img")
-    private String mainImg;
+    private final String mainImg;
 
     @Field("type_key")
-    private String typeKey;
+    private final String typeKey;
 
     @Field("method_key")
-    private String methodKey;
+    private final String methodKey;
 
     @Field("servings")
-    private String servings;
+    private final String servings;
 
     @Field("cooking_time")
-    private String cookingTime;
+    private final String cookingTime;
 
     @Field("difficulty")
-    private String difficulty;
+    private final String difficulty;
 
     @Field("ingredients")
-    private List<String> ingredients;
+    private final List<String> ingredients;
 
     @Field("cooking_order")
-    private List<String> cookingOrder;
+    private final List<String> cookingOrder;
 
     @Field("cooking_img")
-    private List<String> cookingImg;
+    private final List<String> cookingImg;
 
     @Field("hashtag")
-    private List<String> hashtag;
+    private final List<String> hashtag;
 
     @Field("tips")
-    private List<String> tips;
+    private final List<String> tips;
 
     @Field("recipe_type")
-    private List<String> recipeType;
+    private final List<String> recipeType;
 
     @Builder
-    public CustomRecipe(Long userId, String title, String mainImg, String typeKey, String methodKey, String servings, String cookingTime, String difficulty, List<String> ingredients, List<String> cookingOrder, List<String> cookingImg, List<String> hashtag, List<String> tips, List<String> recipeType) {
+    public CustomRecipe(Long userId, String title, String mainImg, String typeKey, String methodKey,
+        String servings, String cookingTime, String difficulty, List<String> ingredients,
+        List<String> cookingOrder, List<String> cookingImg, List<String> hashtag, List<String> tips,
+        List<String> recipeType) {
         this.userId = userId;
         this.title = title;
         this.mainImg = mainImg;

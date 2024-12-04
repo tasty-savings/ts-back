@@ -10,7 +10,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class BookmarkedRecipe {
     @Id
     private Long userId;
-    private String recipeId;
+    private final String recipeId;
 
     @Builder
     public BookmarkedRecipe(Long userId, String recipeId) {
