@@ -17,7 +17,6 @@ import com.example.testysavingsbe.domain.recipe.service.usecase.RecipeQueryUseCa
 import com.example.testysavingsbe.domain.recipe.service.usecase.RecipeQueryUseCase.RecipeFromIngredientsRequest;
 import com.example.testysavingsbe.global.config.PrincipalDetails;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -95,28 +94,28 @@ public class RecipeController {
     }
 
     @GetMapping("/custom/all")
-    public ResponseEntity<List<CustomRecipe>> getRecipesByUser(
+    public ResponseEntity<List<CustomRecipeResponse>> getRecipesByUser(
         @AuthenticationPrincipal PrincipalDetails details,
         @RequestParam(name = "page", defaultValue = "0") int page,
         @RequestParam(name = "page_size", defaultValue = "10") int pageSize) {
-        Page<CustomRecipe> mongoRecipeByUser = recipeQueryUseCase.getCustomRecipeByUser(
+        List<CustomRecipeResponse> responses = recipeQueryUseCase.getCustomRecipeByUser(
             details.getUser(), page, pageSize);
-        return ResponseEntity.ok(mongoRecipeByUser.getContent());
+        return ResponseEntity.ok(responses);
     }
 
     @GetMapping("/custom/{recipeId}")
-    public ResponseEntity<CustomRecipe> getCustomRecipe(
+    public ResponseEntity<CustomRecipeResponse> getCustomRecipe(
         @AuthenticationPrincipal PrincipalDetails principalDetails,
         @PathVariable(name = "recipeId") String id) {
-        CustomRecipe response = recipeQueryUseCase.getCustomRecipe(principalDetails.getUser(), id);
+        CustomRecipeResponse response = recipeQueryUseCase.getCustomRecipe(principalDetails.getUser(), id);
         return ResponseEntity.ok(response);
     }
 
     @PostMapping("/custom/save")
-    public ResponseEntity<CustomRecipe> saveCustomRecipe(
+    public ResponseEntity<CustomRecipeResponse> saveCustomRecipe(
         @AuthenticationPrincipal PrincipalDetails principalDetails,
         @RequestBody SaveCustomRecipeRequest request) {
-        CustomRecipe mongoRecipe = recipeCommandUseCase.saveCustomRecipe(principalDetails.getUser(),
+        CustomRecipeResponse mongoRecipe = recipeCommandUseCase.saveCustomRecipe(principalDetails.getUser(),
             request);
         return ResponseEntity.status(HttpStatus.CREATED).body(mongoRecipe);
     }

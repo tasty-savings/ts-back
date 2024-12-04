@@ -1,5 +1,6 @@
 package com.example.testysavingsbe.domain.recipe.port;
 
+import com.example.testysavingsbe.domain.recipe.dto.request.AIGenerateBasedOnNutrientsRequest;
 import com.example.testysavingsbe.domain.recipe.dto.request.LeftoverCookingRequest;
 import com.example.testysavingsbe.domain.recipe.dto.request.SimplifyRecipeToAiRequest;
 import com.example.testysavingsbe.domain.recipe.dto.response.AIRecipeResponse;
@@ -18,6 +19,6 @@ public interface AiWebClientAdapter {
 
     List<String> requestRecommendRecipeList(Map<String, List<String>> request);
 
-    void requestRecipeForUserNutrition();
 
+    void requestRecipeForUserNutrition(AIGenerateBasedOnNutrientsRequest request);
 }

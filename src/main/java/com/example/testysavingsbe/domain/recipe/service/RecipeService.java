@@ -3,6 +3,7 @@ package com.example.testysavingsbe.domain.recipe.service;
 
 import com.example.testysavingsbe.domain.ingredient.entity.Food;
 import com.example.testysavingsbe.domain.ingredient.repository.FoodRepository;
+import com.example.testysavingsbe.domain.recipe.dto.request.AIGenerateBasedOnNutrientsRequest;
 import com.example.testysavingsbe.domain.recipe.dto.request.LeftoverCookingRequest;
 import com.example.testysavingsbe.domain.recipe.dto.request.EatRecipeRequest;
 import com.example.testysavingsbe.domain.recipe.dto.request.SaveCustomRecipeRequest;
@@ -26,6 +27,8 @@ import com.example.testysavingsbe.domain.user.entity.User;
 import com.example.testysavingsbe.domain.user.entity.UserPreferType;
 import com.example.testysavingsbe.domain.user.repository.UserPreferTypeRepository;
 import com.example.testysavingsbe.global.util.CalorieCalculationType;
+import com.example.testysavingsbe.global.util.MealPattern.Pattern;
+import com.example.testysavingsbe.global.util.MealPatternData;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.HashMap;
 import java.util.Map;
@@ -194,16 +197,21 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
      * @return
      */
     @Override
-    public Page<CustomRecipe> getCustomRecipeByUser(User user, int page, int pageSize) {
+    public List<CustomRecipeResponse> getCustomRecipeByUser(User user, int page, int pageSize) {
         Pageable pageable = PageRequest.of(page, pageSize);
-        return customRecipeRepository.findMongoRecipesByUserId(user.getId(), pageable);
+        Page<CustomRecipe> mongoRecipesByUserId = customRecipeRepository.findMongoRecipesByUserId(
+            user.getId(), pageable);
+
+        return mongoRecipesByUserId.getContent().stream()
+            .map(CustomRecipeResponse::from)
+            .collect(Collectors.toList());
     }
 
     @Override
-    public CustomRecipe saveCustomRecipe(User user, SaveCustomRecipeRequest request) {
+    public CustomRecipeResponse saveCustomRecipe(User user, SaveCustomRecipeRequest request) {
         CustomRecipe recipe = buildCustomRecipe(user, request);
         customRecipeRepository.save(recipe);
-        return recipe;
+        return CustomRecipeResponse.from(recipe);
     }
 
     @Override
@@ -244,34 +252,32 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
     }
 
     @Override
-    public void generateRecipeBasedOnNutrients(User user) {
+    public void generateRecipeBasedOnNutrients(User user, int mealsADay) {
         // TODO: 사용자 영양소에 맞게 레시피 추천해주기 2024. 12. 2. by kong
         // 넘겨야할 정보 (사용자 기준 한끼 식사중 필요한 영양소 정보들) -> 사용자 키/몸무게/신체활동단계를 기준으로 계산
         PhysicalAttributes physicalAttributes = user.getPhysicalAttributes();
-        calculateUserRequiredNutrition(user);
-        // ai server에 넘겨야함
-        aiAdapter.requestRecipeForUserNutrition();
-
-
+        AIGenerateBasedOnNutrientsRequest request = calculateUserRequiredNutrition(
+            user, mealsADay);
+        aiAdapter.requestRecipeForUserNutrition(request);
     }
 
-    private void calculateUserRequiredNutrition(User user) {
+    private AIGenerateBasedOnNutrientsRequest calculateUserRequiredNutrition(User user,
+        int mealsADay) {
         validUserPhysicalAttribute(user);
-        // 식사 구성안 작성방법
         // 1. 자신에게 적합한 1일 에너지 필요량 확인 -> 에너지 필요량 계산
 
         // 칼로리 근사치 확인
         int userCalories = calculateCalories(user.getGender(), user.getAge(),
             user.getPhysicalAttributes().getWeight(),
             user.getPhysicalAttributes().getHeight());
-        // 2. 에너지 필요량에 적절한 권장식사패턴 선택
         // 18세 이하 A타입 / 19세 부터 B타입
+        Pattern pattern =
+            user.getAge() <= 18 ? MealPatternData.getTypeA().searchByKcal(userCalories)
+                : MealPatternData.getTypeB().searchByKcal(userCalories);
 
         // 3. 각 식품군별 식품의 섭취회수 확인 및 세 끼 배분
-
-        // 4. 식품 섭취량 계산 및 메뉴 결정
-
-
+        return AIGenerateBasedOnNutrientsRequest.toNutrientsRequestDivideByMeals(
+            pattern, mealsADay);
     }
 
     private int calculateCalories(Gender gender, int age, float weight, float height) {
@@ -317,9 +323,11 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
 
 
     @Override
-    public CustomRecipe getCustomRecipe(User user, String id) {
-        return customRecipeRepository.findByIdAndUserId(id, user.getId())
+    public CustomRecipeResponse getCustomRecipe(User user, String id) {
+        CustomRecipe customRecipe = customRecipeRepository.findByIdAndUserId(id, user.getId())
             .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 커스텀 레시피입니다."));
+
+        return CustomRecipeResponse.from(customRecipe);
     }
 
 
@@ -333,12 +341,12 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
 
     @Override
     public List<OriginalRecipeResponse> getRecommendedRecipe(User user) {
-
         List<UserPreferType> userPreferTypes = userPreferTypeRepository.findAllByUser(user);
         List<String> userPreferTypeStrings = userPreferTypes.stream()
             .map(UserPreferType::getDisplayName).toList();
 
         // TODO: request dto로 변환 2024. 12. 2. by kong
+        // TODO: AI로부터 받아오는 값들 6시간 기준으로 캐시에 저장 2024. 12. 3. by kong
         Map<String, List<String>> request = new HashMap<>();
         request.put("search_types", userPreferTypeStrings);
 
