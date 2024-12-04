@@ -4,6 +4,7 @@ import com.example.testysavingsbe.domain.user.dto.request.DeleteUserTypeRequest;
 import com.example.testysavingsbe.domain.user.dto.request.PhysicalInfoRegisterRequest;
 import com.example.testysavingsbe.domain.user.dto.request.RegisterAllergyRequest;
 import com.example.testysavingsbe.domain.user.dto.request.SetUserTypesRequest;
+import com.example.testysavingsbe.domain.user.dto.response.CheckSetPreferFoodResponse;
 import com.example.testysavingsbe.domain.user.dto.response.RegisteredAllergyResponse;
 import com.example.testysavingsbe.domain.user.dto.response.UserCookingLevelResponse;
 import com.example.testysavingsbe.domain.user.dto.response.UserInfoResponse;
@@ -50,6 +51,13 @@ public class UserInfoController {
     ) {
         userInfoSettingUseCase.deletePreferType(principalDetails.getUser(), request);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/me/preferences/status")
+    public ResponseEntity<CheckSetPreferFoodResponse> checkSetUserPrefer(@AuthenticationPrincipal PrincipalDetails principalDetails){
+        CheckSetPreferFoodResponse response = userinfoQueryUseCase.checkSetUserPrefer(
+            principalDetails.getUser());
+        return ResponseEntity.ok(response);
     }
 
 

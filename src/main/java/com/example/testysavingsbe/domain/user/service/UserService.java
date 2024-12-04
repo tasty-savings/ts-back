@@ -2,6 +2,7 @@ package com.example.testysavingsbe.domain.user.service;
 
 import com.example.testysavingsbe.domain.user.dto.request.DeleteUserTypeRequest;
 import com.example.testysavingsbe.domain.user.dto.request.PhysicalInfoRegisterRequest;
+import com.example.testysavingsbe.domain.user.dto.response.CheckSetPreferFoodResponse;
 import com.example.testysavingsbe.domain.user.dto.response.UserInfoResponse;
 import com.example.testysavingsbe.domain.user.dto.response.UserPreferTypeResponse;
 import com.example.testysavingsbe.domain.user.entity.*;
@@ -20,6 +21,7 @@ public class UserService implements UserInfoSettingUseCase, UserinfoQueryUseCase
     private final UserPreferTypeRepository userPreferTypeRepository;
     private final AllergyRepository allergyRepository;
 
+
     @Override
     @Transactional
     public UserPreferTypeResponse registerPreferType(SettingPreferTypeRequest request) {
@@ -29,6 +31,10 @@ public class UserService implements UserInfoSettingUseCase, UserinfoQueryUseCase
             .map(type -> new UserPreferType(PreferType.fromKoreanName(type), user))
             .toList();
         userPreferTypeRepository.saveAll(userPreferTypeList);
+
+        if (!user.getSetPreferType()) {
+            user.doneUserPreferType();
+        }
 
         return new UserPreferTypeResponse(request.preferredTypes());
     }
@@ -89,4 +95,10 @@ public class UserService implements UserInfoSettingUseCase, UserinfoQueryUseCase
             .build();
 
     }
+
+    @Override
+    public CheckSetPreferFoodResponse checkSetUserPrefer(User user) {
+        return new CheckSetPreferFoodResponse(user.getSetPreferType());
+    }
+
 }

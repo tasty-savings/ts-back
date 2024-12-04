@@ -44,6 +44,9 @@ public class User {
     @Enumerated(EnumType.STRING)
     private SpicyLevel spicyLevel = SpicyLevel.LEVEL_2;
 
+    @Column(name = "set_preffer_type")
+    private Boolean setPreferType = false;
+
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<Allergy> allergy;
 
@@ -69,6 +72,10 @@ public class User {
             allergy = new HashSet<>();
         }
         return allergy;
+    }
+
+    public void doneUserPreferType(){
+        this.setPreferType = true;
     }
 
     public void registerAllergy(Allergy allergy) {
