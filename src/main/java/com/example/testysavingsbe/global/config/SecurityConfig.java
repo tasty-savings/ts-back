@@ -1,6 +1,7 @@
 package com.example.testysavingsbe.global.config;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -14,6 +15,9 @@ import org.springframework.web.cors.CorsUtils;
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfig {
+
+    @Value("server_host.front_url")
+    String frontUrl;
 
     private final CustomUserService customUserService;
 
@@ -40,7 +44,9 @@ public class SecurityConfig {
                     .userService(customUserService)
                 )
                 .successHandler((request, response, authentication) -> {
-                    response.sendRedirect("/");         // baseurl
+//                    response.sendRedirect("/");         // baseurl
+                    response.sendRedirect(frontUrl);         // baseurl
+                    response.setHeader("Set-Cookie", "JSESSIONID=" + authentication.getCredentials().toString());
                 })
             )
             .logout(logout -> logout
