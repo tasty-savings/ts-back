@@ -197,16 +197,21 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
      * @return
      */
     @Override
-    public Page<CustomRecipe> getCustomRecipeByUser(User user, int page, int pageSize) {
+    public List<CustomRecipeResponse> getCustomRecipeByUser(User user, int page, int pageSize) {
         Pageable pageable = PageRequest.of(page, pageSize);
-        return customRecipeRepository.findMongoRecipesByUserId(user.getId(), pageable);
+        Page<CustomRecipe> mongoRecipesByUserId = customRecipeRepository.findMongoRecipesByUserId(
+            user.getId(), pageable);
+
+        return mongoRecipesByUserId.getContent().stream()
+            .map(CustomRecipeResponse::from)
+            .collect(Collectors.toList());
     }
 
     @Override
-    public CustomRecipe saveCustomRecipe(User user, SaveCustomRecipeRequest request) {
+    public CustomRecipeResponse saveCustomRecipe(User user, SaveCustomRecipeRequest request) {
         CustomRecipe recipe = buildCustomRecipe(user, request);
         customRecipeRepository.save(recipe);
-        return recipe;
+        return CustomRecipeResponse.from(recipe);
     }
 
     @Override
@@ -318,9 +323,11 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
 
 
     @Override
-    public CustomRecipe getCustomRecipe(User user, String id) {
-        return customRecipeRepository.findByIdAndUserId(id, user.getId())
+    public CustomRecipeResponse getCustomRecipe(User user, String id) {
+        CustomRecipe customRecipe = customRecipeRepository.findByIdAndUserId(id, user.getId())
             .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 커스텀 레시피입니다."));
+
+        return CustomRecipeResponse.from(customRecipe);
     }
 
 

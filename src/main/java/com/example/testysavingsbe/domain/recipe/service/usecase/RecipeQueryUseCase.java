@@ -4,16 +4,14 @@ import com.example.testysavingsbe.domain.recipe.dto.response.AIChangeRecipeRespo
 import com.example.testysavingsbe.domain.recipe.dto.response.CustomRecipeResponse;
 import com.example.testysavingsbe.domain.recipe.dto.response.OriginalRecipeResponse;
 import com.example.testysavingsbe.domain.recipe.dto.response.RecipeResponse;
-import com.example.testysavingsbe.domain.recipe.entity.CustomRecipe;
 import com.example.testysavingsbe.domain.user.entity.User;
 import lombok.Builder;
-import org.springframework.data.domain.Page;
 
 import java.util.List;
 
 public interface RecipeQueryUseCase {
 
-    CustomRecipe getCustomRecipe(User user, String id);
+    CustomRecipeResponse getCustomRecipe(User user, String id);
 
     AIChangeRecipeResponse createRecipeFromIngredients(User user,
         RecipeFromIngredientsRequest request);
@@ -24,7 +22,7 @@ public interface RecipeQueryUseCase {
 
     OriginalRecipeResponse getRecipeById(String id);
 
-    Page<CustomRecipe> getCustomRecipeByUser(User user, int page, int pageSize);
+    List<CustomRecipeResponse> getCustomRecipeByUser(User user, int page, int pageSize);
 
     boolean checkBookmarked(User user, String recipeId);
 
