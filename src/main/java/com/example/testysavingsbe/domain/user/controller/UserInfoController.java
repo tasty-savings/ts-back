@@ -114,7 +114,7 @@ public class UserInfoController {
     @PutMapping("/setting/physical")
     public ResponseEntity<Void> updateUserSpicyLevel(
         @AuthenticationPrincipal PrincipalDetails principalDetails,
-        @RequestBody PhysicalInfoRegisterRequest request
+        @RequestBody @Valid PhysicalInfoRegisterRequest request
         ) {
         userInfoSettingUseCase.updateUserPhysicalAttribute(principalDetails.getUser(), request);
         return ResponseEntity.noContent().build();

@@ -8,6 +8,7 @@ import com.example.testysavingsbe.domain.user.dto.response.UserPreferTypeRespons
 import com.example.testysavingsbe.domain.user.entity.*;
 import com.example.testysavingsbe.domain.user.repository.AllergyRepository;
 import com.example.testysavingsbe.domain.user.repository.UserPreferTypeRepository;
+import com.example.testysavingsbe.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +21,7 @@ public class UserService implements UserInfoSettingUseCase, UserinfoQueryUseCase
 
     private final UserPreferTypeRepository userPreferTypeRepository;
     private final AllergyRepository allergyRepository;
+    private final UserRepository userRepository;
 
 
     @Override
@@ -81,6 +83,7 @@ public class UserService implements UserInfoSettingUseCase, UserinfoQueryUseCase
     public void updateUserPhysicalAttribute(User user, PhysicalInfoRegisterRequest request) {
         user.updatePhysicalAttributes(request.age(), request.height(), request.weight(),
             ActivityLevel.from(request.activityLevel()));
+        userRepository.save(user);
     }
 
     @Override
