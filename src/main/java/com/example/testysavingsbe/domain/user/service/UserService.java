@@ -80,7 +80,7 @@ public class UserService implements UserInfoSettingUseCase, UserinfoQueryUseCase
     @Transactional
     public void updateUserPhysicalAttribute(User user, PhysicalInfoRegisterRequest request) {
         user.updatePhysicalAttributes(request.age(), request.height(), request.weight(),
-            request.activityLevel());
+            ActivityLevel.from(request.activityLevel()));
     }
 
     @Override

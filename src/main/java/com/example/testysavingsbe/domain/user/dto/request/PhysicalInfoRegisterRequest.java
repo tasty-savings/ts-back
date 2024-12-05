@@ -10,7 +10,7 @@ public record PhysicalInfoRegisterRequest(
     @JsonProperty("weight")
     float weight,
     @JsonProperty("activity_level")
-    int activityLevel
+    String activityLevel
 ) {
 
 }

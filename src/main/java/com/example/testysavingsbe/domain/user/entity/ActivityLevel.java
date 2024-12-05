@@ -16,5 +16,13 @@ public enum ActivityLevel {
         return this.description;
     }
 
+    public static ActivityLevel from(String description) {
+        for (ActivityLevel activityLevel : ActivityLevel.values()) {
+            if (activityLevel.getDescription().equals(description)) {
+                return activityLevel;
+            }
+        }
+        return ActivityLevel.LOW_ACTIVE;
+    }
 
 }
