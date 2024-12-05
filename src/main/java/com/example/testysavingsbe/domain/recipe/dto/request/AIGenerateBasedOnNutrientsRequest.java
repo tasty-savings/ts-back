@@ -42,7 +42,7 @@ public record AIGenerateBasedOnNutrientsRequest(
         String gender,
         float height,
         float weight,
-        int activityLevel,
+        ActivityLevel activityLevel,
         MealPattern.Pattern pattern,
         int mealsADay
     ) {
@@ -71,21 +71,13 @@ public record AIGenerateBasedOnNutrientsRequest(
     ) {
 
         public UserHealthInfo(int age, String gender, float height, float weight,
-            int activityLevelInt) {
+            ActivityLevel activityLevel) {
             this(
                 age,
                 gender,
                 height,
                 weight,
-                switch (activityLevelInt) {
-                    case 1 -> "비활동적";
-                    case 2 -> "저활동적";
-                    case 3 -> "활동적";
-                    case 4 -> "매우 활동적";
-                    default ->
-                        throw new IllegalArgumentException("유효하지 않은 활동 수준입니다: " + activityLevelInt);
-                }
-            );
+                activityLevel.getDescription());
         }
     }
 

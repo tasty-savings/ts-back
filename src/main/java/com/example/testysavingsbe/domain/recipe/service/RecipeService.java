@@ -20,6 +20,7 @@ import com.example.testysavingsbe.domain.recipe.port.AiWebClientAdapter;
 import com.example.testysavingsbe.domain.recipe.repository.*;
 import com.example.testysavingsbe.domain.recipe.service.usecase.RecipeCommandUseCase;
 import com.example.testysavingsbe.domain.recipe.service.usecase.RecipeQueryUseCase;
+import com.example.testysavingsbe.domain.user.entity.ActivityLevel;
 import com.example.testysavingsbe.domain.user.entity.Allergy;
 import com.example.testysavingsbe.domain.user.entity.Gender;
 import com.example.testysavingsbe.domain.user.entity.PhysicalAttributes;
@@ -270,7 +271,7 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
         Gender userGender = user.getGender();
         Float userHeight = user.getPhysicalAttributes().getHeight();
         Float userWeight = user.getPhysicalAttributes().getWeight();
-        Integer userActivityLevel = user.getPhysicalAttributes().getActivityLevel();
+        ActivityLevel userActivityLevel = user.getPhysicalAttributes().getActivityLevel();
 
         int userCalories = calculateCalories(userGender, userAge,
             userWeight,
