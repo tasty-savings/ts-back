@@ -57,7 +57,7 @@ public class User {
         this.gender = gender;
     }
 
-    public void updatePhysicalAttributes(int age, float height, float weight, int activityLevel) {
+    public void updatePhysicalAttributes(int age, float height, float weight, ActivityLevel activityLevel) {
         this.age = age;
         this.physicalAttributes = PhysicalAttributes.builder()
             .height(height)
