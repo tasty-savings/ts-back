@@ -60,6 +60,9 @@ public class UserInfoController {
         return ResponseEntity.ok(response);
     }
 
+    // TODO: 사용자가 헬스정보를 등록했는지 확인할 API가 필요 2024. 12. 4. by kong
+
+
 
     @PostMapping("/prefer")
     public ResponseEntity<UserPreferTypeResponse> setUserPreferUserType(
@@ -112,7 +115,6 @@ public class UserInfoController {
         @RequestBody PhysicalInfoRegisterRequest request
         ) {
         userInfoSettingUseCase.updateUserPhysicalAttribute(principalDetails.getUser(), request);
-
         return ResponseEntity.noContent().build();
     }
 

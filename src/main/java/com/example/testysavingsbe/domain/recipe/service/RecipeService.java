@@ -68,16 +68,14 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
     private final AiWebClientAdapter aiAdapter;
 
     @Override
-    public BookmarkedRecipe bookmarkRecipe(User user, String recipeId) {
+    public void bookmarkRecipe(User user, String recipeId) {
         Optional<BookmarkedRecipe> byUserIdAndRecipeId = bookmarkedRepository.findByUserIdAndRecipeId(
             user.getId(), recipeId);
 
         if (byUserIdAndRecipeId.isPresent()) {
             BookmarkedRecipe existingRecipe = byUserIdAndRecipeId.get();
-            // 삭제후 리턴
             bookmarkedRepository.delete(existingRecipe);
-
-            return existingRecipe;
+            return;
         }
 
         BookmarkedRecipe bookmarkedRecipe = BookmarkedRecipe.builder()
@@ -86,8 +84,6 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
             .build();
 
         bookmarkedRepository.save(bookmarkedRecipe);
-
-        return bookmarkedRecipe;
     }
 
 
