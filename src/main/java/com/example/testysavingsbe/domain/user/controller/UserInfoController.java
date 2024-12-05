@@ -60,9 +60,11 @@ public class UserInfoController {
         return ResponseEntity.ok(response);
     }
 
-    // TODO: 사용자가 헬스정보를 등록했는지 확인할 API가 필요 2024. 12. 4. by kong
-
-
+    @GetMapping("/me/health/status")
+    public ResponseEntity<CheckSetUserInfoResponse> getRegisteredAllergy(@AuthenticationPrincipal PrincipalDetails principalDetails){
+        CheckSetUserInfoResponse response = userinfoQueryUseCase.checkSetUserHealthInfo(principalDetails.getUser());
+        return ResponseEntity.ok(response);
+    }
 
     @PostMapping("/prefer")
     public ResponseEntity<UserPreferTypeResponse> setUserPreferUserType(
@@ -112,7 +114,7 @@ public class UserInfoController {
     @PutMapping("/setting/physical")
     public ResponseEntity<Void> updateUserSpicyLevel(
         @AuthenticationPrincipal PrincipalDetails principalDetails,
-        @RequestBody PhysicalInfoRegisterRequest request
+        @RequestBody @Valid PhysicalInfoRegisterRequest request
         ) {
         userInfoSettingUseCase.updateUserPhysicalAttribute(principalDetails.getUser(), request);
         return ResponseEntity.noContent().build();

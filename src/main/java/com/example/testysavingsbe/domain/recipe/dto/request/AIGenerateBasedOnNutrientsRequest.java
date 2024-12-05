@@ -1,10 +1,13 @@
 package com.example.testysavingsbe.domain.recipe.dto.request;
 
+import com.example.testysavingsbe.domain.user.entity.ActivityLevel;
 import com.example.testysavingsbe.global.util.MealPattern;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 
 public record AIGenerateBasedOnNutrientsRequest(
+    @JsonProperty("유저 정보")
+    UserHealthInfo userHealthInfo,
     @JsonProperty("곡류")
     float grains,
     @JsonProperty("고기·생선·달걀 종류")
@@ -23,15 +26,60 @@ public record AIGenerateBasedOnNutrientsRequest(
     public AIGenerateBasedOnNutrientsRequest {
     }
 
+    private static float roundToOneDecimal(int value, int mealsADay) {
+        float divisionResult = (float) value / mealsADay;
+        return Math.round(divisionResult * 10f) / 10f;
+    }
+
+    private static float roundToOneDecimal(float value, int mealsADay) {
+        float divisionResult = value / mealsADay;
+        return Math.round(divisionResult * 10f) / 10f;
+    }
+
+
     public static AIGenerateBasedOnNutrientsRequest toNutrientsRequestDivideByMeals(
-        MealPattern.Pattern pattern, int mealsADay) {
+        int age,
+        String gender,
+        float height,
+        float weight,
+        ActivityLevel activityLevel,
+        MealPattern.Pattern pattern,
+        int mealsADay
+    ) {
         return AIGenerateBasedOnNutrientsRequest.builder()
-            .grains(pattern.getGrains() / mealsADay)
-            .proteinSources(pattern.getProteinSources() / mealsADay)
-            .vegetables((float) pattern.getVegetables() / mealsADay)
-            .fruits((float) pattern.getFruits() / mealsADay)
-            .dairy((float) pattern.getDairy() / mealsADay)
-            .fatsAndSugars((float) pattern.getFatsAndSugars() / mealsADay)
+            .grains(roundToOneDecimal(pattern.getGrains(), mealsADay))
+            .proteinSources(roundToOneDecimal(pattern.getProteinSources(), mealsADay))
+            .vegetables(roundToOneDecimal(pattern.getVegetables(), mealsADay))
+            .fruits(roundToOneDecimal(pattern.getFruits(), mealsADay))
+            .dairy(roundToOneDecimal(pattern.getDairy(), mealsADay))
+            .fatsAndSugars(roundToOneDecimal(pattern.getFatsAndSugars(), mealsADay))
+            .userHealthInfo(new UserHealthInfo(age, gender, height, weight, activityLevel))
             .build();
     }
+
+    public record UserHealthInfo(
+        @JsonProperty("나이")
+        int age,
+        @JsonProperty("성별")
+        String gender,
+        @JsonProperty("키")
+        float height,
+        @JsonProperty("몸무게")
+        float weight,
+        @JsonProperty("활동계수")
+        String activityLevel
+    ) {
+
+        public UserHealthInfo(int age, String gender, float height, float weight,
+            ActivityLevel activityLevel) {
+            this(
+                age,
+                gender,
+                height,
+                weight,
+                activityLevel.getDescription());
+        }
+    }
+
+
 }

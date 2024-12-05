@@ -11,10 +11,10 @@ import lombok.NoArgsConstructor;
 public class PhysicalAttributes {
     Float height;
     Float weight;
-    Integer activityLevel;
+    ActivityLevel activityLevel;
 
     @Builder
-    public PhysicalAttributes(float height, float weight, int activityLevel) {
+    public PhysicalAttributes(float height, float weight, ActivityLevel activityLevel) {
         this.height = height;
         this.weight = weight;
         this.activityLevel = activityLevel;

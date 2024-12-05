@@ -9,7 +9,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Getter
 public class BookmarkedRecipe {
     @Id
-    private Long userId;
+    private String id;
+    private final Long userId;
     private final String recipeId;
 
     @Builder
