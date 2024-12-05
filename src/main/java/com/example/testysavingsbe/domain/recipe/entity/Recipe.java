@@ -37,14 +37,14 @@ public class Recipe {
     @Field("ingredients")
     private List<String> ingredients;
 
-    @Field("cooking_order")
+    @Field("cooking_steps")
     private List<String> cookingOrder;
 
-    @Field("cooking_img")
-    private List<String> cookingImg;
+    @Field("cooking_images")
+    private List<String> cookingImages;
 
-    @Field("hashtag")
-    private List<String> hashtag;
+    @Field("hashtags")
+    private List<String> hashtags;
 
     @Field("tips")
     private List<String> tips;
