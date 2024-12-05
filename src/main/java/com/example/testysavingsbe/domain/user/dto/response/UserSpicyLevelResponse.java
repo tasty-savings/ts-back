@@ -1,6 +1,10 @@
 package com.example.testysavingsbe.domain.user.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public record UserSpicyLevelResponse(
-        String spicyLevel
+    @JsonProperty("spicy_level")
+    String spicyLevel
 ) {
+
 }

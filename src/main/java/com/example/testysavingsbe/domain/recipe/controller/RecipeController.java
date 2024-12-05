@@ -121,12 +121,11 @@ public class RecipeController {
     }
 
     @PutMapping("/{recipeId}/bookmark")
-    public ResponseEntity<BookmarkedRecipe> bookMarkRecipe(
+    public ResponseEntity<Void> bookMarkRecipe(
         @AuthenticationPrincipal PrincipalDetails principalDetails,
         @PathVariable(name = "recipeId") String recipeId) {
-        BookmarkedRecipe bookmarkedRecipe = recipeCommandUseCase.bookmarkRecipe(
-            principalDetails.getUser(), recipeId);
-        return ResponseEntity.ok(bookmarkedRecipe);
+        recipeCommandUseCase.bookmarkRecipe(principalDetails.getUser(), recipeId);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{recipeId}/bookmark")

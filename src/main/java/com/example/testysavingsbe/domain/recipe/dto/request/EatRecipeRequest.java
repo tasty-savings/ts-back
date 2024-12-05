@@ -1,7 +1,11 @@
 package com.example.testysavingsbe.domain.recipe.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public record EatRecipeRequest(
+    @JsonProperty("recipe_id")
     String recipeId,
+    @JsonProperty("recipe_type")
     String recipeType
 ) {
 

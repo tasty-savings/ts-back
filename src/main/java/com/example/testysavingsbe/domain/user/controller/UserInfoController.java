@@ -4,6 +4,7 @@ import com.example.testysavingsbe.domain.user.dto.request.DeleteUserTypeRequest;
 import com.example.testysavingsbe.domain.user.dto.request.PhysicalInfoRegisterRequest;
 import com.example.testysavingsbe.domain.user.dto.request.RegisterAllergyRequest;
 import com.example.testysavingsbe.domain.user.dto.request.SetUserTypesRequest;
+import com.example.testysavingsbe.domain.user.dto.response.CheckSetPreferFoodResponse;
 import com.example.testysavingsbe.domain.user.dto.response.RegisteredAllergyResponse;
 import com.example.testysavingsbe.domain.user.dto.response.UserCookingLevelResponse;
 import com.example.testysavingsbe.domain.user.dto.response.UserInfoResponse;
@@ -51,6 +52,16 @@ public class UserInfoController {
         userInfoSettingUseCase.deletePreferType(principalDetails.getUser(), request);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/me/preferences/status")
+    public ResponseEntity<CheckSetPreferFoodResponse> checkSetUserPrefer(@AuthenticationPrincipal PrincipalDetails principalDetails){
+        CheckSetPreferFoodResponse response = userinfoQueryUseCase.checkSetUserPrefer(
+            principalDetails.getUser());
+        return ResponseEntity.ok(response);
+    }
+
+    // TODO: 사용자가 헬스정보를 등록했는지 확인할 API가 필요 2024. 12. 4. by kong
+
 
 
     @PostMapping("/prefer")
@@ -104,7 +115,6 @@ public class UserInfoController {
         @RequestBody PhysicalInfoRegisterRequest request
         ) {
         userInfoSettingUseCase.updateUserPhysicalAttribute(principalDetails.getUser(), request);
-
         return ResponseEntity.noContent().build();
     }
 

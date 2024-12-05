@@ -73,7 +73,11 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
             user.getId(), recipeId);
 
         if (byUserIdAndRecipeId.isPresent()) {
-            throw new IllegalStateException("북마크된 레시피입니다.");
+            BookmarkedRecipe existingRecipe = byUserIdAndRecipeId.get();
+            // 삭제후 리턴
+            bookmarkedRepository.delete(existingRecipe);
+
+            return existingRecipe;
         }
 
         BookmarkedRecipe bookmarkedRecipe = BookmarkedRecipe.builder()
@@ -254,7 +258,6 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
     @Override
     public void generateRecipeBasedOnNutrients(User user, int mealsADay) {
         // TODO: 사용자 영양소에 맞게 레시피 추천해주기 2024. 12. 2. by kong
-        // 넘겨야할 정보 (사용자 기준 한끼 식사중 필요한 영양소 정보들) -> 사용자 키/몸무게/신체활동단계를 기준으로 계산
         PhysicalAttributes physicalAttributes = user.getPhysicalAttributes();
         AIGenerateBasedOnNutrientsRequest request = calculateUserRequiredNutrition(
             user, mealsADay);
@@ -264,30 +267,21 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
     private AIGenerateBasedOnNutrientsRequest calculateUserRequiredNutrition(User user,
         int mealsADay) {
         validUserPhysicalAttribute(user);
-        // 1. 자신에게 적합한 1일 에너지 필요량 확인 -> 에너지 필요량 계산
 
-        // 칼로리 근사치 확인
         int userCalories = calculateCalories(user.getGender(), user.getAge(),
             user.getPhysicalAttributes().getWeight(),
             user.getPhysicalAttributes().getHeight());
-        // 18세 이하 A타입 / 19세 부터 B타입
         Pattern pattern =
             user.getAge() <= 18 ? MealPatternData.getTypeA().searchByKcal(userCalories)
                 : MealPatternData.getTypeB().searchByKcal(userCalories);
 
-        // 3. 각 식품군별 식품의 섭취회수 확인 및 세 끼 배분
         return AIGenerateBasedOnNutrientsRequest.toNutrientsRequestDivideByMeals(
             pattern, mealsADay);
     }
 
     private int calculateCalories(Gender gender, int age, float weight, float height) {
-        double result = 0;
-        if (gender == Gender.MALE) {
-            result = CalorieCalculationType.MALE.calculate(age, weight, height);
-        } else {
-            result = CalorieCalculationType.FEMALE.calculate(age, weight, height);
-        }
-
+        double result = CalorieCalculationType.valueOf(gender.toString())
+            .calculate(age, weight, height);
         return (int) result;
     }
 

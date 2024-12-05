@@ -2,6 +2,7 @@ package com.example.testysavingsbe.domain.user.service;
 
 import com.example.testysavingsbe.domain.user.dto.request.DeleteUserTypeRequest;
 import com.example.testysavingsbe.domain.user.dto.request.PhysicalInfoRegisterRequest;
+import com.example.testysavingsbe.domain.user.dto.response.CheckSetPreferFoodResponse;
 import com.example.testysavingsbe.domain.user.dto.response.UserInfoResponse;
 import com.example.testysavingsbe.domain.user.dto.response.UserPreferTypeResponse;
 import com.example.testysavingsbe.domain.user.entity.*;
@@ -20,17 +21,30 @@ public class UserService implements UserInfoSettingUseCase, UserinfoQueryUseCase
     private final UserPreferTypeRepository userPreferTypeRepository;
     private final AllergyRepository allergyRepository;
 
+
     @Override
     @Transactional
     public UserPreferTypeResponse registerPreferType(SettingPreferTypeRequest request) {
         User user = request.user();
+        List<UserPreferType> userPreferTypeList = userPreferTypeRepository.findAllByUser(user);
+        List<String> userPreferTypeStringList = userPreferTypeList.stream()
+            .map(UserPreferType::getDisplayName).toList();
 
-        List<UserPreferType> userPreferTypeList = request.preferredTypes().stream()
+        List<UserPreferType> registerUserPreferType = request.preferredTypes().stream()
+            .filter(preferType -> !userPreferTypeStringList.contains(preferType))
             .map(type -> new UserPreferType(PreferType.fromKoreanName(type), user))
             .toList();
-        userPreferTypeRepository.saveAll(userPreferTypeList);
 
-        return new UserPreferTypeResponse(request.preferredTypes());
+        userPreferTypeRepository.saveAll(registerUserPreferType);
+
+        if (!user.getSetPreferType()) {
+            user.doneUserPreferType();
+        }
+        List<String> response = registerUserPreferType.stream()
+            .map(UserPreferType::getDisplayName)
+            .toList();
+
+        return new UserPreferTypeResponse(response);
     }
 
 
@@ -89,4 +103,10 @@ public class UserService implements UserInfoSettingUseCase, UserinfoQueryUseCase
             .build();
 
     }
+
+    @Override
+    public CheckSetPreferFoodResponse checkSetUserPrefer(User user) {
+        return new CheckSetPreferFoodResponse(user.getSetPreferType());
+    }
+
 }

@@ -1,5 +1,6 @@
 package com.example.testysavingsbe.domain.recipe.port;
 
+import com.example.testysavingsbe.domain.recipe.dto.request.AIGenerateBasedOnNutrientsRequest;
 import com.example.testysavingsbe.domain.recipe.dto.request.LeftoverCookingRequest;
 import com.example.testysavingsbe.domain.recipe.dto.request.SimplifyRecipeToAiRequest;
 import com.example.testysavingsbe.domain.recipe.dto.response.AIRecipeResponse;
@@ -71,9 +72,9 @@ public class AiWebClientAdapterImpl implements AiWebClientAdapter {
             .block();
     }
 
-    // TODO: AI 개발 완성시 연결 2024. 12. 2. by kong
     @Override
-    public void requestRecipeForUserNutrition() {
+    public void requestRecipeForUserNutrition(AIGenerateBasedOnNutrientsRequest request) {
 
     }
+
 }

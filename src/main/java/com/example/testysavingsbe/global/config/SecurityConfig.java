@@ -43,7 +43,6 @@ public class SecurityConfig {
                     .userService(customUserService)
                 )
                 .successHandler((request, response, authentication) -> {
-//                    response.sendRedirect("/");         // baseurl
                     response.sendRedirect(frontUrl);         // baseurl
                     response.setHeader("Set-Cookie", "JSESSIONID=" + authentication.getCredentials().toString());
                 })
