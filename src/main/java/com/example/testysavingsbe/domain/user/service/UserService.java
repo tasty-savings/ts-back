@@ -2,7 +2,7 @@ package com.example.testysavingsbe.domain.user.service;
 
 import com.example.testysavingsbe.domain.user.dto.request.DeleteUserTypeRequest;
 import com.example.testysavingsbe.domain.user.dto.request.PhysicalInfoRegisterRequest;
-import com.example.testysavingsbe.domain.user.dto.response.CheckSetPreferFoodResponse;
+import com.example.testysavingsbe.domain.user.dto.response.CheckSetUserInfoResponse;
 import com.example.testysavingsbe.domain.user.dto.response.UserInfoResponse;
 import com.example.testysavingsbe.domain.user.dto.response.UserPreferTypeResponse;
 import com.example.testysavingsbe.domain.user.entity.*;
@@ -105,8 +105,20 @@ public class UserService implements UserInfoSettingUseCase, UserinfoQueryUseCase
     }
 
     @Override
-    public CheckSetPreferFoodResponse checkSetUserPrefer(User user) {
-        return new CheckSetPreferFoodResponse(user.getSetPreferType());
+    public CheckSetUserInfoResponse checkSetUserPrefer(User user) {
+        return new CheckSetUserInfoResponse(user.getSetPreferType());
+    }
+
+    @Override
+    public CheckSetUserInfoResponse checkSetUserHealthInfo(User user) {
+        if (user.getPhysicalAttributes().getWeight() == null
+            || user.getPhysicalAttributes().getHeight() == null
+            || user.getPhysicalAttributes().getActivityLevel() == null
+            || user.getAge() == null
+        ) {
+            return new CheckSetUserInfoResponse(false);
+        }
+        return new CheckSetUserInfoResponse(true);
     }
 
 }
