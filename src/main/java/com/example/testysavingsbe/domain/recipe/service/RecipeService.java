@@ -260,19 +260,34 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
         aiAdapter.requestRecipeForUserNutrition(request);
     }
 
-    private AIGenerateBasedOnNutrientsRequest calculateUserRequiredNutrition(User user,
-        int mealsADay) {
+    private AIGenerateBasedOnNutrientsRequest calculateUserRequiredNutrition(
+        User user,
+        int mealsADay
+    ) {
         validUserPhysicalAttribute(user);
 
-        int userCalories = calculateCalories(user.getGender(), user.getAge(),
-            user.getPhysicalAttributes().getWeight(),
-            user.getPhysicalAttributes().getHeight());
+        Integer userAge = user.getAge();
+        Gender userGender = user.getGender();
+        Float userHeight = user.getPhysicalAttributes().getHeight();
+        Float userWeight = user.getPhysicalAttributes().getWeight();
+        Integer userActivityLevel = user.getPhysicalAttributes().getActivityLevel();
+
+        int userCalories = calculateCalories(userGender, userAge,
+            userWeight,
+            userHeight);
+
         Pattern pattern =
-            user.getAge() <= 18 ? MealPatternData.getTypeA().searchByKcal(userCalories)
+            userAge <= 18 ? MealPatternData.getTypeA().searchByKcal(userCalories)
                 : MealPatternData.getTypeB().searchByKcal(userCalories);
 
         return AIGenerateBasedOnNutrientsRequest.toNutrientsRequestDivideByMeals(
-            pattern, mealsADay);
+            userAge,
+            userGender.toString(),
+            userHeight,
+            userWeight,
+            userActivityLevel,
+            pattern,
+            mealsADay);
     }
 
     private int calculateCalories(Gender gender, int age, float weight, float height) {

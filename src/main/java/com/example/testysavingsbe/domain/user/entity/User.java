@@ -1,7 +1,6 @@
 package com.example.testysavingsbe.domain.user.entity;
 
 
-import com.example.testysavingsbe.global.config.PrincipalDetails;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -44,7 +43,7 @@ public class User {
     @Enumerated(EnumType.STRING)
     private SpicyLevel spicyLevel = SpicyLevel.LEVEL_2;
 
-    @Column(name = "set_preffer_type")
+    @Column(name = "set_prefer_type")
     private Boolean setPreferType = false;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
