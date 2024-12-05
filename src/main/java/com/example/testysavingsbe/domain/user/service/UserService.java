@@ -26,17 +26,25 @@ public class UserService implements UserInfoSettingUseCase, UserinfoQueryUseCase
     @Transactional
     public UserPreferTypeResponse registerPreferType(SettingPreferTypeRequest request) {
         User user = request.user();
+        List<UserPreferType> userPreferTypeList = userPreferTypeRepository.findAllByUser(user);
+        List<String> userPreferTypeStringList = userPreferTypeList.stream()
+            .map(UserPreferType::getDisplayName).toList();
 
-        List<UserPreferType> userPreferTypeList = request.preferredTypes().stream()
+        List<UserPreferType> registerUserPreferType = request.preferredTypes().stream()
+            .filter(preferType -> !userPreferTypeStringList.contains(preferType))
             .map(type -> new UserPreferType(PreferType.fromKoreanName(type), user))
             .toList();
-        userPreferTypeRepository.saveAll(userPreferTypeList);
+
+        userPreferTypeRepository.saveAll(registerUserPreferType);
 
         if (!user.getSetPreferType()) {
             user.doneUserPreferType();
         }
+        List<String> response = registerUserPreferType.stream()
+            .map(UserPreferType::getDisplayName)
+            .toList();
 
-        return new UserPreferTypeResponse(request.preferredTypes());
+        return new UserPreferTypeResponse(response);
     }
 
 
