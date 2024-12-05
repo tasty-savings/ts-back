@@ -1,5 +1,6 @@
 package com.example.testysavingsbe.domain.recipe.dto.request;
 
+import com.example.testysavingsbe.domain.user.entity.ActivityLevel;
 import com.example.testysavingsbe.global.util.MealPattern;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
@@ -40,8 +41,11 @@ public record AIGenerateBasedOnNutrientsRequest(
         int age,
         String gender,
         float height,
-        float weight, int activityLevel,
-        MealPattern.Pattern pattern, int mealsADay) {
+        float weight,
+        int activityLevel,
+        MealPattern.Pattern pattern,
+        int mealsADay
+    ) {
         return AIGenerateBasedOnNutrientsRequest.builder()
             .grains(roundToOneDecimal(pattern.getGrains(), mealsADay))
             .proteinSources(roundToOneDecimal(pattern.getProteinSources(), mealsADay))
