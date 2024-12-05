@@ -61,6 +61,11 @@ public class UserInfoController {
     }
 
     // TODO: 사용자가 헬스정보를 등록했는지 확인할 API가 필요 2024. 12. 4. by kong
+    @GetMapping("/me/health/status")
+    public ResponseEntity<CheckSetUserInfoResponse> getRegisteredAllergy(@AuthenticationPrincipal PrincipalDetails principalDetails){
+        CheckSetUserInfoResponse response = userinfoQueryUseCase.checkSetUserHealthInfo(principalDetails.getUser());
+        return ResponseEntity.ok(response);
+    }
 
 
 
