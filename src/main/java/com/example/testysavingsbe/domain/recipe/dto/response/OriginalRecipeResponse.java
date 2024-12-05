@@ -81,8 +81,8 @@ public class OriginalRecipeResponse implements RecipeResponse {
             .typeKey(recipe.getTypeKey()).methodKey(recipe.getMethodKey())
             .servings(recipe.getServings()).cookingTime(recipe.getCookingTime())
             .difficulty(recipe.getDifficulty()).ingredients(recipe.getIngredients())
-            .cookingOrder(recipe.getCookingOrder()).cookingImg(recipe.getCookingImg())
-            .hashtag(recipe.getHashtag()).tips(recipe.getTips())
+            .cookingOrder(recipe.getCookingOrder()).cookingImg(recipe.getCookingImages())
+            .hashtag(recipe.getHashtags()).tips(recipe.getTips())
             .recipeType(recipe.getRecipeType()).build();
     }
 }
