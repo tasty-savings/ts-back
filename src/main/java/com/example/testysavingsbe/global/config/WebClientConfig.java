@@ -21,10 +21,6 @@ public class WebClientConfig {
                     log.info("Request: " + request.method() + " " + request.url());
                     return next.exchange(request);
                 }) // 요청 로깅
-                .filter(((request, next) -> {
-                    log.info("Request: " + request.method() + " " + request.url());
-                    return next.exchange(request);
-                })) // 응답 로깅
                 .build();
     }
 }
