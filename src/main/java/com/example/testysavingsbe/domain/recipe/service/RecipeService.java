@@ -177,17 +177,21 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
 
     @Override
     public List<RecipeResponse> getAllEatenRecipe(User user) {
-        UserEaten userEaten = userEatenRepository.findByUserId(user.getId())
-            .orElseThrow(() -> new EntityNotFoundException("먹은 레시피가 존재하지 않습니다."));
+        Optional<UserEaten> userEaten = userEatenRepository.findByUserId(user.getId());
+        if (userEaten.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        UserEaten userEatenEntity = userEaten.get();
 
         Map<Boolean, List<String>> recipeIdsByType = classifyRecipeIdsByType(
-            userEaten.getEatenRecipes());
+            userEatenEntity.getEatenRecipes());
 
         Map<String, Recipe> originalRecipeMap = fetchRecipesByIds(recipeIdsByType.get(true));
         Map<String, CustomRecipe> customRecipeMap = fetchCustomRecipesByIds(
             recipeIdsByType.get(false));
 
-        return buildEatenRecipeResponses(userEaten.getEatenRecipes(), originalRecipeMap,
+        return buildEatenRecipeResponses(userEatenEntity.getEatenRecipes(), originalRecipeMap,
             customRecipeMap);
     }
 
