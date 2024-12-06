@@ -31,7 +31,6 @@ public class SecurityConfig {
                 .requestMatchers("/recipe/share/**").permitAll()
                 .requestMatchers("/healthcheck/userinfo").authenticated()
                 .requestMatchers("/recipe/**").authenticated()
-                .requestMatchers("/recipes/**").authenticated()
                 .requestMatchers("/userinfo/**").authenticated()
                 .anyRequest().permitAll()
             )
