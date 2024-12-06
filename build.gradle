@@ -55,6 +55,9 @@ dependencies {
     // gson
     implementation 'com.google.code.gson:gson:2.11.0'
 
+    // loki-logback appender
+    implementation 'com.github.loki4j:loki-logback-appender:1.5.2'
+
 
     // test
     testRuntimeOnly 'com.h2database:h2'
