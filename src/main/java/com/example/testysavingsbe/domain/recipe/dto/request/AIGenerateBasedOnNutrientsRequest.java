@@ -8,18 +8,8 @@ import lombok.Builder;
 public record AIGenerateBasedOnNutrientsRequest(
     @JsonProperty("유저 정보")
     UserHealthInfo userHealthInfo,
-    @JsonProperty("곡류")
-    float grains,
-    @JsonProperty("고기·생선·달걀 종류")
-    float proteinSources,
-    @JsonProperty("채소류")
-    float vegetables,
-    @JsonProperty("과일류")
-    float fruits,
-    @JsonProperty("우유·유제품")
-    float dairy,
-    @JsonProperty("유자·당류")
-    float fatsAndSugars
+    @JsonProperty("끼별_영양소")
+    IndividualServingGuide guide
 ) {
 
     @Builder
@@ -37,6 +27,26 @@ public record AIGenerateBasedOnNutrientsRequest(
     }
 
 
+    public record IndividualServingGuide(
+        @JsonProperty("곡류")
+        float grains,
+        @JsonProperty("고기·생선·달걀 종류")
+        float proteinSources,
+        @JsonProperty("채소류")
+        float vegetables,
+        @JsonProperty("과일류")
+        float fruits,
+        @JsonProperty("우유·유제품")
+        float dairy,
+        @JsonProperty("유자·당류")
+        float fatsAndSugars
+    ) {
+
+        @Builder
+        public IndividualServingGuide {
+        }
+    }
+
     public static AIGenerateBasedOnNutrientsRequest toNutrientsRequestDivideByMeals(
         int age,
         String gender,
@@ -47,12 +57,14 @@ public record AIGenerateBasedOnNutrientsRequest(
         int mealsADay
     ) {
         return AIGenerateBasedOnNutrientsRequest.builder()
-            .grains(roundToOneDecimal(pattern.getGrains(), mealsADay))
-            .proteinSources(roundToOneDecimal(pattern.getProteinSources(), mealsADay))
-            .vegetables(roundToOneDecimal(pattern.getVegetables(), mealsADay))
-            .fruits(roundToOneDecimal(pattern.getFruits(), mealsADay))
-            .dairy(roundToOneDecimal(pattern.getDairy(), mealsADay))
-            .fatsAndSugars(roundToOneDecimal(pattern.getFatsAndSugars(), mealsADay))
+            .guide(IndividualServingGuide.builder()
+                .grains(roundToOneDecimal(pattern.getGrains(), mealsADay))
+                .proteinSources(roundToOneDecimal(pattern.getProteinSources(), mealsADay))
+                .vegetables(roundToOneDecimal(pattern.getVegetables(), mealsADay))
+                .fruits(roundToOneDecimal(pattern.getFruits(), mealsADay))
+                .dairy(roundToOneDecimal(pattern.getDairy(), mealsADay))
+                .fatsAndSugars(roundToOneDecimal(pattern.getFatsAndSugars(), mealsADay))
+                .build())
             .userHealthInfo(new UserHealthInfo(age, gender, height, weight, activityLevel))
             .build();
     }
@@ -70,8 +82,13 @@ public record AIGenerateBasedOnNutrientsRequest(
         String activityLevel
     ) {
 
-        public UserHealthInfo(int age, String gender, float height, float weight,
-            ActivityLevel activityLevel) {
+        public UserHealthInfo(
+            int age,
+            String gender,
+            float height,
+            float weight,
+            ActivityLevel activityLevel
+        ) {
             this(
                 age,
                 gender,
@@ -79,7 +96,7 @@ public record AIGenerateBasedOnNutrientsRequest(
                 weight,
                 activityLevel.getDescription());
         }
-    }
 
+    }
 
 }
