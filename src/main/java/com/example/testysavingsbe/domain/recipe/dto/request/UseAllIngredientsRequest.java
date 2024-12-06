@@ -10,7 +10,7 @@ public record UseAllIngredientsRequest(
     List<String> dislikeIngredients,
     @JsonProperty("basic_seasoning")
     List<String> basicSeasoning,
-    @JsonProperty("must_ues_ingredients")
+    @JsonProperty("must_use_ingredients")
     List<String> mustUseIngredients
 ) {
 

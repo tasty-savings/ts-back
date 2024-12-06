@@ -15,6 +15,7 @@ import com.example.testysavingsbe.domain.recipe.service.usecase.RecipeQueryUseCa
 import com.example.testysavingsbe.domain.recipe.service.usecase.RecipeQueryUseCase.RecipeFromIngredientsRequest;
 import com.example.testysavingsbe.global.config.PrincipalDetails;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/recipe")
@@ -66,7 +68,7 @@ public class RecipeController {
         @AuthenticationPrincipal PrincipalDetails principalDetails,
         @RequestBody UseAllIngredientsRequest request
     ) {
-
+        log.info("냉장고 파먹기 요청");
         AIChangeRecipeResponse response = recipeQueryUseCase.createRecipeFromIngredients(
             principalDetails.getUser(),
             RecipeFromIngredientsRequest.builder()
@@ -76,6 +78,7 @@ public class RecipeController {
                 .mustUseIngredients(request.mustUseIngredients())
                 .build());
 
+        log.info("응답 요청");
         return ResponseEntity.ok(response);
     }
 
