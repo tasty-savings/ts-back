@@ -8,7 +8,7 @@ import lombok.Builder;
 public record AIGenerateBasedOnNutrientsRequest(
     @JsonProperty("유저 정보")
     UserHealthInfo userHealthInfo,
-    @JsonProperty("끼별_영양소")
+    @JsonProperty("식품군 1회 분량 권장 횟수")
     IndividualServingGuide guide
 ) {
 
@@ -26,26 +26,6 @@ public record AIGenerateBasedOnNutrientsRequest(
         return Math.round(divisionResult * 10f) / 10f;
     }
 
-
-    public record IndividualServingGuide(
-        @JsonProperty("곡류")
-        float grains,
-        @JsonProperty("고기·생선·달걀 종류")
-        float proteinSources,
-        @JsonProperty("채소류")
-        float vegetables,
-        @JsonProperty("과일류")
-        float fruits,
-        @JsonProperty("우유·유제품")
-        float dairy,
-        @JsonProperty("유자·당류")
-        float fatsAndSugars
-    ) {
-
-        @Builder
-        public IndividualServingGuide {
-        }
-    }
 
     public static AIGenerateBasedOnNutrientsRequest toNutrientsRequestDivideByMeals(
         int age,
@@ -97,6 +77,27 @@ public record AIGenerateBasedOnNutrientsRequest(
                 activityLevel.getDescription());
         }
 
+
+    }
+
+    public record IndividualServingGuide(
+        @JsonProperty("곡류")
+        float grains,
+        @JsonProperty("고기·생선·달걀 종류")
+        float proteinSources,
+        @JsonProperty("채소류")
+        float vegetables,
+        @JsonProperty("과일류")
+        float fruits,
+        @JsonProperty("우유·유제품")
+        float dairy,
+        @JsonProperty("유자·당류")
+        float fatsAndSugars
+    ) {
+
+        @Builder
+        public IndividualServingGuide {
+        }
     }
 
 }
