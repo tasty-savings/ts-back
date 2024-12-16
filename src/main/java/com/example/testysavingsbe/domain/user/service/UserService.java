@@ -10,6 +10,7 @@ import com.example.testysavingsbe.domain.user.repository.AllergyRepository;
 import com.example.testysavingsbe.domain.user.repository.UserPreferTypeRepository;
 import com.example.testysavingsbe.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +18,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserService implements UserInfoSettingUseCase, UserinfoQueryUseCase {
 
     private final UserPreferTypeRepository userPreferTypeRepository;
@@ -47,7 +49,6 @@ public class UserService implements UserInfoSettingUseCase, UserinfoQueryUseCase
         List<String> response = registerUserPreferType.stream()
             .map(UserPreferType::getDisplayName)
             .toList();
-
         return new UserPreferTypeResponse(response);
     }
 

@@ -3,9 +3,18 @@ package com.example.testysavingsbe.domain.recipe.dto.request;
 import com.example.testysavingsbe.domain.user.entity.ActivityLevel;
 import com.example.testysavingsbe.global.util.MealPattern;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.List;
 import lombok.Builder;
 
 public record AIGenerateBasedOnNutrientsRequest(
+    @JsonProperty("user_allergy_ingredients")
+    List<String> userAllergyIngredients,
+    @JsonProperty("user_cooking_level")
+    String userCookingLevel,
+    @JsonProperty("user_owned_ingredients")
+    List<String> userOwnedIngredients,
+    @JsonProperty("user_basic_seasoning")
+    List<String> userBasicSeasoning,
     @JsonProperty("유저 정보")
     UserHealthInfo userHealthInfo,
     @JsonProperty("식품군 1회 분량 권장 횟수")
@@ -28,6 +37,10 @@ public record AIGenerateBasedOnNutrientsRequest(
 
 
     public static AIGenerateBasedOnNutrientsRequest toNutrientsRequestDivideByMeals(
+        List<String> userAllergyIngredients,
+        String userCookingLevel,
+        List<String> userOwnedIngredients,
+        List<String> userBasicSeasoning,
         int age,
         String gender,
         float height,
@@ -37,6 +50,10 @@ public record AIGenerateBasedOnNutrientsRequest(
         int mealsADay
     ) {
         return AIGenerateBasedOnNutrientsRequest.builder()
+            .userAllergyIngredients(userAllergyIngredients)
+            .userCookingLevel(userCookingLevel)
+            .userOwnedIngredients(userOwnedIngredients)
+            .userBasicSeasoning(userBasicSeasoning)
             .guide(IndividualServingGuide.builder()
                 .grains(roundToOneDecimal(pattern.getGrains(), mealsADay))
                 .proteinSources(roundToOneDecimal(pattern.getProteinSources(), mealsADay))

@@ -9,8 +9,9 @@ import com.example.testysavingsbe.domain.recipe.dto.request.EatRecipeRequest;
 import com.example.testysavingsbe.domain.recipe.dto.request.SaveCustomRecipeRequest;
 import com.example.testysavingsbe.domain.recipe.dto.request.SimplifyRecipeToAiRequest;
 import com.example.testysavingsbe.domain.recipe.dto.response.AIChangeRecipeResponse;
-import com.example.testysavingsbe.domain.recipe.dto.response.AIRecipeResponse;
+import com.example.testysavingsbe.domain.recipe.dto.response.AIRecipe;
 import com.example.testysavingsbe.domain.recipe.dto.response.CustomRecipeResponse;
+import com.example.testysavingsbe.domain.recipe.dto.response.NutritionBasedRecipeCreateResponse;
 import com.example.testysavingsbe.domain.recipe.dto.response.OriginalRecipeResponse;
 import com.example.testysavingsbe.domain.recipe.dto.response.RecipeResponse;
 import com.example.testysavingsbe.domain.recipe.dto.response.SharedRecipeResponse;
@@ -130,8 +131,10 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
         Mono<LeftoverCookingRequest> aiRequest = Mono.just(
             buildLeftoverCookingRequest(user, request, userAllergy, userIngredients));
 
-        AIRecipeResponse after = aiAdapter.requestCreateRecipeUseIngredients(request,
+        AIRecipe after = aiAdapter.requestCreateRecipeUseIngredients(request,
             aiRequest);
+
+        log.info(after.toString());
 
         OriginalRecipeResponse before = OriginalRecipeResponse.fromRecipe(orignalRecipe);
 
@@ -147,7 +150,7 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
         SimplifyRecipeToAiRequest request = new SimplifyRecipeToAiRequest(userAllergy,
             user.getCookingLevel().getDisplayName());
 
-        AIRecipeResponse after = aiAdapter.requestRecipeMakeSimplify(recipeId, request);
+        AIRecipe after = aiAdapter.requestRecipeMakeSimplify(recipeId, request);
         OriginalRecipeResponse before = OriginalRecipeResponse.fromRecipe(recipe);
 
         return new AIChangeRecipeResponse(before, after);
@@ -257,35 +260,51 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
     }
 
     @Override
-    public void generateRecipeBasedOnNutrients(User user, int mealsADay) {
+    public AIChangeRecipeResponse generateRecipeBasedOnNutrients(User user, int mealsADay,
+        String recipeId, List<String> userBasicSeasoning) {
+        Recipe recipe = recipeRepository.findById(recipeId)
+            .orElseThrow(EntityNotFoundException::new);
+
         // TODO: 사용자 영양소에 맞게 레시피 추천해주기 2024. 12. 2. by kong
-        PhysicalAttributes physicalAttributes = user.getPhysicalAttributes();
+//        PhysicalAttributes physicalAttributes = user.getPhysicalAttributes();
+        log.info(String.valueOf(user.getAge()));
         AIGenerateBasedOnNutrientsRequest request = calculateUserRequiredNutrition(
-            user, mealsADay);
-        aiAdapter.requestRecipeForUserNutrition(request);
+            user, mealsADay, userBasicSeasoning);
+        log.info(request.toString());
+
+        NutritionBasedRecipeCreateResponse nutritionBasedRecipeCreateResponse = aiAdapter.requestRecipeForUserNutrition(
+            recipeId, request);
+
+        return new AIChangeRecipeResponse(OriginalRecipeResponse.fromRecipe(recipe),
+            nutritionBasedRecipeCreateResponse);
     }
 
     private AIGenerateBasedOnNutrientsRequest calculateUserRequiredNutrition(
         User user,
-        int mealsADay
+        int mealsADay,
+        List<String> userBasicSeasoning
     ) {
         validUserPhysicalAttribute(user);
-
-        Integer userAge = user.getAge();
+        int userAge = user.getAge();
         Gender userGender = user.getGender();
-        Float userHeight = user.getPhysicalAttributes().getHeight();
         Float userWeight = user.getPhysicalAttributes().getWeight();
+        Float userHeight = user.getPhysicalAttributes().getHeight();
         ActivityLevel userActivityLevel = user.getPhysicalAttributes().getActivityLevel();
 
         int userCalories = calculateCalories(userGender, userAge,
             userWeight,
             userHeight);
-
-        Pattern pattern =
-            userAge <= 18 ? MealPatternData.getTypeA().searchByKcal(userCalories)
-                : MealPatternData.getTypeB().searchByKcal(userCalories);
+        userCalories = adjustCaloriesForAge(userAge, userCalories);
+        Pattern pattern = getMealPatternForAgeAndCalories(userAge, userCalories);
+        List<String> userIngredients = foodRepository.findAllByUser(user).stream()
+            .map(Food::getFoodName)
+            .toList();
 
         return AIGenerateBasedOnNutrientsRequest.toNutrientsRequestDivideByMeals(
+            getUserAllergyInfo(user),
+            user.getCookingLevel().getDisplayName(),
+            userIngredients,
+            userBasicSeasoning,
             userAge,
             userGender.toString(),
             userHeight,
@@ -295,10 +314,33 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
             mealsADay);
     }
 
+    private Pattern getMealPatternForAgeAndCalories(int userAge, int userCalories) {
+        return userAge <= 18 ? MealPatternData.getTypeA().searchByKcal(userCalories)
+            : MealPatternData.getTypeB().searchByKcal(userCalories);
+    }
+
+    private int adjustCaloriesForAge(int userAge, int userCalories) {
+        if (userAge <= 18) {
+            if (userCalories < 900) {
+                userCalories = 900;
+            } else if (userCalories > 2800) {
+                userCalories = 2800;
+            }
+        } else {
+            if (userCalories < 1000) {
+                userCalories = 1000;
+            } else if (userCalories > 2700) {
+                userCalories = 2700;
+            }
+        }
+        return userCalories;
+    }
+
     private int calculateCalories(Gender gender, int age, float weight, float height) {
+        height = height / 100;
         double result = CalorieCalculationType.valueOf(gender.toString())
             .calculate(age, weight, height);
-        return (int) result;
+        return (int) (Math.round(result / 100.0) * 100);
     }
 
     private void validUserPhysicalAttribute(User user) {

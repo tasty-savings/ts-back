@@ -1,5 +1,7 @@
 package com.example.testysavingsbe.domain.recipe.controller;
 
+import com.example.testysavingsbe.domain.recipe.dto.request.AIGenerateBasedOnNutrientsRequest;
+import com.example.testysavingsbe.domain.recipe.dto.request.BasedOnNutrientsRequest;
 import com.example.testysavingsbe.domain.recipe.dto.request.EatRecipeRequest;
 import com.example.testysavingsbe.domain.recipe.dto.request.SaveCustomRecipeRequest;
 import com.example.testysavingsbe.domain.recipe.dto.request.UseAllIngredientsRequest;
@@ -31,6 +33,23 @@ public class RecipeController {
 
     private final RecipeCommandUseCase recipeCommandUseCase;
     private final RecipeQueryUseCase recipeQueryUseCase;
+
+
+    /**
+     * 영양소 기반 사용자 맞춤형 레시피 제작
+     */
+    @PostMapping("/custom/nutrients/{recipeId}")
+    public ResponseEntity<AIChangeRecipeResponse> createRecipeBasedOnNutrients(
+        @AuthenticationPrincipal PrincipalDetails principalDetails,
+        @PathVariable("recipeId") String recipeId,
+        @RequestBody BasedOnNutrientsRequest request
+    ) {
+        AIChangeRecipeResponse response = recipeCommandUseCase.generateRecipeBasedOnNutrients(
+            principalDetails.getUser(), request.mealsADay(), recipeId,
+            request.userBasicSeasoning());
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
 
     /**
      * user prefer 가 없을시 백엔드에서 아무거나 주기 RAG를 통해 추천된 레시피 전송
@@ -108,7 +127,8 @@ public class RecipeController {
     public ResponseEntity<CustomRecipeResponse> getCustomRecipe(
         @AuthenticationPrincipal PrincipalDetails principalDetails,
         @PathVariable(name = "recipeId") String id) {
-        CustomRecipeResponse response = recipeQueryUseCase.getCustomRecipe(principalDetails.getUser(), id);
+        CustomRecipeResponse response = recipeQueryUseCase.getCustomRecipe(
+            principalDetails.getUser(), id);
         return ResponseEntity.ok(response);
     }
 
@@ -116,7 +136,8 @@ public class RecipeController {
     public ResponseEntity<CustomRecipeResponse> saveCustomRecipe(
         @AuthenticationPrincipal PrincipalDetails principalDetails,
         @RequestBody SaveCustomRecipeRequest request) {
-        CustomRecipeResponse mongoRecipe = recipeCommandUseCase.saveCustomRecipe(principalDetails.getUser(),
+        CustomRecipeResponse mongoRecipe = recipeCommandUseCase.saveCustomRecipe(
+            principalDetails.getUser(),
             request);
         return ResponseEntity.status(HttpStatus.CREATED).body(mongoRecipe);
     }
