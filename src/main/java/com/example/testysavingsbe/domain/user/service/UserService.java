@@ -10,6 +10,7 @@ import com.example.testysavingsbe.domain.user.repository.AllergyRepository;
 import com.example.testysavingsbe.domain.user.repository.UserPreferTypeRepository;
 import com.example.testysavingsbe.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +18,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserService implements UserInfoSettingUseCase, UserinfoQueryUseCase {
 
     private final UserPreferTypeRepository userPreferTypeRepository;
@@ -41,11 +43,12 @@ public class UserService implements UserInfoSettingUseCase, UserinfoQueryUseCase
 
         if (!user.getSetPreferType()) {
             user.doneUserPreferType();
+            userRepository.save(user);
         }
+
         List<String> response = registerUserPreferType.stream()
             .map(UserPreferType::getDisplayName)
             .toList();
-
         return new UserPreferTypeResponse(response);
     }
 
@@ -103,6 +106,10 @@ public class UserService implements UserInfoSettingUseCase, UserinfoQueryUseCase
             .cookingLevel(user.getCookingLevel().getDisplayName())
             .spicyLevel(user.getSpicyLevel().getDisplayName())
             .allergy(user.getAllergy().stream().map(Allergy::getAllergy).toList())
+            .gender(user.getGender().toString())
+            .activity_level(user.getPhysicalAttributes().getActivityLevel().getDescription())
+            .height(user.getPhysicalAttributes().getHeight())
+            .weight(user.getPhysicalAttributes().getWeight())
             .build();
 
     }

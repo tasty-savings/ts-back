@@ -2,10 +2,12 @@ package com.example.testysavingsbe.domain.recipe.service.usecase;
 
 import com.example.testysavingsbe.domain.recipe.dto.request.EatRecipeRequest;
 import com.example.testysavingsbe.domain.recipe.dto.request.SaveCustomRecipeRequest;
+import com.example.testysavingsbe.domain.recipe.dto.response.AIChangeRecipeResponse;
 import com.example.testysavingsbe.domain.recipe.dto.response.CustomRecipeResponse;
 import com.example.testysavingsbe.domain.recipe.dto.response.SharedRecipeResponse;
 import com.example.testysavingsbe.domain.recipe.entity.UserEaten;
 import com.example.testysavingsbe.domain.user.entity.User;
+import java.util.List;
 
 
 public interface RecipeCommandUseCase {
@@ -22,7 +24,7 @@ public interface RecipeCommandUseCase {
 
     void deleteSharedRecipe(String customRecipeId);
 
-    void generateRecipeBasedOnNutrients(User user, int mealsADay);
+    AIChangeRecipeResponse generateRecipeBasedOnNutrients(User user, int mealsADay, String recipeId, List<String> userBasicSeasoning);
 
     record RecipeGenerateServiceRequest(
         User user,

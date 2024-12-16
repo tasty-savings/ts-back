@@ -34,6 +34,5 @@ public record AIRecipeResponse(
 
         @JsonProperty("unchanged_parts_and_reasons")
         String unchangedPartsAndReasons
-
-) {
+) implements AIRecipe {
 }

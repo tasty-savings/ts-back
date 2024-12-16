@@ -13,7 +13,15 @@ public record UserInfoResponse(
     @JsonProperty("spicy_level")
     String spicyLevel,
     @JsonProperty("allergy")
-    List<String> allergy
+    List<String> allergy,
+    @JsonProperty("gender")
+    String gender,
+    @JsonProperty("activity_level")
+    String activity_level,
+    @JsonProperty("height")
+    Float height,
+    @JsonProperty("weight")
+    Float weight
 ) {
 
 }
