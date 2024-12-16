@@ -41,7 +41,9 @@ public class UserService implements UserInfoSettingUseCase, UserinfoQueryUseCase
 
         if (!user.getSetPreferType()) {
             user.doneUserPreferType();
+            userRepository.save(user);
         }
+
         List<String> response = registerUserPreferType.stream()
             .map(UserPreferType::getDisplayName)
             .toList();
