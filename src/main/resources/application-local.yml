@@ -1,6 +1,10 @@
 server:
   servlet:
     context-path: /api
+    session:
+      cookie:
+        http-only: false
+        path: /
 
 spring:
   application:
@@ -10,7 +14,6 @@ spring:
       url: ${SPRING_DATASOURCE_URL}
       username: ${SPRING_DATASOURCE_USERNAME}
       password: ${SPRING_DATASOURCE_PASSWORD}
-
   jpa:
     properties:
       hibernate:
@@ -19,11 +22,8 @@ spring:
     show-sql: false
     open-in-view: false
     hibernate:
-      ddl-auto: create
+      ddl-auto: create-drop
     database: mysql
-
-
-
   cache:
     type: redis
   data:
@@ -58,3 +58,8 @@ spring:
 server_host:
   ai: ${AI_HOST}
   front_url: ${FRONT_HOST}
+
+
+logging:
+  config: classpath:logback-dev.xml
+#  config: classpath:logback-spring.xml
