@@ -1,5 +1,6 @@
 package com.example.testysavingsbe.global.config;
 
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -24,7 +25,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .sessionManagement(session -> session
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
             )
             .cors(AbstractHttpConfigurer::disable)
             .csrf(AbstractHttpConfigurer::disable)
@@ -47,18 +48,14 @@ public class SecurityConfig {
                 .successHandler((request, response, authentication) -> {
                     request.getSession(true);
                     response.sendRedirect(frontUrl);         // baseurl
-                    response.setHeader("Set-Cookie", "JSESSIONID=" + authentication.getCredentials().toString());
+                    response.setHeader("Set-Cookie",
+                        "JSESSIONID=" + authentication.getCredentials().toString());
                 })
             )
             .logout(logout -> logout
                 .logoutUrl("/logout")
                 .logoutSuccessUrl("/")      // {baseurl 설정}
                 .permitAll()
-            )
-            .sessionManagement(session -> session
-                .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
-                .invalidSessionUrl("/login/oauth2/code")
-                .maximumSessions(1)
             );
 
         return http.build();
