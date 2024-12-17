@@ -4,6 +4,7 @@ Content-Type: application/json
 Cookie: JSESSIONID={{session}}
 
 {
+  "gender": "male",
   "age": 26,
   "height": 168,
   "weight": 59.2,

@@ -286,6 +286,19 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
         return CustomRecipeResponse.from(customRecipe);
     }
 
+
+    /**
+     * 레시피 검색 기능
+     */
+    @Override
+    public List<OriginalRecipeResponse> searchRecipe(String recipeName) {
+        List<Recipe> allByRecipeTitleStartingWith = recipeRepository.findAllByRecipeTitleContaining(recipeName);
+
+        return allByRecipeTitleStartingWith.stream()
+            .map(OriginalRecipeResponse::fromRecipe)
+            .toList();
+    }
+
     @Override
     public OriginalRecipeResponse getRecipeById(String id) {
         Recipe recipe = recipeRecommendRepository.findById(id)
