@@ -31,6 +31,7 @@ public class SecurityConfig {
             .csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
+                .requestMatchers("/healthcheck/session").permitAll()
                 .requestMatchers("/recipe/original/**").permitAll()
                 .requestMatchers("/recipe/share/**").permitAll()
                 .requestMatchers("/healthcheck/userinfo").authenticated()
