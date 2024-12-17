@@ -58,8 +58,3 @@ spring:
 server_host:
   ai: ${AI_HOST}
   front_url: ${FRONT_HOST}
-
-
-logging:
-  config: classpath:logback-dev.xml
-#  config: classpath:logback-spring.xml
