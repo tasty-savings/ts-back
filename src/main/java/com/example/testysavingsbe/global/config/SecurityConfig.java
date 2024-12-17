@@ -23,6 +23,9 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+            .sessionManagement(session -> session
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            )
             .cors(AbstractHttpConfigurer::disable)
             .csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(auth -> auth
@@ -42,6 +45,7 @@ public class SecurityConfig {
                     .userService(customUserService)
                 )
                 .successHandler((request, response, authentication) -> {
+                    request.getSession(true);
                     response.sendRedirect(frontUrl);         // baseurl
                     response.setHeader("Set-Cookie", "JSESSIONID=" + authentication.getCredentials().toString());
                 })
