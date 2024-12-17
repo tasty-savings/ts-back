@@ -4,6 +4,7 @@ server:
     session:
       cookie:
         http-only: false
+        path: /
 
 spring:
   application:
