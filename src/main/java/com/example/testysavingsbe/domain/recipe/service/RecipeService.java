@@ -265,18 +265,41 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
         Recipe recipe = recipeRepository.findById(recipeId)
             .orElseThrow(EntityNotFoundException::new);
 
-        // TODO: 사용자 영양소에 맞게 레시피 추천해주기 2024. 12. 2. by kong
-//        PhysicalAttributes physicalAttributes = user.getPhysicalAttributes();
-        log.info(String.valueOf(user.getAge()));
         AIGenerateBasedOnNutrientsRequest request = calculateUserRequiredNutrition(
             user, mealsADay, userBasicSeasoning);
-        log.info(request.toString());
 
         NutritionBasedRecipeCreateResponse nutritionBasedRecipeCreateResponse = aiAdapter.requestRecipeForUserNutrition(
             recipeId, request);
 
         return new AIChangeRecipeResponse(OriginalRecipeResponse.fromRecipe(recipe),
             nutritionBasedRecipeCreateResponse);
+    }
+
+    @Override
+    public CustomRecipeResponse getCustomRecipeBySharedLink(String uuid) {
+        SharedRecipe byUuid = sharedRecipeRepository.findByUuid(uuid)
+            .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 링크입니다."));
+        String customRecipeId = byUuid.getCustomRecipeId();
+        CustomRecipe customRecipe = customRecipeRepository.findById(customRecipeId)
+            .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 레시피입니다."));
+
+        return CustomRecipeResponse.from(customRecipe);
+    }
+
+    @Override
+    public OriginalRecipeResponse getRecipeById(String id) {
+        Recipe recipe = recipeRecommendRepository.findById(id)
+            .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 레시피입니다."));
+
+        return OriginalRecipeResponse.fromRecipe(recipe);
+    }
+
+    @Override
+    public CustomRecipeResponse getCustomRecipe(User user, String id) {
+        CustomRecipe customRecipe = customRecipeRepository.findByIdAndUserId(id, user.getId())
+            .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 커스텀 레시피입니다."));
+
+        return CustomRecipeResponse.from(customRecipe);
     }
 
     private AIGenerateBasedOnNutrientsRequest calculateUserRequiredNutrition(
@@ -362,34 +385,7 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
     }
 
 
-    @Override
-    public CustomRecipeResponse getCustomRecipeBySharedLink(String uuid) {
-        SharedRecipe byUuid = sharedRecipeRepository.findByUuid(uuid)
-            .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 링크입니다."));
-        String customRecipeId = byUuid.getCustomRecipeId();
-        CustomRecipe customRecipe = customRecipeRepository.findById(customRecipeId)
-            .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 레시피입니다."));
 
-        return CustomRecipeResponse.from(customRecipe);
-    }
-
-
-    @Override
-    public CustomRecipeResponse getCustomRecipe(User user, String id) {
-        CustomRecipe customRecipe = customRecipeRepository.findByIdAndUserId(id, user.getId())
-            .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 커스텀 레시피입니다."));
-
-        return CustomRecipeResponse.from(customRecipe);
-    }
-
-
-    @Override
-    public OriginalRecipeResponse getRecipeById(String id) {
-        Recipe recipe = recipeRecommendRepository.findById(id)
-            .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 레시피입니다."));
-
-        return OriginalRecipeResponse.fromRecipe(recipe);
-    }
 
     @Override
     public List<OriginalRecipeResponse> getRecommendedRecipe(User user) {
@@ -507,3 +503,4 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
         return null;
     }
 }
+

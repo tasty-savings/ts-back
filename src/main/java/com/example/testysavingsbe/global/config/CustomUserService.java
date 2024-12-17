@@ -1,12 +1,10 @@
 package com.example.testysavingsbe.global.config;
 
 import com.example.testysavingsbe.domain.user.entity.CookingLevel;
-import com.example.testysavingsbe.domain.user.entity.Gender;
 import com.example.testysavingsbe.domain.user.entity.User;
 import com.example.testysavingsbe.domain.user.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
@@ -23,7 +21,6 @@ public class CustomUserService extends DefaultOAuth2UserService {
 
     public static final String KAKAO_SOCIAL_ID_PROPERTY = "id";
     public static final String KAKAO_NAME_PROPERTY = "nickname";
-    public static final String KAKAO_GENDER_PROPERTY = "gender";
     public static final String KAKAO_PROPERTIES_KEY = "properties";
     public static final String KAKAO_ACCOUNT_KEY = "kakao_account";
     public static final String UNKNOWN_VALUE = "Unknown";
@@ -38,21 +35,19 @@ public class CustomUserService extends DefaultOAuth2UserService {
         OAuth2User oAuth2User = super.loadUser(userRequest);
         Long socialId = oAuth2User.getAttribute(KAKAO_SOCIAL_ID_PROPERTY);
         String username = extractArgument(oAuth2User, KAKAO_NAME_PROPERTY);
-        String gender = extractArgument(oAuth2User, KAKAO_GENDER_PROPERTY);
 
         User userEntity = userRepository.findBySocialId(socialId)
             .orElseGet(() -> {
-                return createUser(username, socialId, gender);
+                return createUser(username, socialId);
             });
         return new PrincipalDetails(userEntity, oAuth2User.getAttributes());
     }
 
-    private @NotNull User createUser(String username, Long socialId, String gender) {
+    private @NotNull User createUser(String username, Long socialId) {
         User newUser = User.builder()
             .username(username)
             .socialId(socialId)
             .cookingLevel(CookingLevel.BEGINNER)
-            .gender(Gender.of(gender))
             .build();
         userRepository.save(newUser);
         return newUser;
