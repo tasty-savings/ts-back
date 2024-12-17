@@ -50,11 +50,13 @@ public class User {
     private Set<Allergy> allergy;
 
     @Builder
-    public User(String username, Long socialId, CookingLevel cookingLevel, Gender gender) {
+    public User(String username, Long socialId, CookingLevel cookingLevel) {
         this.username = username;
         this.socialId = socialId;
         this.cookingLevel = cookingLevel;
-        this.gender = gender;
+    }
+    public void updateGender(String gender){
+        this.gender = Gender.of(gender);
     }
 
     public void updatePhysicalAttributes(int age, float height, float weight, ActivityLevel activityLevel) {

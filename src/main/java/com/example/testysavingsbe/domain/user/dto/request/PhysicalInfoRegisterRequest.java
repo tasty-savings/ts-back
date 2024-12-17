@@ -4,6 +4,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.Pattern;
 
 public record PhysicalInfoRegisterRequest(
+    @JsonProperty("gender")
+    @Pattern(regexp = "male|female", message = "male or female required")
+    String gender,
     @JsonProperty("age")
     int age,
     @JsonProperty("height")

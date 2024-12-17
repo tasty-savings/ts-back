@@ -32,6 +32,8 @@ public interface RecipeQueryUseCase {
 
     CustomRecipeResponse getCustomRecipeBySharedLink(String uuid);
 
+    List<OriginalRecipeResponse> searchRecipe(String recipeName);
+
     @Builder
     record RecipeFromIngredientsRequest(
         String originalRecipeId,

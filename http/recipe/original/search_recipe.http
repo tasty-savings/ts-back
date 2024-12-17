@@ -1,0 +1,4 @@
+###
+GET http://localhost:8080/api/recipe/original/search?
+    recipe=돼지
+Cookie: JSESSIONID={{session}}

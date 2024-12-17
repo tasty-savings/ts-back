@@ -14,7 +14,6 @@ spring:
       url: ${SPRING_DATASOURCE_URL}
       username: ${SPRING_DATASOURCE_USERNAME}
       password: ${SPRING_DATASOURCE_PASSWORD}
-
   jpa:
     properties:
       hibernate:
@@ -23,11 +22,8 @@ spring:
     show-sql: false
     open-in-view: false
     hibernate:
-      ddl-auto: create
+      ddl-auto: create-drop
     database: mysql
-
-
-
   cache:
     type: redis
   data:
