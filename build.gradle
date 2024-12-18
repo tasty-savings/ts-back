@@ -18,15 +18,10 @@ configurations {
     compileOnly {
         extendsFrom annotationProcessor
     }
-    asciidoctorExt
 }
 
 repositories {
     mavenCentral()
-}
-
-ext {
-    set('snippetsDir', file("build/generated-snippets"))
 }
 
 dependencies {
@@ -36,43 +31,45 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
     compileOnly 'org.projectlombok:lombok'
-    developmentOnly 'org.springframework.boot:spring-boot-devtools'
-    runtimeOnly 'com.h2database:h2'
     annotationProcessor 'org.projectlombok:lombok'
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
+//     mysql
+    runtimeOnly 'com.mysql:mysql-connector-j'
+
+    // mongo
+    implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
+
+    // h2
+//    runtimeOnly 'com.h2database:h2'
+
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'io.projectreactor:reactor-test'
     testImplementation 'org.springframework.security:spring-security-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-
     implementation 'org.springframework.boot:spring-boot-starter-validation'        // Valid
+
+    // redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+    // gson
+    implementation 'com.google.code.gson:gson:2.11.0'
+
+    // loki-logback appender
+    implementation 'com.github.loki4j:loki-logback-appender:1.5.2'
+
 
     // test
     testRuntimeOnly 'com.h2database:h2'
+    implementation 'com.squareup.okhttp3:okhttp:4.12.0'     // okhttp
+    implementation 'com.squareup.okhttp3:mockwebserver:4.12.0'
 
-    // rest doc
-    asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor' // (4)
-    testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
 }
 
 tasks.named('test') {
     useJUnitPlatform()
-    outputs.dir snippetsDir
 }
 
-
-tasks.named('asciidoctor') {
-    inputs.dir snippetsDir
-    configurations 'asciidoctorExt'
-    sources{
-        include("**/index.adoc")
-    }
-    baseDirFollowsSourceFile()
-    dependsOn test
-}
 
 bootJar {
-    dependsOn asciidoctor
-    from("${asciidoctor.outputDir}") {
-        into 'static/docs'
-    }
 }

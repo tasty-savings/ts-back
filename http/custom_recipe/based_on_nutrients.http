@@ -1,0 +1,22 @@
+
+### 사용자 영양(헬스)정보 등록
+PUT http://localhost:8080/api/userinfo/setting/physical
+Content-Type: application/json
+Cookie: JSESSIONID={{session}}
+
+{
+  "age": 26,
+  "height": 168,
+  "weight": 59.2,
+  "activity_level": "저활동적"
+}
+
+### AI를 이용해서 사용자 영양 맞춤형 레시피 생성
+POST http://localhost:8080/api/recipe/custom/nutrients/67518322077f816ec70f08c7
+Cookie: JSESSIONID={{session}}
+Content-Type: application/json
+
+{
+  "meals_a_day": 2,
+  "basic_seasoning": ["후추", "소금"]
+}

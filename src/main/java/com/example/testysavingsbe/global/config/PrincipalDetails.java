@@ -1,22 +1,29 @@
 package com.example.testysavingsbe.global.config;
 
 import com.example.testysavingsbe.domain.user.entity.User;
-import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.security.web.authentication.session.SessionAuthenticationException;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
 public class PrincipalDetails implements OAuth2User {
-    @Getter
     private final User user;
+
     private final Map<String, Object> attributes;
 
     public PrincipalDetails(User user , Map<String, Object> attributes) {
         this.user = user;
         this.attributes = attributes;
+    }
+
+    public User getUser() {
+        if (this.user == null) {
+            throw new SessionAuthenticationException("만료된 세션이거나 유저가 존재하지 않습니다.");
+        }
+        return user;
     }
 
     public Long getUserId(){

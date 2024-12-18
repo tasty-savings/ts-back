@@ -1,40 +1,54 @@
 package com.example.testysavingsbe.domain.recipe.entity;
 
-import com.example.testysavingsbe.domain.user.entity.User;
-import jakarta.persistence.*;
-import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
-@Entity
-@NoArgsConstructor
+import java.util.List;
+
 @Getter
+@Document(collection = "recipe")
 public class Recipe {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    @Column
-    private String content;
-    @Column
-    private Boolean isEaten;
-    @Column
-    private Boolean isBookMarked;
-    @ManyToOne(fetch = FetchType.LAZY)
-    private User user;
+    private String id;
 
-    @Builder
-    public Recipe(String content, User user) {
-        this.content = content;
-        this.user = user;
-        this.isEaten = false;
-        this.isBookMarked = false;
-    }
+    @Field("title")
+    private String title;
 
-    public void updateEaten(){
-        this.isEaten = !this.isEaten;
-    }
+    @Field("main_img")
+    private String mainImg;
 
-    public void updateBookMarked(){
-        this.isBookMarked = !this.isBookMarked;
-    }
+    @Field("type_key")
+    private String typeKey;
+
+    @Field("method_key")
+    private String methodKey;
+
+    @Field("servings")
+    private String servings;
+
+    @Field("cooking_time")
+    private String cookingTime;
+
+    @Field("difficulty")
+    private String difficulty;
+
+    @Field("ingredients")
+    private List<String> ingredients;
+
+    @Field("cooking_steps")
+    private List<String> cookingOrder;
+
+    @Field("cooking_images")
+    private List<String> cookingImages;
+
+    @Field("hashtags")
+    private List<String> hashtags;
+
+    @Field("tips")
+    private List<String> tips;
+
+    @Field("recipe_type")
+    private List<String> recipeType;
 }

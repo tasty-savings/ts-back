@@ -1,0 +1,16 @@
+### 사용자 영양(헬스)정보 등록
+PUT http://localhost:8080/api/userinfo/setting/physical
+Content-Type: application/json
+Cookie: JSESSIONID={{session}}
+
+{
+  "gender": "male",
+  "age": 26,
+  "height": 168,
+  "weight": 59.2,
+  "activity_level": "저활동적"
+}
+
+### 유저 정보 가져오기
+GET http://localhost:8080/api/userinfo
+Cookie: JSESSIONID={{session}}
