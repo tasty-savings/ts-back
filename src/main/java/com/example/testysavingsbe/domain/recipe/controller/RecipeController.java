@@ -54,8 +54,8 @@ public class RecipeController {
         @AuthenticationPrincipal PrincipalDetails principalDetails,
         @PathVariable("recipeId") String recipeId, @RequestBody BasedOnNutrientsRequest request) {
         AIChangeRecipeResponse response = recipeCommandUseCase.generateRecipeBasedOnNutrients(
-            principalDetails.getUser(), request.mealsADay(), recipeId,
-            request.userBasicSeasoning());
+            principalDetails.getUser(), recipeId, request.mealsADay()
+        );
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -99,7 +99,7 @@ public class RecipeController {
             principalDetails.getUser(),
             RecipeFromIngredientsRequest.builder().originalRecipeId(request.originalRecipeId())
                 .dislikeIngredients(request.dislikeIngredients())
-                .basicSeasoning(request.basicSeasoning())
+//                .basicSeasoning(request.basicSeasoning())
                 .mustUseIngredients(request.mustUseIngredients()).build());
 
         log.info("응답 요청");
