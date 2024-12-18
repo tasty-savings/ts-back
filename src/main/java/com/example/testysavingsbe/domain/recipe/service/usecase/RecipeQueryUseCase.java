@@ -38,7 +38,6 @@ public interface RecipeQueryUseCase {
     record RecipeFromIngredientsRequest(
         String originalRecipeId,
         List<String> dislikeIngredients,
-        List<String> basicSeasoning,
         List<String> mustUseIngredients
     ) {
 

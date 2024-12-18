@@ -2,6 +2,7 @@ package com.example.testysavingsbe.domain.recipe.service;
 
 
 import com.example.testysavingsbe.domain.ingredient.entity.Food;
+import com.example.testysavingsbe.domain.ingredient.entity.FoodType;
 import com.example.testysavingsbe.domain.ingredient.repository.FoodRepository;
 import com.example.testysavingsbe.domain.recipe.dto.request.AIGenerateBasedOnNutrientsRequest;
 import com.example.testysavingsbe.domain.recipe.dto.request.LeftoverCookingRequest;
@@ -35,11 +36,13 @@ import jakarta.persistence.EntityNotFoundException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -118,6 +121,7 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
      * @return 변환된 레시피와 원본 레시피 정보를 포함하는 {@code AIChangeRecipeResponse}
      * @throws EntityNotFoundException 원본 레시피가 존재하지 않는 경우
      */
+
     @Override
     public AIChangeRecipeResponse createRecipeFromIngredients(User user,
         RecipeFromIngredientsRequest request) {
@@ -128,17 +132,32 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
             .map(Food::getFoodName)
             .toList();
 
+        List<String> basicSeasoning = extractBasicSeasoning(user);
+
         Mono<LeftoverCookingRequest> aiRequest = Mono.just(
-            buildLeftoverCookingRequest(user, request, userAllergy, userIngredients));
+            buildLeftoverCookingRequest(user, request, basicSeasoning, userAllergy,
+                userIngredients));
 
         AIRecipe after = aiAdapter.requestCreateRecipeUseIngredients(request,
             aiRequest);
 
-        log.info(after.toString());
-
         OriginalRecipeResponse before = OriginalRecipeResponse.fromRecipe(orignalRecipe);
-
         return new AIChangeRecipeResponse(before, after);
+    }
+
+    private @NotNull List<String> extractBasicSeasoning(User user) {
+        List<Food> foods = foodRepository.findAllByUser(user);
+
+        Set<FoodType> allowedFoodTypes = Set.of(
+            FoodType.SEASONING_AND_SPICE,
+            FoodType.FAT_AND_OIL,
+            FoodType.SOURCE
+        );
+
+        return foods.stream()
+            .filter(food -> allowedFoodTypes.contains(food.getFoodInfo().getFoodType()))
+            .map(Food::getFoodName)
+            .toList();
     }
 
 
@@ -260,13 +279,13 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
     }
 
     @Override
-    public AIChangeRecipeResponse generateRecipeBasedOnNutrients(User user, int mealsADay,
-        String recipeId, List<String> userBasicSeasoning) {
+    public AIChangeRecipeResponse generateRecipeBasedOnNutrients(User user, String recipeId,
+        int mealsADay) {
         Recipe recipe = recipeRepository.findById(recipeId)
             .orElseThrow(EntityNotFoundException::new);
-
+        List<String> basicSeasoning = extractBasicSeasoning(user);
         AIGenerateBasedOnNutrientsRequest request = calculateUserRequiredNutrition(
-            user, mealsADay, userBasicSeasoning);
+            user, mealsADay, basicSeasoning);
 
         NutritionBasedRecipeCreateResponse nutritionBasedRecipeCreateResponse = aiAdapter.requestRecipeForUserNutrition(
             recipeId, request);
@@ -286,13 +305,13 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
         return CustomRecipeResponse.from(customRecipe);
     }
 
-
     /**
      * 레시피 검색 기능
      */
     @Override
     public List<OriginalRecipeResponse> searchRecipe(String recipeName) {
-        List<Recipe> allByRecipeTitleStartingWith = recipeRepository.findAllByRecipeTitleContaining(recipeName);
+        List<Recipe> allByRecipeTitleStartingWith = recipeRepository.findAllByRecipeTitleContaining(
+            recipeName);
 
         return allByRecipeTitleStartingWith.stream()
             .map(OriginalRecipeResponse::fromRecipe)
@@ -398,8 +417,6 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
     }
 
 
-
-
     @Override
     public List<OriginalRecipeResponse> getRecommendedRecipe(User user) {
         List<UserPreferType> userPreferTypes = userPreferTypeRepository.findAllByUser(user);
@@ -451,13 +468,15 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
 
     private LeftoverCookingRequest buildLeftoverCookingRequest(User user,
         RecipeFromIngredientsRequest request,
+        List<String> basicSeasoning,
         List<String> userAllergy, List<String> userIngredients) {
         return LeftoverCookingRequest.builder()
             .userAllergyIngredients(userAllergy)
             .userDislikeIngredients(request.dislikeIngredients())
             .userSpicyLevel(String.valueOf(user.getSpicyLevel()))
             .userCookingLevel(String.valueOf(user.getCookingLevel()))
-            .userOwnedIngredients(userIngredients).userBasicSeasoning(request.basicSeasoning())
+            .userOwnedIngredients(userIngredients)
+            .userBasicSeasoning(basicSeasoning)
             .mustUseIngredients(request.mustUseIngredients()).build();
     }
 
