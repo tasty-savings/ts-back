@@ -1,5 +1,6 @@
 package com.example.testysavingsbe.global.config;
 
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -55,7 +56,11 @@ public class SecurityConfig {
             )
             .logout(logout -> logout
                 .logoutUrl("/logout")
-                .logoutSuccessUrl("/")      // {baseurl 설정}
+                .logoutSuccessHandler((request, response, authentication) ->  {
+                    response.setHeader("Access-Control-Allow-Origin", "*");
+                    response.setHeader("Access-Control-Allow-Credentials", "true");
+                    response.setStatus(HttpServletResponse.SC_OK);
+                })
                 .permitAll()
             );
 
