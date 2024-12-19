@@ -132,4 +132,13 @@ public class UserService implements UserInfoSettingUseCase, UserinfoQueryUseCase
         return new CheckSetUserInfoResponse(true);
     }
 
+    @Override
+    public UserPreferTypeResponse getUserPreferInfo(User user) {
+        List<String> userPreferTypes = userPreferTypeRepository.findAllByUser(user).stream()
+            .map(UserPreferType::getDisplayName)
+            .toList();
+
+        return new UserPreferTypeResponse(userPreferTypes);
+    }
+
 }
