@@ -22,7 +22,7 @@ spring:
     show-sql: false
     open-in-view: false
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     database: mysql
   cache:
     type: redis
