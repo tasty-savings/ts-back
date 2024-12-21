@@ -2,6 +2,7 @@ package com.example.testysavingsbe.domain.recipe.entity;
 
 import lombok.Getter;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
@@ -14,6 +15,7 @@ public class Recipe {
     private String id;
 
     @Field("title")
+    @Indexed
     private String title;
 
     @Field("main_img")
