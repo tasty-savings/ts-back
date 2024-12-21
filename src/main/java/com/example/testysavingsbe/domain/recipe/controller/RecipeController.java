@@ -14,6 +14,7 @@ import com.example.testysavingsbe.domain.recipe.entity.UserEaten;
 import com.example.testysavingsbe.domain.recipe.service.usecase.RecipeCommandUseCase;
 import com.example.testysavingsbe.domain.recipe.service.usecase.RecipeQueryUseCase;
 import com.example.testysavingsbe.domain.recipe.service.usecase.RecipeQueryUseCase.RecipeFromIngredientsRequest;
+import com.example.testysavingsbe.domain.user.entity.User;
 import com.example.testysavingsbe.global.config.PrincipalDetails;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -66,7 +67,6 @@ public class RecipeController {
     @GetMapping("/recommend")
     public ResponseEntity<?> getRecommendedRecipe(
         @AuthenticationPrincipal PrincipalDetails principalDetails) {
-
         List<OriginalRecipeResponse> response = recipeQueryUseCase.getRecommendedRecipe(
             principalDetails.getUser());
 
@@ -167,18 +167,23 @@ public class RecipeController {
 
     @GetMapping("/bookmark/all")
     public ResponseEntity<List<OriginalRecipeResponse>> getAllBookmarkedRecipes(
-        @AuthenticationPrincipal PrincipalDetails principalDetails) {
+        @AuthenticationPrincipal PrincipalDetails principalDetails,
+        @RequestParam(name = "page", defaultValue = "0") int page,
+        @RequestParam(name = "page_size", defaultValue = "10") int pageSize
+    ) {
         List<OriginalRecipeResponse> response = recipeQueryUseCase.getBookmarkedRecipes(
-            principalDetails.getUser());
+            principalDetails.getUser(), page, pageSize);
         return ResponseEntity.ok(response);
     }
 
-
     @GetMapping("/eat/all")
     public ResponseEntity<List<RecipeResponse>> getAllEatenRecipe(
-        @AuthenticationPrincipal PrincipalDetails principalDetails) {
+        @AuthenticationPrincipal PrincipalDetails principalDetails,
+        @RequestParam(name = "page", defaultValue = "0") int page,
+        @RequestParam(name = "page_size", defaultValue = "10") int pageSize
+    ) {
         List<RecipeResponse> allEatenRecipe = recipeQueryUseCase.getAllEatenRecipe(
-            principalDetails.getUser());
+            principalDetails.getUser(), page, pageSize);
 
         return ResponseEntity.ok(allEatenRecipe);
 

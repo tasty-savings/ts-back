@@ -184,8 +184,9 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
     }
 
     @Override
-    public List<OriginalRecipeResponse> getBookmarkedRecipes(User user) {
-        List<String> recipeIds = bookmarkedRepository.findAllByUserId(user.getId())
+    public List<OriginalRecipeResponse> getBookmarkedRecipes(User user, int page, int pageSize) {
+        PageRequest pageRequest = PageRequest.of(page, pageSize);
+        List<String> recipeIds = bookmarkedRepository.findAllByUserId(user.getId(), pageRequest)
             .stream()
             .map(BookmarkedRecipe::getRecipeId)
             .collect(Collectors.toList());
@@ -198,23 +199,29 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
     }
 
     @Override
-    public List<RecipeResponse> getAllEatenRecipe(User user) {
+    public List<RecipeResponse> getAllEatenRecipe(User user, int page, int pageSize) {
         Optional<UserEaten> userEaten = userEatenRepository.findByUserId(user.getId());
         if (userEaten.isEmpty()) {
             return new ArrayList<>();
         }
 
         UserEaten userEatenEntity = userEaten.get();
+        List<EatenRecipe> eatenRecipes = pageRequestEatenRecipes(page, pageSize, userEatenEntity);
 
-        Map<Boolean, List<String>> recipeIdsByType = classifyRecipeIdsByType(
-            userEatenEntity.getEatenRecipes());
-
+        Map<Boolean, List<String>> recipeIdsByType = classifyRecipeIdsByType(eatenRecipes);
         Map<String, Recipe> originalRecipeMap = fetchRecipesByIds(recipeIdsByType.get(true));
         Map<String, CustomRecipe> customRecipeMap = fetchCustomRecipesByIds(
             recipeIdsByType.get(false));
 
         return buildEatenRecipeResponses(userEatenEntity.getEatenRecipes(), originalRecipeMap,
             customRecipeMap);
+    }
+
+    private List<EatenRecipe> pageRequestEatenRecipes(int page, int pageSize, UserEaten userEatenEntity) {
+        List<EatenRecipe> eatenRecipes = userEatenEntity.getEatenRecipes();
+        int fromIndex = page * pageSize;
+        int toIndex = Math.min(fromIndex + pageSize, eatenRecipes.size());
+        return eatenRecipes.subList(fromIndex, toIndex);
     }
 
 
@@ -310,8 +317,11 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
      */
     @Override
     public List<OriginalRecipeResponse> searchRecipe(String recipeName) {
+        long startTime = System.currentTimeMillis();
         List<Recipe> allByRecipeTitleStartingWith = recipeRepository.findAllByRecipeTitleContaining(
             recipeName);
+        long endTime = System.currentTimeMillis();
+        log.info("시간: " + (endTime - startTime) + "ms");
 
         return allByRecipeTitleStartingWith.stream()
             .map(OriginalRecipeResponse::fromRecipe)
@@ -423,8 +433,6 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
         List<String> userPreferTypeStrings = userPreferTypes.stream()
             .map(UserPreferType::getDisplayName).toList();
 
-        // TODO: request dto로 변환 2024. 12. 2. by kong
-        // TODO: AI로부터 받아오는 값들 6시간 기준으로 캐시에 저장 2024. 12. 3. by kong
         Map<String, List<String>> request = new HashMap<>();
         request.put("search_types", userPreferTypeStrings);
 
