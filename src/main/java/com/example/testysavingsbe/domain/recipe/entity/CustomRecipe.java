@@ -1,6 +1,7 @@
 package com.example.testysavingsbe.domain.recipe.entity;
 
 import lombok.Builder;
+import lombok.Data;
 import lombok.Getter;
 import lombok.ToString;
 import org.springframework.data.annotation.Id;
@@ -13,6 +14,7 @@ import java.util.List;
 @ToString
 @Document(collection = "custom_recipe")
 @Getter
+@Data
 public class CustomRecipe implements Serializable {
 
     @Id

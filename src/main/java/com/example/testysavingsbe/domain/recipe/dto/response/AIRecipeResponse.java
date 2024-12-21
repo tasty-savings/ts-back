@@ -6,10 +6,10 @@ import java.util.List;
 
 public record AIRecipeResponse(
         @JsonProperty("main_changes_from_original_recipe")
-        String mainChangesFromOriginalRecipe,
+        List<String> mainChangesFromOriginalRecipe,
 
         @JsonProperty("reason_for_changes")
-        String reasonForChanges,
+        List<String> reasonForChanges,
 
         @JsonProperty("recipe_cooking_order")
         List<String> recipeCookingOrder,
@@ -27,12 +27,12 @@ public record AIRecipeResponse(
         String recipeMenuName,
 
         @JsonProperty("recipe_tips")
-        String recipeTips,
+        List<String> recipeTips,
 
         @JsonProperty("recipe_type")
         String recipeType,
 
         @JsonProperty("unchanged_parts_and_reasons")
-        String unchangedPartsAndReasons
+        List<String> unchangedPartsAndReasons
 ) implements AIRecipe {
 }

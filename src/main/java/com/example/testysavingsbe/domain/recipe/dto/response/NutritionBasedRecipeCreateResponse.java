@@ -5,13 +5,13 @@ import java.util.List;
 
 public record NutritionBasedRecipeCreateResponse(
     @JsonProperty("main_changes_from_original_recipe")
-    String mainChangesFromOriginalRecipe,
+    List<String> mainChangesFromOriginalRecipe,
     @JsonProperty("new_recipe_food_group_composition")
-    String newRecipeFoodGroupComposition,
+    List<FoodConsumption> newRecipeFoodGroupComposition,
     @JsonProperty("original_recipe_food_group_composition")
-    String originalRecipeFoodGroupComposition,
+    List<FoodConsumption> originalRecipeFoodGroupComposition,
     @JsonProperty("reason_for_changes")
-    String reasonForChanges,
+    List<String> reasonForChanges,
     @JsonProperty("recipe_cooking_order")
     List<String> recipeCookingOrder,
     @JsonProperty("recipe_cooking_time")
@@ -23,14 +23,19 @@ public record NutritionBasedRecipeCreateResponse(
     @JsonProperty("recipe_menu_name")
     String recipeMenuName,
     @JsonProperty("recipe_tips")
-    String recipeTips,
+    List<String> recipeTips,
     @JsonProperty("recipe_type")
     String recipeType,
     @JsonProperty("unchanged_parts_and_reasons")
-    String unchangedPartsAndReasons,
+    List<String> unchangedPartsAndReasons,
     @JsonProperty("user_meal_food_group_requirements")
-    String userMealFoodGroupRequirements
+    List<FoodConsumption> userMealFoodGroupRequirements
 ) implements AIRecipe
 {
+    public record FoodConsumption(
+        @JsonProperty("food_group") String foodGroup,
+        @JsonProperty("amount") Float amount
+    ){
 
+    }
 }

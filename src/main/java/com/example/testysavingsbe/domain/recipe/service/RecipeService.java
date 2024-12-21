@@ -11,6 +11,7 @@ import com.example.testysavingsbe.domain.recipe.dto.request.SaveCustomRecipeRequ
 import com.example.testysavingsbe.domain.recipe.dto.request.SimplifyRecipeToAiRequest;
 import com.example.testysavingsbe.domain.recipe.dto.response.AIChangeRecipeResponse;
 import com.example.testysavingsbe.domain.recipe.dto.response.AIRecipe;
+import com.example.testysavingsbe.domain.recipe.dto.response.AIRecipeResponse;
 import com.example.testysavingsbe.domain.recipe.dto.response.CustomRecipeResponse;
 import com.example.testysavingsbe.domain.recipe.dto.response.NutritionBasedRecipeCreateResponse;
 import com.example.testysavingsbe.domain.recipe.dto.response.OriginalRecipeResponse;
@@ -121,7 +122,6 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
      * @return 변환된 레시피와 원본 레시피 정보를 포함하는 {@code AIChangeRecipeResponse}
      * @throws EntityNotFoundException 원본 레시피가 존재하지 않는 경우
      */
-
     @Override
     public AIChangeRecipeResponse createRecipeFromIngredients(User user,
         RecipeFromIngredientsRequest request) {
@@ -141,8 +141,14 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
         AIRecipe after = aiAdapter.requestCreateRecipeUseIngredients(request,
             aiRequest);
 
+        CustomRecipe customRecipe = buildAIChangedCustomRecipe(user.getId(), orignalRecipe,
+            (AIRecipeResponse) after);
+
+        customRecipeRepository.save(customRecipe);
+        log.info(customRecipe.toString());
+
         OriginalRecipeResponse before = OriginalRecipeResponse.fromRecipe(orignalRecipe);
-        return new AIChangeRecipeResponse(before, after);
+        return new AIChangeRecipeResponse(customRecipe.getId(), before, after);
     }
 
     private @NotNull List<String> extractBasicSeasoning(User user) {
@@ -170,9 +176,13 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
             user.getCookingLevel().getDisplayName());
 
         AIRecipe after = aiAdapter.requestRecipeMakeSimplify(recipeId, request);
+        CustomRecipe customRecipe = buildAIChangedCustomRecipe(user.getId(), recipe,
+            (AIRecipeResponse) after);
+        customRecipeRepository.save(customRecipe);
+
         OriginalRecipeResponse before = OriginalRecipeResponse.fromRecipe(recipe);
 
-        return new AIChangeRecipeResponse(before, after);
+        return new AIChangeRecipeResponse(customRecipe.getId(), before, after);
     }
 
 
@@ -217,7 +227,8 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
             customRecipeMap);
     }
 
-    private List<EatenRecipe> pageRequestEatenRecipes(int page, int pageSize, UserEaten userEatenEntity) {
+    private List<EatenRecipe> pageRequestEatenRecipes(int page, int pageSize,
+        UserEaten userEatenEntity) {
         List<EatenRecipe> eatenRecipes = userEatenEntity.getEatenRecipes();
         int fromIndex = page * pageSize;
         int toIndex = Math.min(fromIndex + pageSize, eatenRecipes.size());
@@ -296,8 +307,11 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
 
         NutritionBasedRecipeCreateResponse nutritionBasedRecipeCreateResponse = aiAdapter.requestRecipeForUserNutrition(
             recipeId, request);
-
-        return new AIChangeRecipeResponse(OriginalRecipeResponse.fromRecipe(recipe),
+        CustomRecipe customRecipe = buildAIChangedCustomRecipe(user.getId(), recipe,
+            (NutritionBasedRecipeCreateResponse) nutritionBasedRecipeCreateResponse);
+        customRecipeRepository.save(customRecipe);
+        return new AIChangeRecipeResponse(customRecipe.getId(),
+            OriginalRecipeResponse.fromRecipe(recipe),
             nutritionBasedRecipeCreateResponse);
     }
 
@@ -317,11 +331,8 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
      */
     @Override
     public List<OriginalRecipeResponse> searchRecipe(String recipeName) {
-        long startTime = System.currentTimeMillis();
         List<Recipe> allByRecipeTitleStartingWith = recipeRepository.findAllByRecipeTitleContaining(
             recipeName);
-        long endTime = System.currentTimeMillis();
-        log.info("시간: " + (endTime - startTime) + "ms");
 
         return allByRecipeTitleStartingWith.stream()
             .map(OriginalRecipeResponse::fromRecipe)
@@ -461,6 +472,46 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
         return user.getAllergy().stream()
             .map(Allergy::getAllergy)
             .toList();
+    }
+
+    private CustomRecipe buildAIChangedCustomRecipe(Long userId, Recipe originalRecipe,
+        NutritionBasedRecipeCreateResponse aiRecipeResponse) {
+        return CustomRecipe.builder()
+            .userId(userId)
+            .title(aiRecipeResponse.recipeMenuName())
+            .mainImg(originalRecipe.getMainImg())
+            .typeKey(aiRecipeResponse.recipeType())
+            .methodKey(originalRecipe.getMethodKey())
+            .servings(originalRecipe.getServings())
+            .cookingTime(aiRecipeResponse.recipeCookingTime())
+            .difficulty(aiRecipeResponse.recipeDifficulty())
+            .ingredients(aiRecipeResponse.recipeIngredients())
+            .cookingOrder(aiRecipeResponse.recipeCookingOrder())
+            .cookingImg(originalRecipe.getCookingImages())
+            .hashtag(originalRecipe.getHashtags())
+            .tips(aiRecipeResponse.recipeTips())
+            .recipeType(originalRecipe.getRecipeType())
+            .build();
+    }
+
+    private CustomRecipe buildAIChangedCustomRecipe(Long userId, Recipe originalRecipe,
+        AIRecipeResponse aiRecipeResponse) {
+        return CustomRecipe.builder()
+            .userId(userId)
+            .title(aiRecipeResponse.recipeMenuName())
+            .mainImg(originalRecipe.getMainImg())
+            .typeKey(aiRecipeResponse.recipeType())
+            .methodKey(originalRecipe.getMethodKey())
+            .servings(originalRecipe.getServings())
+            .cookingTime(aiRecipeResponse.recipeCookingTime())
+            .difficulty(aiRecipeResponse.recipeDifficulty())
+            .ingredients(aiRecipeResponse.recipeIngredients())
+            .cookingOrder(aiRecipeResponse.recipeCookingOrder())
+            .cookingImg(originalRecipe.getCookingImages())
+            .hashtag(originalRecipe.getHashtags())
+            .tips(aiRecipeResponse.recipeTips())
+            .recipeType(originalRecipe.getRecipeType())
+            .build();
     }
 
     private CustomRecipe buildCustomRecipe(User user, SaveCustomRecipeRequest request) {
