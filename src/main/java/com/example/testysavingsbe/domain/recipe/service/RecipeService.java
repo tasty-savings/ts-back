@@ -62,6 +62,7 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
 
     public static final String ORIGINAL_TYPE = "original";
     public static final int RECOMMEND_RECIPE_MAX_SIZE = 10;
+    public static final String RECIPE_DEFAULT_SERVINGS = "1인분";
 
     private final RecipeRepository recipeRecommendRepository;
     private final CustomRecipeRepository customRecipeRepository;
@@ -506,16 +507,16 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
             .title(aiRecipeResponse.recipeMenuName())
             .mainImg(originalRecipe.getMainImg())
             .typeKey(aiRecipeResponse.recipeType())
-            .methodKey(originalRecipe.getMethodKey())
-            .servings(originalRecipe.getServings())
+//            .methodKey(originalRecipe.getMethodKey())
+            .servings(RECIPE_DEFAULT_SERVINGS)
             .cookingTime(aiRecipeResponse.recipeCookingTime())
             .difficulty(aiRecipeResponse.recipeDifficulty())
             .ingredients(aiRecipeResponse.recipeIngredients())
             .cookingOrder(aiRecipeResponse.recipeCookingOrder())
-            .cookingImg(originalRecipe.getCookingImages())
-            .hashtag(originalRecipe.getHashtags())
+//            .cookingImg(originalRecipe.getCookingImages())
+//            .hashtag(originalRecipe.getHashtags())
             .tips(aiRecipeResponse.recipeTips())
-            .recipeType(originalRecipe.getRecipeType())
+//            .recipeType(originalRecipe.getRecipeType())
             .build();
     }
 
@@ -526,16 +527,16 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
             .title(aiRecipeResponse.recipeMenuName())
             .mainImg(originalRecipe.getMainImg())
             .typeKey(aiRecipeResponse.recipeType())
-            .methodKey(originalRecipe.getMethodKey())
-            .servings(originalRecipe.getServings())
+//            .methodKey(originalRecipe.getMethodKey())
+            .servings(RECIPE_DEFAULT_SERVINGS)
             .cookingTime(aiRecipeResponse.recipeCookingTime())
             .difficulty(aiRecipeResponse.recipeDifficulty())
             .ingredients(aiRecipeResponse.recipeIngredients())
             .cookingOrder(aiRecipeResponse.recipeCookingOrder())
-            .cookingImg(originalRecipe.getCookingImages())
-            .hashtag(originalRecipe.getHashtags())
+//            .cookingImg(originalRecipe.getCookingImages())
+//            .hashtag(originalRecipe.getHashtags())
             .tips(aiRecipeResponse.recipeTips())
-            .recipeType(originalRecipe.getRecipeType())
+//            .recipeType(originalRecipe.getRecipeType())
             .build();
     }
 
