@@ -25,6 +25,8 @@ public interface RecipeCommandUseCase {
 
     AIChangeRecipeResponse generateRecipeBasedOnNutrients(User user, String recipeId, int mealsADay);
 
+    void updateCustomRecipe(String recipeId, SaveCustomRecipeRequest request);
+
     record RecipeGenerateServiceRequest(
         User user,
         String recipeName

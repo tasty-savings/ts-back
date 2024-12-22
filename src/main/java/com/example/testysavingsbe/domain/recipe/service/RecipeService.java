@@ -316,6 +316,31 @@ public class RecipeService implements RecipeQueryUseCase, RecipeCommandUseCase {
     }
 
     @Override
+    public void updateCustomRecipe(String recipeId, SaveCustomRecipeRequest request) {
+        CustomRecipe customRecipe = customRecipeRepository.findById(recipeId)
+            .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 커스텀 레시피입니다."));
+
+        CustomRecipe updateCustomRecipe = customRecipe.toBuilder()
+            .id(customRecipe.getId())
+            .title(request.title())
+            .mainImg(request.mainImg())
+            .typeKey(request.typeKey())
+            .methodKey(request.methodKey())
+            .servings(request.servings())
+            .cookingTime(request.cookingTime())
+            .difficulty(request.difficulty())
+            .ingredients(request.ingredients())
+            .cookingOrder(request.cookingOrder())
+            .cookingImg(request.cookingImg())
+            .hashtag(request.hashtag())
+            .tips(request.tips())
+            .recipeType(request.recipeType())
+            .build();
+
+        customRecipeRepository.save(updateCustomRecipe);
+    }
+
+    @Override
     public CustomRecipeResponse getCustomRecipeBySharedLink(String uuid) {
         SharedRecipe byUuid = sharedRecipeRepository.findByUuid(uuid)
             .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 링크입니다."));

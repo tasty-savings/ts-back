@@ -62,11 +62,14 @@ public class CustomRecipe implements Serializable {
     @Field("recipe_type")
     private final List<String> recipeType;
 
-    @Builder
-    public CustomRecipe(Long userId, String title, String mainImg, String typeKey, String methodKey,
+
+    @Builder(toBuilder = true)
+    public CustomRecipe(String id,
+        Long userId, String title, String mainImg, String typeKey, String methodKey,
         String servings, String cookingTime, String difficulty, List<String> ingredients,
         List<String> cookingOrder, List<String> cookingImg, List<String> hashtag, List<String> tips,
         List<String> recipeType) {
+        this.id = id;
         this.userId = userId;
         this.title = title;
         this.mainImg = mainImg;

@@ -14,7 +14,6 @@ import com.example.testysavingsbe.domain.recipe.entity.UserEaten;
 import com.example.testysavingsbe.domain.recipe.service.usecase.RecipeCommandUseCase;
 import com.example.testysavingsbe.domain.recipe.service.usecase.RecipeQueryUseCase;
 import com.example.testysavingsbe.domain.recipe.service.usecase.RecipeQueryUseCase.RecipeFromIngredientsRequest;
-import com.example.testysavingsbe.domain.user.entity.User;
 import com.example.testysavingsbe.global.config.PrincipalDetails;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -94,15 +93,12 @@ public class RecipeController {
     public ResponseEntity<AIChangeRecipeResponse> createRecipeFromUserIngredients(
         @AuthenticationPrincipal PrincipalDetails principalDetails,
         @RequestBody UseAllIngredientsRequest request) {
-        log.info("냉장고 파먹기 요청");
         AIChangeRecipeResponse response = recipeQueryUseCase.createRecipeFromIngredients(
             principalDetails.getUser(),
             RecipeFromIngredientsRequest.builder().originalRecipeId(request.originalRecipeId())
                 .dislikeIngredients(request.dislikeIngredients())
-//                .basicSeasoning(request.basicSeasoning())
                 .mustUseIngredients(request.mustUseIngredients()).build());
 
-        log.info("응답 요청");
         return ResponseEntity.ok(response);
     }
 
@@ -208,6 +204,15 @@ public class RecipeController {
         @PathVariable(name = "recipeId") String recipeId) {
         recipeCommandUseCase.removeEatenRecipe(principalDetails.getUser(), recipeId);
 
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/custom/edit/{customRecipeId}")
+    public ResponseEntity<Void> updateCustomRecipe(
+        @PathVariable(name = "customRecipeId") String recipeId,
+        @RequestBody SaveCustomRecipeRequest request
+    ) {
+        recipeCommandUseCase.updateCustomRecipe(recipeId, request);
         return ResponseEntity.noContent().build();
     }
 
