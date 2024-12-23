@@ -106,6 +106,7 @@ public class UserService implements UserInfoSettingUseCase, UserinfoQueryUseCase
             .username(user.getUsername())
             .cookingLevel(user.getCookingLevel().getDisplayName())
             .spicyLevel(user.getSpicyLevel().getDisplayName())
+            .age(user.getAge())
             .allergy(user.getAllergy().stream().map(Allergy::getAllergy).toList())
             .gender(user.getGender().toString())
             .activity_level(user.getPhysicalAttributes().getActivityLevel().getDescription())
