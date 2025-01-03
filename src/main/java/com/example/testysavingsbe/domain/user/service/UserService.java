@@ -106,6 +106,7 @@ public class UserService implements UserInfoSettingUseCase, UserinfoQueryUseCase
             .username(user.getUsername())
             .cookingLevel(user.getCookingLevel().getDisplayName())
             .spicyLevel(user.getSpicyLevel().getDisplayName())
+            .age(user.getAge())
             .allergy(user.getAllergy().stream().map(Allergy::getAllergy).toList())
             .gender(user.getGender().toString())
             .activity_level(user.getPhysicalAttributes().getActivityLevel().getDescription())
@@ -122,14 +123,26 @@ public class UserService implements UserInfoSettingUseCase, UserinfoQueryUseCase
 
     @Override
     public CheckSetUserInfoResponse checkSetUserHealthInfo(User user) {
-        if (user.getPhysicalAttributes().getWeight() == null
-            || user.getPhysicalAttributes().getHeight() == null
-            || user.getPhysicalAttributes().getActivityLevel() == null
-            || user.getAge() == null
-        ) {
+        try {
+            boolean isInfoComplete = user.getPhysicalAttributes().getWeight() != null
+                && user.getPhysicalAttributes().getHeight() != null
+                && user.getPhysicalAttributes().getActivityLevel() != null
+                && user.getAge() != null;
+
+            return new CheckSetUserInfoResponse(isInfoComplete);
+        } catch (NullPointerException e) {
+            // NullPointerException이 발생하면 필요한 정보가 없는 것으로 간주
             return new CheckSetUserInfoResponse(false);
         }
-        return new CheckSetUserInfoResponse(true);
+    }
+
+    @Override
+    public UserPreferTypeResponse getUserPreferInfo(User user) {
+        List<String> userPreferTypes = userPreferTypeRepository.findAllByUser(user).stream()
+            .map(UserPreferType::getDisplayName)
+            .toList();
+
+        return new UserPreferTypeResponse(userPreferTypes);
     }
 
 }

@@ -54,8 +54,8 @@ public class RecipeController {
         @AuthenticationPrincipal PrincipalDetails principalDetails,
         @PathVariable("recipeId") String recipeId, @RequestBody BasedOnNutrientsRequest request) {
         AIChangeRecipeResponse response = recipeCommandUseCase.generateRecipeBasedOnNutrients(
-            principalDetails.getUser(), request.mealsADay(), recipeId,
-            request.userBasicSeasoning());
+            principalDetails.getUser(), recipeId, request.mealsADay()
+        );
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -66,7 +66,6 @@ public class RecipeController {
     @GetMapping("/recommend")
     public ResponseEntity<?> getRecommendedRecipe(
         @AuthenticationPrincipal PrincipalDetails principalDetails) {
-
         List<OriginalRecipeResponse> response = recipeQueryUseCase.getRecommendedRecipe(
             principalDetails.getUser());
 
@@ -94,15 +93,12 @@ public class RecipeController {
     public ResponseEntity<AIChangeRecipeResponse> createRecipeFromUserIngredients(
         @AuthenticationPrincipal PrincipalDetails principalDetails,
         @RequestBody UseAllIngredientsRequest request) {
-        log.info("냉장고 파먹기 요청");
         AIChangeRecipeResponse response = recipeQueryUseCase.createRecipeFromIngredients(
             principalDetails.getUser(),
             RecipeFromIngredientsRequest.builder().originalRecipeId(request.originalRecipeId())
                 .dislikeIngredients(request.dislikeIngredients())
-                .basicSeasoning(request.basicSeasoning())
                 .mustUseIngredients(request.mustUseIngredients()).build());
 
-        log.info("응답 요청");
         return ResponseEntity.ok(response);
     }
 
@@ -167,18 +163,23 @@ public class RecipeController {
 
     @GetMapping("/bookmark/all")
     public ResponseEntity<List<OriginalRecipeResponse>> getAllBookmarkedRecipes(
-        @AuthenticationPrincipal PrincipalDetails principalDetails) {
+        @AuthenticationPrincipal PrincipalDetails principalDetails,
+        @RequestParam(name = "page", defaultValue = "0") int page,
+        @RequestParam(name = "page_size", defaultValue = "10") int pageSize
+    ) {
         List<OriginalRecipeResponse> response = recipeQueryUseCase.getBookmarkedRecipes(
-            principalDetails.getUser());
+            principalDetails.getUser(), page, pageSize);
         return ResponseEntity.ok(response);
     }
 
-
     @GetMapping("/eat/all")
     public ResponseEntity<List<RecipeResponse>> getAllEatenRecipe(
-        @AuthenticationPrincipal PrincipalDetails principalDetails) {
+        @AuthenticationPrincipal PrincipalDetails principalDetails,
+        @RequestParam(name = "page", defaultValue = "0") int page,
+        @RequestParam(name = "page_size", defaultValue = "10") int pageSize
+    ) {
         List<RecipeResponse> allEatenRecipe = recipeQueryUseCase.getAllEatenRecipe(
-            principalDetails.getUser());
+            principalDetails.getUser(), page, pageSize);
 
         return ResponseEntity.ok(allEatenRecipe);
 
@@ -203,6 +204,15 @@ public class RecipeController {
         @PathVariable(name = "recipeId") String recipeId) {
         recipeCommandUseCase.removeEatenRecipe(principalDetails.getUser(), recipeId);
 
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/custom/edit/{customRecipeId}")
+    public ResponseEntity<Void> updateCustomRecipe(
+        @PathVariable(name = "customRecipeId") String recipeId,
+        @RequestBody SaveCustomRecipeRequest request
+    ) {
+        recipeCommandUseCase.updateCustomRecipe(recipeId, request);
         return ResponseEntity.noContent().build();
     }
 

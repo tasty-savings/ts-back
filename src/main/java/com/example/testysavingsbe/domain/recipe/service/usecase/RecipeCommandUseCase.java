@@ -7,7 +7,6 @@ import com.example.testysavingsbe.domain.recipe.dto.response.CustomRecipeRespons
 import com.example.testysavingsbe.domain.recipe.dto.response.SharedRecipeResponse;
 import com.example.testysavingsbe.domain.recipe.entity.UserEaten;
 import com.example.testysavingsbe.domain.user.entity.User;
-import java.util.List;
 
 
 public interface RecipeCommandUseCase {
@@ -24,7 +23,9 @@ public interface RecipeCommandUseCase {
 
     void deleteSharedRecipe(String customRecipeId);
 
-    AIChangeRecipeResponse generateRecipeBasedOnNutrients(User user, int mealsADay, String recipeId, List<String> userBasicSeasoning);
+    AIChangeRecipeResponse generateRecipeBasedOnNutrients(User user, String recipeId, int mealsADay);
+
+    void updateCustomRecipe(String recipeId, SaveCustomRecipeRequest request);
 
     record RecipeGenerateServiceRequest(
         User user,

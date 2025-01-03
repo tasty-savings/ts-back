@@ -27,7 +27,7 @@ public class AiWebClientAdapterImpl implements AiWebClientAdapter {
     private static final int USE_ALL_INGREDIENTS_REQUEST_TYPE = 1;
     private static final int SIMPLIFY_RECIPE_REQUEST_TYPE = 2;
     private static final int BASED_ON_NUTRIENTS_REQUEST_TYPE = 3;
-    private static final int AI_REQUEST_TIMEOUT_MINUTE = 2;
+    private static final int AI_REQUEST_TIMEOUT_MINUTE = 3;
 
 
     private final WebClient aiWebClient;

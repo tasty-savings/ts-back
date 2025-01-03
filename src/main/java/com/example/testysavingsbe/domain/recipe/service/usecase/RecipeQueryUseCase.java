@@ -26,9 +26,9 @@ public interface RecipeQueryUseCase {
 
     boolean checkBookmarked(User user, String recipeId);
 
-    List<OriginalRecipeResponse> getBookmarkedRecipes(User user);
+    List<OriginalRecipeResponse> getBookmarkedRecipes(User user, int page, int pageSize);
 
-    List<RecipeResponse> getAllEatenRecipe(User user);
+    List<RecipeResponse> getAllEatenRecipe(User user, int page, int pageSize);
 
     CustomRecipeResponse getCustomRecipeBySharedLink(String uuid);
 
@@ -38,7 +38,6 @@ public interface RecipeQueryUseCase {
     record RecipeFromIngredientsRequest(
         String originalRecipeId,
         List<String> dislikeIngredients,
-        List<String> basicSeasoning,
         List<String> mustUseIngredients
     ) {
 

@@ -13,6 +13,7 @@ import java.time.LocalDate;
 @Entity
 @Getter
 @NoArgsConstructor
+@Table(indexes = @Index(name="idx_food_name", columnList = "food_name"))
 public class Food {
 
     @Id

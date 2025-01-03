@@ -10,6 +10,8 @@ public record UserInfoResponse(
     String username,
     @JsonProperty("cooking_level")
     String cookingLevel,
+    @JsonProperty("age")
+    int age,
     @JsonProperty("spicy_level")
     String spicyLevel,
     @JsonProperty("allergy")

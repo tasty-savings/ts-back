@@ -36,14 +36,21 @@ public class UserInfoController {
     private final UserinfoQueryUseCase userinfoQueryUseCase;
     private final UserInfoSettingUseCase userInfoSettingUseCase;
 
+
     @GetMapping
     public ResponseEntity<UserInfoResponse> getUserinfo(
         @AuthenticationPrincipal PrincipalDetails principalDetails) {
 
-        // TODO: gender, activitylevel, height, weight -> null이면 null로 전송 2024. 12. 16. by kong
         UserInfoResponse response = userinfoQueryUseCase.getUserInfo(principalDetails.getUser());
 
         return ResponseEntity.ok(response);
+    }
+    @GetMapping("/me/preferences")
+    public ResponseEntity<?> getUserPreferInfo(@AuthenticationPrincipal PrincipalDetails principalDetails){
+        UserPreferTypeResponse userPreferInfo = userinfoQueryUseCase.getUserPreferInfo(
+            principalDetails.getUser());
+
+        return ResponseEntity.ok(userPreferInfo);
     }
 
     @DeleteMapping("/preferences")
