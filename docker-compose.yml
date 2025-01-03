@@ -1,0 +1,36 @@
+version: '3.8'
+# 프로젝트 인프라 세팅용 docker compose
+services:
+  mysql:
+    image: mysql # Replace with your database image
+    container_name: mysql-container
+    ports:
+      - "3306:3306" # Expose database port
+    volumes:
+      - mysql-data:/var/lib/mysql
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+
+  redis:
+    image: redis:latest
+    container_name: redis-container
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb-container
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=rootpassword
+    volumes:
+      - mongo-data:/data/db
+
+volumes:
+  mysql-data:
+  redis-data:
+  mongo-data:
+
