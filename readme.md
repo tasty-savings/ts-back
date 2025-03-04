@@ -38,5 +38,5 @@
     - List<T> 형태의 데이터 저장 시 타입 정보가 소거되는 문제가 발생
     - 기존 GenericJackson2JsonRedisSerializer 사용 시 직렬화된 데이터에 @class 메타데이터가 포함되나, 이후 클래스 수정시 버전 문제 발생
     - **해결 방법**: Custom Redis Serializer (RedisGsonSerializer)를 구현하여 Gson을 활용한 직렬화/역직렬화 처리
-
+    - https://github.com/tasty-savings/ts-back/wiki/Redis-Serialize-DeSerialize
 
